@@ -1,0 +1,93 @@
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) {
+  body {
+    nav {
+      .navbar-brand {
+        img {
+          height: 40px;
+          width: 40px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  body {
+    nav {
+      .navbar-brand {
+        img {
+          height: 40px;
+          width: 40px;
+        }
+      }
+    }
+  }
+}
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) {
+  body {
+    nav {
+      .navbar-brand {
+        img {
+          height: 100px;
+          width: 100px;
+        }
+      }
+    }
+  }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) {
+
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+
+}
+
+body {
+
+  nav {
+    &.navbar {
+      background-color: rgba(247, 247, 247, 0.75);
+    }
+    .navbar-collapse {
+      padding-bottom: 0.25rem;
+      .navbar-nav {
+        text-align: right;
+      }
+    }
+    z-index: 1;
+  }
+
+  .main-banner {
+    background: green url("../images/2017nedcmp_robot.JPG") no-repeat top center;
+    background-blend-mode: multiply;
+    background-size: cover;
+
+    width: 100%;
+
+    padding-top: 200px;
+    padding-bottom: 200px;
+
+    overflow: hidden;
+
+    margin-top: -125px;
+
+    * {
+      text-align: center;
+      color: white;
+    }
+
+  }
+
+  .main-content {
+    text-align: center;
+
+  }
+
+}

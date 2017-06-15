@@ -1,0 +1,36 @@
+@media (min-width: 576px) {
+  body nav .navbar-brand img {
+    height: 40px;
+    width: 40px; } }
+@media (max-width: 576px) {
+  body nav .navbar-brand img {
+    height: 40px;
+    width: 40px; } }
+@media (min-width: 768px) {
+  body nav .navbar-brand img {
+    height: 100px;
+    width: 100px; } }
+body nav {
+  z-index: 1; }
+  body nav.navbar {
+    background-color: rgba(247, 247, 247, 0.75); }
+  body nav .navbar-collapse {
+    padding-bottom: 0.25rem; }
+    body nav .navbar-collapse .navbar-nav {
+      text-align: right; }
+body .main-banner {
+  background: green url("../images/2017nedcmp_robot.JPG") no-repeat top center;
+  background-blend-mode: multiply;
+  background-size: cover;
+  width: 100%;
+  padding-top: 200px;
+  padding-bottom: 200px;
+  overflow: hidden;
+  margin-top: -125px; }
+  body .main-banner * {
+    text-align: center;
+    color: white; }
+body .main-content {
+  text-align: center; }
+
+/*# sourceMappingURL=main.css.map */
