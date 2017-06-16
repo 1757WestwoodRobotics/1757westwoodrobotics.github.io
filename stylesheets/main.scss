@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Roboto:300,400,700');
+
 // Small devices (landscape phones, 576px and up)
 @media (min-width: 576px) {
   body {
@@ -50,13 +52,17 @@
 }
 
 body {
+  font-family: "Roboto", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
 
   nav {
     &.navbar {
       background-color: rgba(247, 247, 247, 0.75);
     }
     .navbar-collapse {
-      padding-bottom: 0.25rem;
+
+      font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
       .navbar-nav {
         text-align: right;
       }
@@ -64,10 +70,23 @@ body {
     z-index: 1;
   }
 
-  .main-banner {
-    background: green url("../images/2017nedcmp_robot.JPG") no-repeat top center;
+  .full-banner {
+
+    &#home-main-banner {
+      background-image: url("../images/2017nedcmp_robot.JPG");
+      background-color: #015723;
+      margin-top: -125px;
+    }
+
+    &#home-news-banner {
+      background-image: url("../images/2017nedcmp_robot.JPG");
+      filter: grayscale(1);
+    }
+
+    background-repeat: no-repeat;
     background-blend-mode: multiply;
     background-size: cover;
+    background-position: top center;
 
     width: 100%;
 
@@ -76,18 +95,20 @@ body {
 
     overflow: hidden;
 
-    margin-top: -125px;
-
     * {
       text-align: center;
       color: white;
     }
 
+    .full-banner-text {
+      h5 {
+        font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        font-weight: 300;
+      }
+    }
+
+    a {
+      background-color: #00840d;
+    }
   }
-
-  .main-content {
-    text-align: center;
-
-  }
-
 }
