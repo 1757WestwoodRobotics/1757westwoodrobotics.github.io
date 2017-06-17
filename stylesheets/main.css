@@ -46,5 +46,8 @@ body {
       font-weight: 300; }
     body .full-banner a {
       background-color: #00840d; }
+  body .main-content {
+    padding-top: 50px;
+    padding-bottom: 50px; }
 
 /*# sourceMappingURL=main.css.map */
