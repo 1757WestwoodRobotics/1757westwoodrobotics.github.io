@@ -28,16 +28,22 @@ body {
     background-size: cover;
     background-position: top center;
     width: 100%;
-    padding-top: 200px;
-    padding-bottom: 200px;
     overflow: hidden; }
     body .full-banner#home-main-banner {
       background-image: url("../images/2017nedcmp_robot.JPG");
       background-color: #015723;
-      margin-top: -125px; }
+      margin-top: -125px;
+      padding-top: 200px;
+      padding-bottom: 200px; }
     body .full-banner#home-news-banner {
       background-image: url("../images/2017nedcmp_robot.JPG");
-      filter: grayscale(1); }
+      filter: grayscale(1);
+      padding-top: 50px;
+      padding-bottom: 200px; }
+    body .full-banner#home-robot-gallery {
+      background-color: #4b5257;
+      padding-top: 50px;
+      padding-bottom: 200px; }
     body .full-banner * {
       text-align: center;
       color: white; }
@@ -49,5 +55,34 @@ body {
   body .main-content {
     padding-top: 50px;
     padding-bottom: 50px; }
+  body #home-sponsors #home-platinum-sponsors > div {
+    display: inline-block;
+    height: 200px;
+    width: 200px; }
+  body #home-sponsors #home-gold-sponsors > div {
+    display: inline-block;
+    height: 150px;
+    width: 150px; }
+  body #home-sponsors #home-silver-sponsors > div {
+    display: inline-block;
+    height: 100px;
+    width: 100px; }
+  body #home-sponsors #home-bronze-sponsors > div {
+    display: inline-block;
+    height: 50px;
+    width: 50px; }
+    body #home-sponsors #home-bronze-sponsors > div p {
+      font-size: small; }
+  body #home-robot-gallery a {
+    display: inline-block; }
+  body #home-robot-gallery .card {
+    width: 20rem; }
+    body #home-robot-gallery .card .card-block * {
+      color: black; }
+  body .footer {
+    background-color: #00840d;
+    margin-bottom: -20px; }
+    body .footer .footer-container * {
+      color: white; }
 
 /*# sourceMappingURL=main.css.map */

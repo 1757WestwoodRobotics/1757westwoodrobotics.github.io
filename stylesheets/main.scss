@@ -76,11 +76,21 @@ body {
       background-image: url("../images/2017nedcmp_robot.JPG");
       background-color: #015723;
       margin-top: -125px;
+      padding-top: 200px;
+      padding-bottom: 200px;
     }
 
     &#home-news-banner {
       background-image: url("../images/2017nedcmp_robot.JPG");
       filter: grayscale(1);
+      padding-top: 50px;
+      padding-bottom: 200px;
+    }
+
+    &#home-robot-gallery {
+      background-color: #4b5257;
+      padding-top: 50px;
+      padding-bottom: 200px;
     }
 
     background-repeat: no-repeat;
@@ -89,9 +99,6 @@ body {
     background-position: top center;
 
     width: 100%;
-
-    padding-top: 200px;
-    padding-bottom: 200px;
 
     overflow: hidden;
 
@@ -115,6 +122,60 @@ body {
   .main-content {
     padding-top: 50px;
     padding-bottom: 50px;
+  }
+
+  #home-sponsors {
+    #home-platinum-sponsors > div {
+      display: inline-block;
+      height: 200px;
+      width: 200px;
+    }
+    #home-gold-sponsors > div {
+      display: inline-block;
+      height: 150px;
+      width: 150px;
+    }
+    #home-silver-sponsors > div {
+      display: inline-block;
+      height: 100px;
+      width: 100px;
+    }
+    #home-bronze-sponsors > div {
+      display: inline-block;
+      height: 50px;
+      width: 50px;
+      p {
+        font-size: small;
+      }
+    }
+  }
+
+  #home-robot-gallery {
+    a {
+      display: inline-block;
+    }
+    .card {
+      width: 20rem;
+      .card-block {
+        * {
+          color: black;
+        }
+      }
+      //:hover {
+      //
+      //}
+    }
+  }
+
+  .footer {
+    background-color: #00840d;
+    margin-bottom: -20px;
+
+    .footer-container {
+      * {
+        color: white;
+      }
+    }
   }
 
 }
