@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <!-- HEADER -->
+    <!-- NAVIGATION -->
     <nav class="navbar navbar-toggleable-sm navbar-light bg-faded">
 
         <button class="navbar-toggler navbar-toggler-right mt-1" type="button" data-toggle="collapse" data-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,19 +36,19 @@
                         ABOUT
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarAboutMenu">
-                        <a class="dropdown-item" href="#">Team</a>
-                        <a class="dropdown-item" href="#">History</a>
-                        <a class="dropdown-item" href="#">3</a>
+                        <a class="dropdown-item" href="about/team/">Team</a>
+                        <a class="dropdown-item" href="about/history/">History</a>
+                        <a class="dropdown-item" href="about/first-robotics-competition/">FIRST Robotics Competition</a>
                     </div>
                 </div>
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarFIRSTMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarRobotsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         ROBOTS
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarFIRSTMenu">
-                        <a class="dropdown-item" href="#"></a>
-                        <a class="dropdown-item" href="#"></a>
-                        <a class="dropdown-item" href="#"></a>
+                    <div class="dropdown-menu" aria-labelledby="navbarRobotsMenu">
+                        <a class="dropdown-item" href="#">1</a>
+                        <a class="dropdown-item" href="#">2</a>
+                        <a class="dropdown-item" href="#">3</a>
                     </div>
                 </div>
                 <div class="nav-item dropdown">
@@ -67,9 +67,9 @@
                         MEDIA
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarMediaMenu">
-                        <a class="dropdown-item" href="#">News</a>
-                        <a class="dropdown-item" href="#">Social Media</a>
-                        <a class="dropdown-item" href="#">Photos and Videos</a>
+                        <a class="dropdown-item" href="media/news/">News</a>
+                        <a class="dropdown-item" href="media/social-media">Social Media</a>
+                        <a class="dropdown-item" href="media/photos-videos">Photos and Videos</a>
                     </div>
                 </div>
                 <div class="nav-item dropdown">
@@ -86,6 +86,7 @@
         </div>
     </nav>
 
+    <!-- MAIN BANNER -->
     <div class="full-banner" id="home-main-banner">
         <div class="container full-banner-text">
             <h1>Welcome to Westwood Robotics!</h1>
@@ -97,17 +98,44 @@
         <a href="#" class="btn" role="button">Learn More</a>
     </div>
 
+    <!-- NEWS -->
     <div class="container main-content">
         <h2>NEWS</h2>
     </div>
 
-    <div class="full-banner" id="home-news-banner">
+    <!-- UPCOMING EVENTS -->
+    <div class="full-banner" id="home-events-banner">
         <h2>UPCOMING EVENTS</h2>
     </div>
 
+    <!-- ROBOT GALLERY -->
+    <div class="container main-content" id="home-robot-gallery">
+        <!-- Scrollable Carousel? -->
+        <h2>ROBOT GALLERY</h2>
+        <template id="robot-gallery-template" hidden>
+            {{#.}}
+            <a href="{{link}}">
+                <div class="card">
+                    <img class="card-img-top img-fluid" src="{{image}}" alt="{{year}} {{robotName}}{{competition}}">
+                    <div class="card-block">
+                        <h6 class="card-title">{{year}} {{robotName}}{{competition}}</h6>
+                    </div>
+                </div>
+            </a>
+            {{/.}}
+        </template>
+        <div id="robot-gallery">
+        </div>
+    </div>
+
+    <!-- MEDIA -->
+    <div class="full-banner" id="home-media-banner">
+        <h2>MEDIA</h2>
+    </div>
+
+    <!-- SPONSORS -->
     <div class="container main-content" id="home-sponsors">
         <h2>SPONSORS</h2>
-        <h4>Platinum</h4>
         <div class="container-fluid" id="home-platinum-sponsors">
             <div class="home-sponsor-logo">
                 <a href="#"><img src="favicon.ico" class="img-fluid"></a>
@@ -183,30 +211,7 @@
         <h5>Interested in sponsoring us?</h5>
     </div>
 
-    <div class="full-banner" id="home-robot-gallery">
-        <h2>ROBOT GALLERY</h2>
-        <div class="container">
-            <a href="#">
-                <div class="card">
-                    <img class="card-img-top img-fluid" src="favicon.ico" alt="">
-                    <div class="card-block">
-                        <h4 class="card-title">2017 STEAMWORKS</h4>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    </div>
-                </div>
-            </a>
-            <a href="#">
-                <div class="card">
-                    <img class="card-img-top img-fluid" src="favicon.ico" alt="">
-                    <div class="card-block">
-                        <h4 class="card-title">2017 STEAMWORKS</h4>
-                        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-    </div>
-
+    <!-- CONTACT -->
     <div class="container main-content">
         <h2>ACTION/CONTACT</h2>
     </div>
@@ -235,9 +240,20 @@
     </div>
 
     <!-- JAVASCRIPT -->
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="scripts/bootstrap.min.js"></script>
+    <script src="node_modules/mustache/mustache.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $.getJSON('robots/robot-list.json', function(data) {
+                var template = $("#robot-gallery-template").html();
+                Mustache.parse(template);
+                $('#robot-gallery').html(Mustache.render(template, data));
+            });
+        })
+    </script>
 
     <!-- GOOGLE ANALYTICS -->
     <!-- <script>

@@ -35,12 +35,12 @@ body {
       margin-top: -125px;
       padding-top: 200px;
       padding-bottom: 200px; }
-    body .full-banner#home-news-banner {
+    body .full-banner#home-events-banner {
       background-image: url("../images/2017nedcmp_robot.JPG");
       filter: grayscale(1);
       padding-top: 50px;
       padding-bottom: 200px; }
-    body .full-banner#home-robot-gallery {
+    body .full-banner#home-media-banner {
       background-color: #4b5257;
       padding-top: 50px;
       padding-bottom: 200px; }
@@ -76,7 +76,7 @@ body {
   body #home-robot-gallery a {
     display: inline-block; }
   body #home-robot-gallery .card {
-    width: 20rem; }
+    width: 15rem; }
     body #home-robot-gallery .card .card-block * {
       color: black; }
   body .footer {

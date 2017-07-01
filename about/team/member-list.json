@@ -1,0 +1,16 @@
+{
+  "mentors": [
+    {
+      "name": "Mentor",
+      "year": "",
+      "role": ""
+    }
+  ],
+  "students": [
+    {
+      "name": "Larry Tseng",
+      "year": "2015",
+      "role": "Captain, Lead Programmer"
+    }
+  ]
+}

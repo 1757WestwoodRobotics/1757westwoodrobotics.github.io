@@ -80,14 +80,14 @@ body {
       padding-bottom: 200px;
     }
 
-    &#home-news-banner {
+    &#home-events-banner {
       background-image: url("../images/2017nedcmp_robot.JPG");
       filter: grayscale(1);
       padding-top: 50px;
       padding-bottom: 200px;
     }
 
-    &#home-robot-gallery {
+    &#home-media-banner {
       background-color: #4b5257;
       padding-top: 50px;
       padding-bottom: 200px;
@@ -155,7 +155,7 @@ body {
       display: inline-block;
     }
     .card {
-      width: 20rem;
+      width: 15rem;
       .card-block {
         * {
           color: black;
