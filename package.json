@@ -7,7 +7,8 @@
     "csslint": "^1.0.5",
     "date-now": "^1.0.1",
     "jshint": "^2.9.5",
-    "mustache": "^2.3.0"
+    "mustache": "^2.3.0",
+    "npm": "^5.2.0"
   },
   "devDependencies": {},
   "scripts": {
