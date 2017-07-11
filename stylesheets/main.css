@@ -44,6 +44,12 @@ body {
       background-color: #4b5257;
       padding-top: 50px;
       padding-bottom: 200px; }
+    body .full-banner#social-media-main-banner {
+      background-image: url("../images/2017nedcmp_robot.JPG");
+      background-color: #015723;
+      margin-top: -125px;
+      padding-top: 200px;
+      padding-bottom: 200px; }
     body .full-banner * {
       text-align: center;
       color: white; }
