@@ -91,4 +91,9 @@ body {
     body .footer .footer-container * {
       color: white; }
 
+  .contact_button {
+    height: 2em;
+    width: 2em;
+    padding: 0;
+}
 /*# sourceMappingURL=main.css.map */
