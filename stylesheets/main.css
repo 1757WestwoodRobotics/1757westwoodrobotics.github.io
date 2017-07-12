@@ -90,5 +90,9 @@ body {
     margin-bottom: -20px; }
     body .footer .footer-container * {
       color: white; }
+    body .footer .footer-container .footer-contact-button {
+      height: 2em;
+      width: 2em;
+      padding: 0; }
 
 /*# sourceMappingURL=main.css.map */
