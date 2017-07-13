@@ -93,7 +93,7 @@
             <h1>Welcome to Westwood Robotics!</h1>
             <h5>FIRST Robotics Competition – Team 1757: Wolverines</h5>
             <br>
-            <p>Started in 2006, Westwood Robotics is Westwood High School's Robotics Team...</p>
+            <p id="home-mission-statement">Started in 2006, Westwood Robotics is Westwood High School's Robotics Team...</p>
             <br>
         </div>
         <a href="#" class="btn" role="button">Learn More</a>
@@ -104,20 +104,16 @@
         <h2>NEWS</h2>
     </div>
 
-    <!-- UPCOMING EVENTS -->
-    <div class="full-banner" id="home-events-banner">
-        <h2>UPCOMING EVENTS</h2>
-    </div>
-
     <!-- ROBOT GALLERY -->
     <div class="container main-content" id="home-robot-gallery">
         <!-- Scrollable Carousel? -->
         <h2>ROBOT GALLERY</h2>
+        <br>
         <template id="robot-gallery-template" hidden>
             {{#.}}
             <a href="{{link}}">
                 <div class="card">
-                    <img class="card-img-top img-fluid" src="{{image}}" alt="{{year}} {{robotName}}{{competition}}">
+                    <img class="card-img-top img-fluid" src="images/robots/{{image}}" alt="{{year}} {{robotName}}{{competition}}">
                     <div class="card-block">
                         <h6 class="card-title">{{year}} {{robotName}}{{competition}}</h6>
                     </div>
@@ -127,11 +123,6 @@
         </template>
         <div id="robot-gallery">
         </div>
-    </div>
-
-    <!-- MEDIA -->
-    <div class="full-banner" id="home-media-banner">
-        <h2>MEDIA</h2>
     </div>
 
     <!-- SPONSORS -->
@@ -247,7 +238,7 @@
                         <i class="fa fa-facebook fa-lg" aria-hidden="true" style="padding-top: 0.40em;"></i>
                     </a>
                     
-                    <a href="#" role="button" class="btn btn-outline-secondary rounded-circle disabled footer-contact-button" target="_blank">
+                    <a href="https://www.instagram.com/wwrobotics1757" role="button" class="btn btn-outline-secondary rounded-circle footer-contact-button" target="_blank">
                         <i class="fa fa-instagram fa-lg" aria-hidden="true" style="padding-top: 0.40em;"></i>
                     </a>
                 </div>
