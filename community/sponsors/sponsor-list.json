@@ -1,30 +1,59 @@
 {
   "platinum": [
     {
+      "name": "Westwood High School",
+      "bio": "",
+      "link": "",
+      "image": "whs.jpg"
+    },
+    {
       "name": "Google",
       "bio": "",
-      "image": ""
+      "link": "",
+      "image": "google.jpg"
     }
   ],
   "gold": [
     {
-      "name": "Google",
+      "name": "Medtronic",
       "bio": "",
-      "image": ""
-    }
+      "link": "",
+      "image": "medtronic.jpg"
+    },
+    {
+      "name": "US STEAM Academy",
+      "bio": "",
+      "link": "",
+      "image": "ussteam.jpg"
+    },
+    {
+      "name": "Engineered Solutions, Inc.",
+      "bio": "",
+      "link": "",
+      "image": "engineeredsolutions.jpg"
+    },
+    {
+      "name": "Energid",
+      "bio": "",
+      "link": "",
+      "image": "energid.jpg"
+    },
   ],
   "silver": [
     {
-      "name": "Google",
+      "name": "Onshape",
       "bio": "",
-      "image": ""
+      "link": "",
+      "image": "onshape.jpg"
+    },
+    {
+      "name": "Github",
+      "bio": "",
+      "link": "",
+      "image": "github.jpg"
     }
   ],
   "bronze": [
-    {
-      "name": "Google",
-      "bio": "",
-      "image": ""
-    }
+
   ]
 }
