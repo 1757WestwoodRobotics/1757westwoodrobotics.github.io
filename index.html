@@ -256,9 +256,14 @@
     <script src="scripts/mustache.min.js"></script>
     
     <script>
-    /* global $ */
+        /* global $ */
         $(document).ready(function() {
             $.getJSON('robots/robot-list.json', function(data) {
+                var template = $("#robot-gallery-template").html();
+                Mustache.parse(template);
+                $('#robot-gallery').html(Mustache.render(template, data));
+            });
+            $.getJSON('community/sponsors/sponsor-list.json', function(data) {
                 var template = $("#robot-gallery-template").html();
                 Mustache.parse(template);
                 $('#robot-gallery').html(Mustache.render(template, data));
