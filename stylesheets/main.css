@@ -89,5 +89,11 @@ body {
       height: 2em;
       width: 2em;
       padding: 0; }
+    body .footer #footer-copyright {
+      margin-left: -1em;
+      margin-right: -0.9em;
+      padding-top: 1em;
+      padding-bottom: 0.01em;
+      background-color: #00750b; }
 
 /*# sourceMappingURL=main.css.map */
