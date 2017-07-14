@@ -3,13 +3,13 @@
     {
       "name": "Westwood High School",
       "bio": "",
-      "link": "",
+      "link": "http://www.westwood.k12.ma.us/westwood-high-school/",
       "image": "whs.jpg"
     },
     {
       "name": "Google",
       "bio": "",
-      "link": "",
+      "link": "https://google.com",
       "image": "google.jpg"
     }
   ],
@@ -17,25 +17,25 @@
     {
       "name": "Medtronic",
       "bio": "",
-      "link": "",
+      "link": "http://www.medtronic.com/us-en/index.html",
       "image": "medtronic.jpg"
     },
     {
       "name": "US STEAM Academy",
       "bio": "",
-      "link": "",
+      "link": "https://ussteam.org",
       "image": "ussteam.jpg"
     },
     {
       "name": "Engineered Solutions, Inc.",
       "bio": "",
-      "link": "",
+      "link": "http://www.engsolutions.com/",
       "image": "engineeredsolutions.jpg"
     },
     {
       "name": "Energid",
       "bio": "",
-      "link": "",
+      "link": "http://www.energid.com/",
       "image": "energid.jpg"
     }
   ],
@@ -43,13 +43,13 @@
     {
       "name": "Onshape",
       "bio": "",
-      "link": "",
+      "link": "https://www.onshape.com/",
       "image": "onshape.jpg"
     },
     {
       "name": "Github",
       "bio": "",
-      "link": "",
+      "link": "https://github.com",
       "image": "github.jpg"
     }
   ],

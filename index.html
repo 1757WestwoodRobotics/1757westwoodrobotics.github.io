@@ -127,79 +127,48 @@
 
     <!-- SPONSORS -->
     <div class="container main-content" id="home-sponsors">
+
         <h2>SPONSORS</h2>
-        <div class="container-fluid" id="home-platinum-sponsors">
-            <div class="home-sponsor-logo">
-                <a href="https://google.com"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2000px-Google_2015_logo.svg.png" class="img-fluid"></a>
-                <p>Google</p>
+        <br>
+        <template id="sponsors-template" hidden>
+            <div>
+                {{#platinum}}
+                <div class="home-platinum-sponsor">
+                    <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
+                    <p>{{name}}</p>
+                </div>
+                {{/platinum}}
             </div>
-            <div class="home-sponsor-logo">
-                <a href="http://www.westwood.k12.ma.us/westwood-high-school/"><img src="#" class="img-fluid"></a>
-                <p>Westwood High School</p>
+            <div>
+                {{#gold}}
+                <div class="home-gold-sponsor">
+                    <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
+                    <p>{{name}}</p>
+                </div>
+                {{/gold}}
             </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+            <div>
+                {{#silver}}
+                <div class="home-silver-sponsor">
+                    <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
+                    <p>{{name}}</p>
+                </div>
+                {{/silver}}
             </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+            <div>
+                {{#bronze}}
+                <div class="home-bronze-sponsor">
+                    <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
+                    <p>{{name}}</p>
+                </div>
+                {{/bronze}}
             </div>
+        </template>
+
+        <div id="sponsors-container">
+
         </div>
-        <div class="container-fluid" id="home-gold-sponsors">
-            <div class="home-sponsor-logo">
-                <a href="https://github.com"><img src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png" class="img-fluid"></a>
-                <p>Github</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="http://www.medtronic.com/us-en/index.html"><img src="#" class="img-fluid"></a>
-                <p>Medtronic</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="http://www.energid.com/"><img src="#" class="img-fluid"></a>
-                <p>Energid</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="https://www.onshape.com/"><img src="#" class="img-fluid"></a>
-                <p>Onshape</p>
-            </div>
-        </div>
-        <div class="container-fluid" id="home-silver-sponsors">
-            <div class="home-sponsor-logo">
-                <a href="http://www.engsolutions.com/"><img src="#" class="img-fluid"></a>
-                <p>Engineered Solutions Inc.</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-        </div>
-        <div class="container-fluid" id="home-bronze-sponsors">
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-            <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
-            </div>
-        </div>
+
     </div>
 
     <!-- FOOTER  -->
@@ -256,12 +225,18 @@
     <script src="scripts/mustache.min.js"></script>
     
     <script>
-    /* global $ */
+        /* global $ */
         $(document).ready(function() {
             $.getJSON('robots/robot-list.json', function(data) {
                 var template = $("#robot-gallery-template").html();
                 Mustache.parse(template);
                 $('#robot-gallery').html(Mustache.render(template, data));
+            });
+            $.getJSON('community/sponsors/sponsor-list.json', function(data) {
+                console.log(data);
+                var template = $("#sponsors-template").html();
+                Mustache.parse(template);
+                $('#sponsors-container').html(Mustache.render(template, data));
             });
         })
     </script>

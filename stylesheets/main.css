@@ -30,7 +30,7 @@ body {
     width: 100%;
     overflow: hidden; }
     body .full-banner#home-main-banner {
-      background-image: url("../images/2017nedcmp_robot.JPG");
+      background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
@@ -40,7 +40,7 @@ body {
       padding-top: 50px;
       padding-bottom: 200px; }
     body .full-banner#social-media-main-banner {
-      background-image: url("../images/2017nedcmp_robot.JPG");
+      background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
@@ -56,23 +56,23 @@ body {
   body .main-content {
     padding-top: 50px;
     padding-bottom: 50px; }
-  body #home-sponsors #home-platinum-sponsors > div {
+  body #home-sponsors .home-platinum-sponsor {
     display: inline-block;
     height: 200px;
     width: 200px; }
-  body #home-sponsors #home-gold-sponsors > div {
+  body #home-sponsors .home-gold-sponsor {
     display: inline-block;
     height: 150px;
     width: 150px; }
-  body #home-sponsors #home-silver-sponsors > div {
+  body #home-sponsors .home-silver-sponsor {
     display: inline-block;
     height: 100px;
     width: 100px; }
-  body #home-sponsors #home-bronze-sponsors > div {
+  body #home-sponsors .home-bronze-sponsor {
     display: inline-block;
     height: 50px;
     width: 50px; }
-    body #home-sponsors #home-bronze-sponsors > div p {
+    body #home-sponsors .home-bronze-sponsor p {
       font-size: small; }
   body #home-robot-gallery a {
     display: inline-block; }
