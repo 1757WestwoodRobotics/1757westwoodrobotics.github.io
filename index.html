@@ -130,12 +130,12 @@
         <h2>SPONSORS</h2>
         <div class="container-fluid" id="home-platinum-sponsors">
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="https://google.com"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/2000px-Google_2015_logo.svg.png" class="img-fluid"></a>
+                <p>Google</p>
             </div>
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="http://www.westwood.k12.ma.us/westwood-high-school/"><img src="http://miaa.net/gen/school_photos/1461_logo55515f0c57a4e.jpg" class="img-fluid"></a>
+                <p>Westwood High School</p>
             </div>
             <div class="home-sponsor-logo">
                 <a href="#"><img src="favicon.ico" class="img-fluid"></a>
@@ -148,26 +148,26 @@
         </div>
         <div class="container-fluid" id="home-gold-sponsors">
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="https://github.com"><img src="https://assets-cdn.github.com/images/modules/logos_page/GitHub-Mark.png" class="img-fluid"></a>
+                <p>Github</p>
             </div>
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="http://www.medtronic.com/us-en/index.html"><img src="http://wwwp.medtronic.com/newsroom/content/1310492654405.low_resolution.jpg" class="img-fluid"></a>
+                <p>Medtronic</p>
             </div>
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="http://www.energid.com/"><img src="http://www.energid.com/assets/energid-logo-retina.png" class="img-fluid"></a>
+                <p>Energid</p>
             </div>
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="https://www.onshape.com/"><img src="http://cdn2.hubspot.net/hubfs/379003/branding/onshape-logo-blue.svg" class="img-fluid"></a>
+                <p>Onshape</p>
             </div>
         </div>
         <div class="container-fluid" id="home-silver-sponsors">
             <div class="home-sponsor-logo">
-                <a href="#"><img src="favicon.ico" class="img-fluid"></a>
-                <p>Caption</p>
+                <a href="http://www.engsolutions.com/"><img src="http://www.engsolutions.com/files/images/global/ESI-log-01.svg" class="img-fluid"></a>
+                <p>Engineered Solutions Inc.</p>
             </div>
             <div class="home-sponsor-logo">
                 <a href="#"><img src="favicon.ico" class="img-fluid"></a>
@@ -261,6 +261,7 @@
     <script src="scripts/mustache.min.js"></script>
     
     <script>
+    /* global $ */
         $(document).ready(function() {
             $.getJSON('robots/robot-list.json', function(data) {
                 var template = $("#robot-gallery-template").html();
