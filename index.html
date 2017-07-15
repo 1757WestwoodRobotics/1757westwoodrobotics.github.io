@@ -73,16 +73,6 @@
                         <a class="dropdown-item" href="media/photos-videos">Photos and Videos</a>
                     </div>
                 </div>
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarMoreMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        MORE
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarMoreMenu">
-                        <a class="dropdown-item" href="#">1</a>
-                        <a class="dropdown-item" href="#">2</a>
-                        <a class="dropdown-item" href="#">3</a>
-                    </div>
-                </div>
             </div>
         </div>
     </nav>
@@ -233,12 +223,11 @@
                 $('#robot-gallery').html(Mustache.render(template, data));
             });
             $.getJSON('community/sponsors/sponsor-list.json', function(data) {
-                console.log(data);
                 var template = $("#sponsors-template").html();
                 Mustache.parse(template);
                 $('#sponsors-container').html(Mustache.render(template, data));
             });
-        })
+        });
     </script>
 
     <!-- GOOGLE ANALYTICS -->
