@@ -34,7 +34,8 @@ body {
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
-      padding-bottom: 200px; }
+      padding-bottom: 200px;
+      background-attachment: fixed; }
     body .full-banner#home-media-banner {
       background-color: #4b5257;
       padding-top: 50px;

@@ -11,6 +11,7 @@
 
     <link href="stylesheets/bootstrap/bootstrap.min.css" rel="stylesheet">
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" integrity="sha256-j+P6EZJVrbXgwSR5Mx+eCS6FvP9Wq27MBRC/ogVriY0=" crossorigin="anonymous">
     <link href="stylesheets/main.css" rel="stylesheet">
     <link href="favicon.ico" type="image/x-icon" rel="icon">
 
@@ -102,7 +103,7 @@
         <template id="robot-gallery-template" hidden>
             {{#.}}
             <a href="{{link}}">
-                <div class="card">
+                <div class="card animated slideInUp">
                     <img class="card-img-top img-fluid" src="images/robots/{{image}}" alt="{{year}} {{robotName}}{{competition}}">
                     <div class="card-block">
                         <h6 class="card-title">{{year}} {{robotName}}{{competition}}</h6>
@@ -125,7 +126,6 @@
                 {{#platinum}}
                 <div class="home-platinum-sponsor">
                     <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                    <p>{{name}}</p>
                 </div>
                 {{/platinum}}
             </div>
@@ -133,7 +133,6 @@
                 {{#gold}}
                 <div class="home-gold-sponsor">
                     <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                    <p>{{name}}</p>
                 </div>
                 {{/gold}}
             </div>
@@ -141,7 +140,6 @@
                 {{#silver}}
                 <div class="home-silver-sponsor">
                     <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                    <p>{{name}}</p>
                 </div>
                 {{/silver}}
             </div>
@@ -149,7 +147,6 @@
                 {{#bronze}}
                 <div class="home-bronze-sponsor">
                     <a href="{{link}}" target="_blank"><img src="images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                    <p>{{name}}</p>
                 </div>
                 {{/bronze}}
             </div>
@@ -213,11 +210,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
     <script src="scripts/bootstrap.min.js"></script>
     <script src="scripts/mustache.min.js"></script>
-    
+
     <script>
-        /* global $ */
         $(document).ready(function() {
             $.getJSON('robots/robot-list.json', function(data) {
+                data = data.slice(0, 4);    // Cuts the number of robots displayed to 3
                 var template = $("#robot-gallery-template").html();
                 Mustache.parse(template);
                 $('#robot-gallery').html(Mustache.render(template, data));
