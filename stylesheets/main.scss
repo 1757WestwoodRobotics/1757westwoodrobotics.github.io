@@ -24,6 +24,11 @@
         }
       }
     }
+    .full-banner {
+      &#home-main-banner {
+        background-attachment: scroll;
+      }
+    }
   }
 }
 
@@ -36,6 +41,11 @@
           height: 100px;
           width: 100px;
         }
+      }
+    }
+    .full-banner {
+      &#home-main-banner {
+        background-attachment: fixed;
       }
     }
   }
@@ -78,8 +88,6 @@ body {
       margin-top: -125px;
       padding-top: 200px;
       padding-bottom: 200px;
-
-      background-attachment: fixed;
     }
 
     &#home-media-banner {

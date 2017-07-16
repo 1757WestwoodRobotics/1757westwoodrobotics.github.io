@@ -6,11 +6,15 @@
 @media (max-width: 576px) {
   body nav .navbar-brand img {
     height: 40px;
-    width: 40px; } }
+    width: 40px; }
+  body .full-banner#home-main-banner {
+    background-attachment: scroll; } }
 @media (min-width: 768px) {
   body nav .navbar-brand img {
     height: 100px;
-    width: 100px; } }
+    width: 100px; }
+  body .full-banner#home-main-banner {
+    background-attachment: fixed; } }
 body {
   font-family: "Roboto", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center; }
@@ -34,8 +38,7 @@ body {
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
-      padding-bottom: 200px;
-      background-attachment: fixed; }
+      padding-bottom: 200px; }
     body .full-banner#home-media-banner {
       background-color: #4b5257;
       padding-top: 50px;
