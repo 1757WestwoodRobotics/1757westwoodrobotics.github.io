@@ -53,7 +53,12 @@
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
-
+  .full-banner {
+    .full-banner-text {
+      padding-left: 15%;
+      padding-right: 15%;
+    }
+  }
 }
 
 // Extra large devices (large desktops, 1200px and up)
@@ -87,7 +92,7 @@ body {
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
-      padding-bottom: 200px;
+      padding-bottom: 7em;
     }
 
     &#home-media-banner {
@@ -138,43 +143,57 @@ body {
   #home-sponsors {
     .home-platinum-sponsor {
       display: inline-block;
-      height: 200px;
-      width: 200px;
+      margin-left: 20px;
+      margin-right: 20px;
+      img {
+        height: 180px;
+        width: 225px;
+        object-fit: contain;
+      }
     }
     .home-gold-sponsor {
       display: inline-block;
-      height: 150px;
-      width: 150px;
+      margin-left: 20px;
+      margin-right: 20px;
+      img {
+        height: 120px;
+        width: 180px;
+        object-fit: contain;
+      }
     }
     .home-silver-sponsor {
       display: inline-block;
-      height: 100px;
-      width: 100px;
+      margin-left: 20px;
+      margin-right: 20px;
+      img {
+        height: 80px;
+        width: 120px;
+        object-fit: contain;
+      }
     }
     .home-bronze-sponsor {
       display: inline-block;
-      height: 50px;
-      width: 50px;
-      p {
-        font-size: small;
+      margin-left: 20px;
+      margin-right: 20px;
+      img {
+        height: 40px;
+        width: 60px;
+        object-fit: contain;
       }
     }
   }
 
   #home-robot-gallery {
-    a {
-      display: inline-block;
-    }
+    overflow: hidden;
     .card {
       width: 15rem;
+      display: inline-block;
+      position: relative;
       .card-block {
         * {
           color: black;
         }
       }
-      //:hover {
-      //
-      //}
     }
   }
 

@@ -82,16 +82,16 @@
     <div class="full-banner" id="home-main-banner">
         <div class="container full-banner-text">
             <h1>Welcome to Westwood Robotics!</h1>
-            <h5>FIRST Robotics Competition – Team 1757: Wolverines</h5>
+            <h5>FIRST Robotics Competition - Team 1757: Wolverines</h5>
             <br>
-            <p id="home-mission-statement">Started in 2006, Westwood Robotics is Westwood High School's Robotics Team...</p>
+            <p id="home-mission-statement">We are a high-school robotics team with a mission to inspire young people to become leaders in science, technology, art, engineering, and mathematics by engaging them in mentor-based programs that build technical and life skills such as leadership, communication, and self-confidence.</p>
             <br>
         </div>
         <a href="#" class="btn" role="button">Learn More</a>
     </div>
 
     <!-- NEWS -->
-    <div class="container main-content">
+    <div class="container main-content" id="home-news">
         <h2>NEWS</h2>
     </div>
 
@@ -102,18 +102,28 @@
         <br>
         <template id="robot-gallery-template" hidden>
             {{#.}}
-            <a href="{{link}}">
-                <div class="card animated slideInUp">
+            <div class="robot card">
+                <a href="{{link}}">
                     <img class="card-img-top img-fluid" src="images/robots/{{image}}" alt="{{year}} {{robotName}}{{competition}}">
                     <div class="card-block">
                         <h6 class="card-title">{{year}} {{robotName}}{{competition}}</h6>
                     </div>
-                </div>
-            </a>
+                </a>
+            </div>
             {{/.}}
         </template>
         <div id="robot-gallery">
         </div>
+    </div>
+
+    <!-- WHS -->
+    <div class="container main-content" id="home-school">
+        WHS
+    </div>
+
+    <!-- FRC -->
+    <div class="container main-content" id="home-frc">
+        FRC
     </div>
 
     <!-- SPONSORS -->
@@ -155,6 +165,12 @@
         <div id="sponsors-container">
 
         </div>
+
+        <br>
+        <br>
+
+        <p>Interested in sponsoring us? Your donations are tax-deductible.</p>
+        <a href="community/sponsors/" class="btn btn-outline-primary" role="button">Learn More</a>
 
     </div>
 
@@ -211,21 +227,12 @@
     <script src="scripts/bootstrap.min.js"></script>
     <script src="scripts/mustache.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
-            $.getJSON('robots/robot-list.json', function(data) {
-                data = data.slice(0, 4);    // Cuts the number of robots displayed to 3
-                var template = $("#robot-gallery-template").html();
-                Mustache.parse(template);
-                $('#robot-gallery').html(Mustache.render(template, data));
-            });
-            $.getJSON('community/sponsors/sponsor-list.json', function(data) {
-                var template = $("#sponsors-template").html();
-                Mustache.parse(template);
-                $('#sponsors-container').html(Mustache.render(template, data));
-            });
-        });
-    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.20.2/TweenMax.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/animation.gsap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/debug.addIndicators.min.js"></script>
+
+    <script src="scripts/homepage.js"></script>
 
     <!-- GOOGLE ANALYTICS -->
     <!-- <script>

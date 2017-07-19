@@ -11,15 +11,17 @@
       "bio": "",
       "link": "https://google.com",
       "image": "google.jpg"
-    }
-  ],
-  "gold": [
+    },
     {
       "name": "Medtronic",
       "bio": "",
       "link": "http://www.medtronic.com/us-en/index.html",
       "image": "medtronic.jpg"
-    },
+    }
+  ],
+  "gold": [
+  ],
+  "silver": [
     {
       "name": "US STEAM Academy",
       "bio": "",
@@ -27,19 +29,11 @@
       "image": "ussteam.jpg"
     },
     {
-      "name": "Engineered Solutions, Inc.",
-      "bio": "",
-      "link": "http://www.engsolutions.com/",
-      "image": "engineeredsolutions.jpg"
-    },
-    {
       "name": "Energid",
       "bio": "",
       "link": "http://www.energid.com/",
       "image": "energid.jpg"
-    }
-  ],
-  "silver": [
+    },
     {
       "name": "Onshape",
       "bio": "",
@@ -51,9 +45,14 @@
       "bio": "",
       "link": "https://github.com",
       "image": "github.jpg"
+    },
+    {
+      "name": "Engineered Solutions, Inc.",
+      "bio": "",
+      "link": "http://www.engsolutions.com/",
+      "image": "engineeredsolutions.jpg"
     }
   ],
   "bronze": [
-
   ]
 }
