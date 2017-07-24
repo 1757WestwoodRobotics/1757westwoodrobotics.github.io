@@ -42,11 +42,12 @@ $(document).ready(function() {
 
         var robotGalleryTween = TweenMax.staggerFrom($('.robot'), 1.5, {opacity: 0, left: ($(window).width() - $('.robot').width()), ease: Power2.easeInOut}, 0.15);
         var robotGalleryScene = new ScrollMagic.Scene({
-            triggerElement: '#home-news',
+            triggerElement: '#home-robot-gallery',
+            triggerHook: 'onEnter',
             reverse: false
         })
-            .setTween(robotGalleryTween)
-            .addIndicators({name: "robot cards"});
+            .setTween(robotGalleryTween);
+            // .addIndicators({name: "robot cards"});
 
         controller.addScene(robotGalleryScene);
     }
