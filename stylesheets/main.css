@@ -2,21 +2,37 @@
 @media (min-width: 576px) {
   body nav .navbar-brand img {
     height: 40px;
-    width: 40px; } }
+    width: 40px; }
+  body #home-main-banner-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); } }
 @media (max-width: 576px) {
   body nav .navbar-brand img {
     height: 40px;
     width: 40px; }
-  body .full-banner#home-main-banner {
-    background-attachment: scroll; } }
+  body #home-main-banner-text {
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%); } }
 @media (min-width: 768px) {
   body nav .navbar-brand img {
     height: 100px;
     width: 100px; }
   body .full-banner#home-main-banner {
-    background-attachment: fixed; } }
+    margin-top: -125px; } }
+@media (max-width: 768px) {
+  .full-banner#home-main-banner {
+    margin-top: -64px; }
+
+  #news-gallery {
+    display: block !important; }
+    #news-gallery .card {
+      margin-left: 0;
+      margin-right: 0; } }
 @media (min-width: 992px) {
-  .full-banner .full-banner-text {
+  .full-banner-text, .container-text {
     padding-left: 15%;
     padding-right: 15%; } }
 body {
@@ -40,9 +56,13 @@ body {
     body .full-banner#home-main-banner {
       background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
-      margin-top: -125px;
       padding-top: 200px;
+      height: 101vh;
       padding-bottom: 7em; }
+      body .full-banner#home-main-banner #home-scroll-down {
+        background-color: transparent;
+        position: absolute;
+        top: 90vh; }
     body .full-banner#home-media-banner {
       background-color: #4b5257;
       padding-top: 50px;
@@ -59,11 +79,21 @@ body {
     body .full-banner .full-banner-text h5 {
       font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       font-weight: 300; }
-    body .full-banner a {
-      background-color: #00840d; }
   body .main-content {
-    padding-top: 50px;
+    padding-top: 75px;
     padding-bottom: 50px; }
+  body #home-news .card-deck {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; }
+    body #home-news .card-deck .card {
+      display: inline-block; }
+      body #home-news .card-deck .card .card-img-top {
+        height: 200px;
+        width: 100%;
+        object-fit: contain; }
+      body #home-news .card-deck .card .card-text {
+        text-align: left; }
   body #home-sponsors .home-platinum-sponsor {
     display: inline-block;
     margin-left: 20px;
@@ -99,9 +129,7 @@ body {
   body #home-robot-gallery {
     overflow: hidden; }
     body #home-robot-gallery .card {
-      width: 15rem;
-      display: inline-block;
-      position: relative; }
+      border: hidden; }
       body #home-robot-gallery .card .card-block * {
         color: black; }
   body .footer {

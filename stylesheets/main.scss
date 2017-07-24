@@ -11,6 +11,12 @@
         }
       }
     }
+    #home-main-banner-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
   }
 }
 
@@ -24,10 +30,10 @@
         }
       }
     }
-    .full-banner {
-      &#home-main-banner {
-        background-attachment: scroll;
-      }
+    #home-main-banner-text {
+      position: absolute;
+      top: 50%;
+      transform: translate(0, -50%);
     }
   }
 }
@@ -45,19 +51,32 @@
     }
     .full-banner {
       &#home-main-banner {
-        background-attachment: fixed;
+        margin-top: -125px;
       }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .full-banner {
+    &#home-main-banner {
+      margin-top: -64px;
+    }
+  }
+  #news-gallery {
+    display: block !important;
+    .card {
+      margin-left: 0;
+      margin-right: 0;
     }
   }
 }
 
 // Large devices (desktops, 992px and up)
 @media (min-width: 992px) {
-  .full-banner {
-    .full-banner-text {
-      padding-left: 15%;
-      padding-right: 15%;
-    }
+  .full-banner-text, .container-text {
+    padding-left: 15%;
+    padding-right: 15%;
   }
 }
 
@@ -75,9 +94,7 @@ body {
       background-color: rgba(247, 247, 247, 0.75);
     }
     .navbar-collapse {
-
       font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-
       .navbar-nav {
         text-align: right;
       }
@@ -90,9 +107,15 @@ body {
     &#home-main-banner {
       background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
-      margin-top: -125px;
       padding-top: 200px;
+      height: 101vh; // TEMP
       padding-bottom: 7em;
+
+      #home-scroll-down {
+        background-color: transparent;
+        position: absolute;
+        top: 90vh;
+      }
     }
 
     &#home-media-banner {
@@ -129,15 +152,30 @@ body {
         font-weight: 300;
       }
     }
-
-    a {
-      background-color: #00840d;
-    }
   }
 
   .main-content {
-    padding-top: 50px;
+    padding-top: 75px;
     padding-bottom: 50px;
+  }
+
+  #home-news {
+    .card-deck {
+      display: flex;
+      justify-content: center;
+      flex-wrap: nowrap;
+      .card {
+        display: inline-block;
+        .card-img-top {
+          height: 200px;
+          width: 100%;
+          object-fit: contain;
+        }
+        .card-text {
+          text-align: left;
+        }
+      }
+    }
   }
 
   #home-sponsors {
@@ -186,9 +224,7 @@ body {
   #home-robot-gallery {
     overflow: hidden;
     .card {
-      width: 15rem;
-      display: inline-block;
-      position: relative;
+      border: hidden;
       .card-block {
         * {
           color: black;
