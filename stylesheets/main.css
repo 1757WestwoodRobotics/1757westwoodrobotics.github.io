@@ -91,7 +91,7 @@ body {
       body #home-news .card-deck .card .card-img-top {
         height: 200px;
         width: 100%;
-        object-fit: contain; }
+        object-fit: cover; }
       body #home-news .card-deck .card .card-text {
         text-align: left; }
   body #home-sponsors .home-platinum-sponsor {
