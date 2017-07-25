@@ -95,28 +95,35 @@
         <div class="container container-text">
             <h2>ABOUT US</h2>
             <br>
-            <p id="home-mission-statement">Founded in 2006, we are a high-school robotics team with a mission to inspire young people to become leaders in science, technology, art, engineering, and mathematics by engaging them in mentor-based programs that build technical and life skills such as leadership, communication, and self-confidence.</p>
+            <p id="home-mission-statement">Founded in 2006, we are a high-school robotics team from Westwood, MA with a mission to inspire young people to become leaders in science, technology, art, engineering, and mathematics by engaging them in mentor-based programs that build important technical and life skills such as leadership, communication, and self-confidence.</p>
         </div>
+        <br>
+        <span class="fa-stack fa-lg">
+          <i class="fa fa-circle-thin fa-stack-2x"></i>
+          <i class="fa fa-info fa-stack-1x"></i>
+        </span>
     </div>
 
     <!-- NEWS -->
-    <div class="container main-content" id="home-news">
-        <h2>NEWS</h2>
-        <br>
-        <template id="news-template" hidden>
-            {{#.}}
-            <div class="card">
-                {{{media}}}
-                <div class="card-block">
-                    <a href="{{link}}" target="_blank">
-                        <h4 class="card-title">{{title}}</h4>
-                    </a>
-                    <p class="card-text">{{{content}}}</p>
+    <div class="full-banner" id="home-news-banner">
+        <div class="container main-content" id="home-news">
+            <h2>NEWS</h2>
+            <br>
+            <template id="news-template" hidden>
+                {{#.}}
+                <div class="card">
+                    {{{media}}}
+                    <div class="card-block">
+                        <a href="{{link}}" target="_blank">
+                            <h4 class="card-title">{{title}}</h4>
+                        </a>
+                        <p class="card-text">{{{content}}}</p>
+                    </div>
                 </div>
+                {{/.}}
+            </template>
+            <div class="card-deck" id="news-gallery">
             </div>
-            {{/.}}
-        </template>
-        <div class="card-deck" id="news-gallery">
         </div>
     </div>
 

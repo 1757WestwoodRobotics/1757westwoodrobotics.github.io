@@ -35,6 +35,13 @@
       top: 50%;
       transform: translate(0, -50%);
     }
+    #home-news {
+      .card-deck {
+        .card {
+          margin-bottom: 25px;
+        }
+      }
+    }
   }
 }
 
@@ -115,13 +122,13 @@ body {
         background-color: transparent;
         position: absolute;
         top: 90vh;
+        color: white;
       }
     }
 
-    &#home-media-banner {
-      background-color: #4b5257;
-      padding-top: 50px;
-      padding-bottom: 200px;
+    &#home-news-banner {
+      background-color: #689d4f;
+      padding-bottom: 50px;
     }
 
     &#social-media-main-banner {
@@ -141,12 +148,11 @@ body {
 
     overflow: hidden;
 
-    * {
-      text-align: center;
-      color: white;
-    }
-
     .full-banner-text {
+      * {
+        text-align: center;
+        color: white;
+      }
       h5 {
         font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         font-weight: 300;
@@ -166,10 +172,12 @@ body {
       flex-wrap: nowrap;
       .card {
         display: inline-block;
+        border-radius: 0;
         .card-img-top {
           height: 200px;
           width: 100%;
           object-fit: cover;
+          border-radius: 0;
         }
         .card-text {
           text-align: left;
