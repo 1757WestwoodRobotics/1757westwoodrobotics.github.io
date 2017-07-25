@@ -15,7 +15,9 @@
   body #home-main-banner-text {
     position: absolute;
     top: 50%;
-    transform: translate(0, -50%); } }
+    transform: translate(0, -50%); }
+  body #home-news .card-deck .card {
+    margin-bottom: 25px; } }
 @media (min-width: 768px) {
   body nav .navbar-brand img {
     height: 100px;
@@ -62,18 +64,18 @@ body {
       body .full-banner#home-main-banner #home-scroll-down {
         background-color: transparent;
         position: absolute;
-        top: 90vh; }
-    body .full-banner#home-media-banner {
-      background-color: #4b5257;
-      padding-top: 50px;
-      padding-bottom: 200px; }
+        top: 90vh;
+        color: white; }
+    body .full-banner#home-news-banner {
+      background-color: #689d4f;
+      padding-bottom: 50px; }
     body .full-banner#social-media-main-banner {
       background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
       margin-top: -125px;
       padding-top: 200px;
       padding-bottom: 200px; }
-    body .full-banner * {
+    body .full-banner .full-banner-text * {
       text-align: center;
       color: white; }
     body .full-banner .full-banner-text h5 {
@@ -87,11 +89,13 @@ body {
     justify-content: center;
     flex-wrap: nowrap; }
     body #home-news .card-deck .card {
-      display: inline-block; }
+      display: inline-block;
+      border-radius: 0; }
       body #home-news .card-deck .card .card-img-top {
         height: 200px;
         width: 100%;
-        object-fit: cover; }
+        object-fit: cover;
+        border-radius: 0; }
       body #home-news .card-deck .card .card-text {
         text-align: left; }
   body #home-sponsors .home-platinum-sponsor {
