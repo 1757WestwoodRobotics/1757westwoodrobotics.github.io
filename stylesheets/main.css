@@ -65,7 +65,9 @@ body {
         background-color: transparent;
         position: absolute;
         top: 90vh;
-        color: white; }
+        color: white;
+        left: 50%;
+        transform: translate(-50%); }
     body .full-banner#home-news-banner {
       background-color: #689d4f;
       padding-bottom: 50px; }
