@@ -17,7 +17,13 @@
     top: 50%;
     transform: translate(0, -50%); }
   body #home-news .card-deck .card {
-    margin-bottom: 25px; } }
+    margin-bottom: 25px; }
+  body #home-sponsors .home-platinum-sponsor img {
+    height: 144px;
+    width: 180px; }
+  body #home-sponsors .home-bronze-sponsor img {
+    height: px;
+    width: 100px; } }
 @media (min-width: 768px) {
   body nav .navbar-brand img {
     height: 100px;
