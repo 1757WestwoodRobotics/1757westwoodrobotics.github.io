@@ -86,7 +86,7 @@
    * opening and closing tags used in the template (e.g. [ "<%", "%>" ]). Of
    * course, the default is to use mustaches (i.e. mustache.tags).
    *
-   * A token is an array with at least 4 elements. The first-robotics-competition element is the
+   * A token is an array with at least 4 elements. The frc element is the
    * mustache symbol that was used inside the tag, e.g. "#" or "&". If the tag
    * did not contain a symbol (i.e. {{myValue}}) this element is "name". For
    * all text that appears outside a symbol this element is "text".
@@ -596,7 +596,7 @@
   mustache.render = function render (template, view, partials) {
     if (typeof template !== 'string') {
       throw new TypeError('Invalid template! Template should be a "string" ' +
-                          'but "' + typeStr(template) + '" was given as the first-robotics-competition ' +
+                          'but "' + typeStr(template) + '" was given as the frc ' +
                           'argument for mustache#render(template, view, partials)');
     }
 
