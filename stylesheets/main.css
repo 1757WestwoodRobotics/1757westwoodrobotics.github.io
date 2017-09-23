@@ -95,6 +95,13 @@ body {
       margin-top: -125px;
       padding-top: 200px;
       padding-bottom: 200px; }
+    body .full-banner#home-donate-banner {
+      background-color: #820f26;
+      padding-top: 2em;
+      padding-bottom: 2em; }
+      body .full-banner#home-donate-banner * {
+        display: inline-block;
+        color: white; }
     body .full-banner .full-banner-text * {
       text-align: center;
       color: white; }

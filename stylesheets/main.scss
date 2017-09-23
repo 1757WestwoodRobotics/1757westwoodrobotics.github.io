@@ -181,6 +181,17 @@ body {
       padding-bottom: 200px;
     }
 
+    &#home-donate-banner {
+      background-color: #820f26;
+      padding-top: 2em;
+      padding-bottom: 2em;
+
+      * {
+        display: inline-block;
+        color: white;
+      }
+    }
+
     background-repeat: no-repeat;
     background-blend-mode: multiply;
     background-size: cover;
