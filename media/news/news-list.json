@@ -1,5 +1,13 @@
 [
   {
+    "title": "FIRST Power Up",
+    "date": "September 21, 2017 5:20 P.M.",
+    "link": "https://twitter.com/WWRobotics1757/status/910977037648715776",
+    "author": "Westwood Robotics - Twitter",
+    "media": "<img class='card-img-top' style='object-fit: contain' src='https://pbs.twimg.com/media/DKRwo1mVAAAOLr5.png' alt='FIRST Power Up'>",
+    "content": "We can't wait to <a href='https://twitter.com/hashtag/PlayForReal?src=hash'>#PlayForReal</a> in the 2018 FIRST Robotics Competition challenge FIRST Power Up!"
+  },
+  {
     "title": "Watch our 2017 Steamworks Robot Reveal Video!",
     "date": "July 20, 2017 3:58 P.M.",
     "link": "https://youtu.be/YrOXxlsnZ70",
@@ -8,19 +16,19 @@
     "content": ""
   },
   {
-    "title": "Interested in mentoring or sponsoring us?",
-    "date": "July 20, 2017 3:58 P.M.",
-    "link": "https://twitter.com/WWRobotics1757/status/869926417307447298",
-    "author": "Westwood Robotics - Twitter",
-    "media": "<img class='card-img-top' src='https://pbs.twimg.com/media/C86MUZsWAAA-9Z6.jpg' alt='2017 FRC Competition, New England District Championships at UNH'>",
-    "content": "<a href='mailto:contact@whsrobotics.org'>Send us an email</a> for more details!"
-  },
-  {
     "title": "Middle School Demo",
     "date": "July 20, 2017 3:58 P.M.",
     "link": "https://twitter.com/WWRobotics1757/status/864909889860186112",
     "author": "Westwood Robotics - Twitter",
     "media": "<img class='card-img-top' src='https://pbs.twimg.com/media/DADG9GYUMAAZIOL.jpg' alt='2017 Steamworks robot at Thurston Middle School demo'>",
     "content": "Amazing demo with our <a href='https://twitter.com/hashtag/firststeamworks?src=hash'>#firststeamworks</a> robot to the 8th graders at the middle school!"
+  },
+  {
+    "title": "Interested in mentoring or sponsoring us?",
+    "date": "July 20, 2017 3:58 P.M.",
+    "link": "https://twitter.com/WWRobotics1757/status/869926417307447298",
+    "author": "Westwood Robotics - Twitter",
+    "media": "<img class='card-img-top' src='https://pbs.twimg.com/media/C86MUZsWAAA-9Z6.jpg' alt='2017 FRC Competition, New England District Championships at UNH'>",
+    "content": "<a href='mailto:contact@whsrobotics.org'>Send us an email</a> for more details!"
   }
 ]
