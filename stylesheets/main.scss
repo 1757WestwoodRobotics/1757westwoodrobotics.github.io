@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:300|Raleway:500,600');
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:400|Raleway:500,600');
 
 // Small devices (landscape phones, 576px and up)
 @media (min-width: 576px) {
@@ -10,11 +10,6 @@
           width: 40px;
         }
       }
-    }
-    #home-main-banner-text {
-      top: 40%;
-      transform: translate(0, -50%);
-      display: inline-block;
     }
   }
 }
@@ -29,11 +24,6 @@
           width: 40px;
         }
       }
-    }
-    #home-main-banner-text {
-      top: 40%;
-      transform: translate(0, -50%);
-      display: inline-block;
     }
     #home-news {
       .card-deck {
@@ -110,7 +100,7 @@ body {
   font-family: "Nunito Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
 
-  font-weight: 300;
+  font-weight: 400;
 
   h1, h2 {
     font-family: "Raleway", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -147,11 +137,16 @@ body {
     &#home-main-banner {
       background-image: url("../images/2017nedcmp_robot.jpg");
       background-color: #015723;
-      padding-top: 200px;
+      padding-top: 100px;
       height: 101vh; // TEMP
       padding-bottom: 7em;
 
       text-align: center;
+
+      #home-main-banner-text {
+        top: 50%;
+        transform: translate(0%, -50%);
+      }
 
       #home-scroll-down {
         background-color: transparent;
