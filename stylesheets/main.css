@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:400|Raleway:500,600");
+@media (max-width: 350px) {
+  h5 {
+    font-size: 1.1rem; } }
 @media (min-width: 576px) {
   body nav .navbar-brand img {
     height: 40px;
@@ -50,7 +53,8 @@ body {
     font-family: "PT Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     z-index: 1; }
     body nav.navbar {
-      background-color: rgba(247, 247, 247, 0.75); }
+      background-color: rgba(247, 247, 247, 0.75);
+      margin-top: -2px; }
     body nav .navbar-brand h5 {
       display: inline-block; }
     body nav .navbar-collapse .navbar-nav {
@@ -70,6 +74,7 @@ body {
       padding-bottom: 7em;
       text-align: center; }
       body .full-banner#home-main-banner #home-main-banner-text {
+        position: relative;
         top: 50%;
         transform: translate(0%, -50%); }
       body .full-banner#home-main-banner #home-scroll-down {

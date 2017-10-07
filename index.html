@@ -21,16 +21,16 @@
 
 <body>
     <!-- NAVIGATION -->
-    <nav class="navbar navbar-toggleable-sm navbar-light bg-faded data-scroll-">
-
-        <button class="navbar-toggler navbar-toggler-right mt-1" type="button" data-toggle="collapse" data-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+    <nav class="navbar navbar-expand-sm navbar-light">
 
         <a class="navbar-brand" href="/">
             <img src="images/wwrobotics_logo.png" alt="Westwood Robotics Logo">
             <h5>Westwood Robotics</h5>
         </a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
         <div class="collapse navbar-collapse justify-content-end" id="navbarMain">
             <div class="navbar-nav">
@@ -119,7 +119,7 @@
                 {{#.}}
                 <div class="card">
                     {{{media}}}
-                    <div class="card-block">
+                    <div class="card-body">
                         <a href="{{link}}" target="_blank">
                             <h4 class="card-title">{{title}}</h4>
                         </a>
@@ -144,7 +144,7 @@
                 <div class="robot card col-6 col-md-3 hvr-shrink">
                     <a href="{{link}}">
                         <img class="card-img-top img-fluid" src="/images/robots/{{image}}" alt="{{year}} {{robotName}}{{competition}}">
-                        <div class="card-block">
+                        <div class="card-body">
                             <h6 class="card-title">{{year}} {{robotName}}{{competition}}</h6>
                         </div>
                     </a>
@@ -276,7 +276,7 @@
 
     <!-- JAVASCRIPT -->
     <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <script src="/scripts/mustache.min.js"></script>
 
