@@ -93,7 +93,8 @@ body {
     body .full-banner#home-donate-banner {
       background-color: #820f26;
       padding-top: 2em;
-      padding-bottom: 2em; }
+      padding-bottom: 2em;
+      vertical-align: middle; }
       body .full-banner#home-donate-banner * {
         display: inline-block;
         color: white; }

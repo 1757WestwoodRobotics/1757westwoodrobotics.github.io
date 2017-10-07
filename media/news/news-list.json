@@ -1,5 +1,13 @@
 [
   {
+    "title": "Westwood Day 2017",
+    "date": "September 24, 2017 2:34 P.M.",
+    "link": "https://twitter.com/WWRobotics1757/status/912064331214413825",
+    "author": "Keith Webber",
+    "media": "<div style='overflow: hidden'><video class='card-img-top' controls><source src='/images/news/wwday2017-drone-compressed.mp4'></video></div>",
+    "content": "Video from a drone of our 2017 <a href='https://twitter.com/hashtag/FIRSTSteamworks?src=hash&amp;ref_src=twsrc%5Etfw'>#FIRSTSteamworks</a> competition robot at <a href='https://twitter.com/WestwoodDay?ref_src=twsrc%5Etfw'>@WestwoodDay</a> yesterday! Great time seeing everybody!"
+  },
+  {
     "title": "FIRST Power Up",
     "date": "September 21, 2017 5:20 P.M.",
     "link": "https://twitter.com/WWRobotics1757/status/910977037648715776",
@@ -8,20 +16,20 @@
     "content": "We can't wait to <a href='https://twitter.com/hashtag/PlayForReal?src=hash'>#PlayForReal</a> in the 2018 FIRST Robotics Competition challenge FIRST Power Up!"
   },
   {
-    "title": "Watch our 2017 Steamworks Robot Reveal Video!",
-    "date": "July 20, 2017 3:58 P.M.",
-    "link": "https://youtu.be/YrOXxlsnZ70",
-    "author": "Larry Tseng",
-    "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/YrOXxlsnZ70' frameborder='0' allowfullscreen></iframe>",
-    "content": ""
-  },
-  {
     "title": "Middle School Demo",
     "date": "July 20, 2017 3:58 P.M.",
     "link": "https://twitter.com/WWRobotics1757/status/864909889860186112",
     "author": "Westwood Robotics - Twitter",
     "media": "<img class='card-img-top' src='https://pbs.twimg.com/media/DADG9GYUMAAZIOL.jpg' alt='2017 Steamworks robot at Thurston Middle School demo'>",
     "content": "Amazing demo with our <a href='https://twitter.com/hashtag/firststeamworks?src=hash'>#firststeamworks</a> robot to the 8th graders at the middle school!"
+  },
+  {
+    "title": "Watch our 2017 Steamworks Robot Reveal Video!",
+    "date": "July 20, 2017 3:58 P.M.",
+    "link": "https://youtu.be/YrOXxlsnZ70",
+    "author": "Larry Tseng",
+    "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/YrOXxlsnZ70' frameborder='0' allowfullscreen></iframe>",
+    "content": ""
   },
   {
     "title": "Interested in mentoring or sponsoring us?",
