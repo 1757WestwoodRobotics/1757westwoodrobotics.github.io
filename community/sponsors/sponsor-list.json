@@ -11,15 +11,15 @@
       "bio": "",
       "link": "https://google.com",
       "image": "google.jpg"
-    },
+    }
+  ],
+  "gold": [
     {
       "name": "Medtronic",
       "bio": "",
       "link": "http://www.medtronic.com/us-en/index.html",
       "image": "medtronic.jpg"
     }
-  ],
-  "gold": [
   ],
   "silver": [
     {
