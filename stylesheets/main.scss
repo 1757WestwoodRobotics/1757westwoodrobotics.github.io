@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:400|Raleway:500,600');
 
+// Tiny phones (iPhone SE/5S)
+@media (max-width: 350px) {
+  h5 {
+    font-size: 1.1rem;
+  }
+}
+
 // Small devices (landscape phones, 576px and up)
 @media (min-width: 576px) {
   body {
@@ -22,13 +29,6 @@
         img {
           height: 40px;
           width: 40px;
-        }
-      }
-    }
-    #home-news {
-      .card-deck {
-        .card {
-          margin-bottom: 25px;
         }
       }
     }
@@ -79,6 +79,7 @@
     .card {
       margin-left: 0;
       margin-right: 0;
+      margin-bottom: 25px;
     }
   }
 }
@@ -97,13 +98,13 @@
 }
 
 body {
-  font-family: "Nunito Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
 
   font-weight: 400;
 
   h1, h2 {
-    font-family: "Raleway", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
 
   h1 {
@@ -115,12 +116,14 @@ body {
   }
 
   nav {
-    font-family: "PT Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     &.navbar {
       background-color: rgba(247, 247, 247, 0.75);
+      margin-top: -2px;
     }
     .navbar-brand {
       h5 {
+        font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         display: inline-block;
       }
     }
@@ -144,6 +147,7 @@ body {
       text-align: center;
 
       #home-main-banner-text {
+        position: relative;
         top: 50%;
         transform: translate(0%, -50%);
       }

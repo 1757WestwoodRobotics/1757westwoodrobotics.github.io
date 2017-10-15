@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:400|Raleway:500,600");
+@media (max-width: 350px) {
+  h5 {
+    font-size: 1.1rem; } }
 @media (min-width: 576px) {
   body nav .navbar-brand img {
     height: 40px;
@@ -9,8 +12,6 @@
     body nav .navbar-brand img {
       height: 40px;
       width: 40px; }
-  body #home-news .card-deck .card {
-    margin-bottom: 25px; }
   body #home-sponsors .home-platinum-sponsor img {
     height: 144px;
     width: 180px; }
@@ -31,27 +32,30 @@
     display: block !important; }
     #news-gallery .card {
       margin-left: 0;
-      margin-right: 0; } }
+      margin-right: 0;
+      margin-bottom: 25px; } }
 @media (min-width: 992px) {
   .full-banner-text, .container-text {
     padding-left: 15%;
     padding-right: 15%; } }
 body {
-  font-family: "Nunito Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   font-weight: 400; }
   body h1, body h2 {
-    font-family: "Raleway", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+    font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
   body h1 {
     font-weight: 600; }
   body h2 {
     font-weight: 500; }
   body nav {
-    font-family: "PT Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     z-index: 1; }
     body nav.navbar {
-      background-color: rgba(247, 247, 247, 0.75); }
+      background-color: rgba(247, 247, 247, 0.75);
+      margin-top: -2px; }
     body nav .navbar-brand h5 {
+      font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
       display: inline-block; }
     body nav .navbar-collapse .navbar-nav {
       text-align: right; }
@@ -70,6 +74,7 @@ body {
       padding-bottom: 7em;
       text-align: center; }
       body .full-banner#home-main-banner #home-main-banner-text {
+        position: relative;
         top: 50%;
         transform: translate(0%, -50%); }
       body .full-banner#home-main-banner #home-scroll-down {
