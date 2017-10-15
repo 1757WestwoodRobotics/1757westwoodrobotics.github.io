@@ -32,13 +32,6 @@
         }
       }
     }
-    #home-news {
-      .card-deck {
-        .card {
-          margin-bottom: 25px;
-        }
-      }
-    }
     #home-sponsors {
       .home-platinum-sponsor {
         img {
@@ -86,6 +79,7 @@
     .card {
       margin-left: 0;
       margin-right: 0;
+      margin-bottom: 25px;
     }
   }
 }
@@ -104,13 +98,13 @@
 }
 
 body {
-  font-family: "Nunito Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
 
   font-weight: 400;
 
   h1, h2 {
-    font-family: "Raleway", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
 
   h1 {
@@ -122,13 +116,14 @@ body {
   }
 
   nav {
-    font-family: "PT Sans", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     &.navbar {
       background-color: rgba(247, 247, 247, 0.75);
       margin-top: -2px;
     }
     .navbar-brand {
       h5 {
+        font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
         display: inline-block;
       }
     }
