@@ -141,6 +141,9 @@
         <br>
         <template id="robot-gallery-template" hidden>
             <div class="row no-gutters">
+
+
+
             {{#.}}
                 <div class="robot card col-6 col-md-3 hvr-shrink">
                     <a href="{{link}}">
@@ -157,18 +160,22 @@
         </div>
     </div>
 
+    <hr style="width:80%">
+
     <!-- WHS -->
-    <div class="container main-content" id="home-school">
-        WHS
-  <div class="row">
-    <div class="col"> Westwood High School is a prestigious public school located in the Boston area of Massachusetts. Westwood high school aims to encourage and develop students education in the stem field.</div>
-    <div class="col">
-      <img src="http://www.westwood.k12.ma.us/userfiles/images/structure/9-Split-W-for-Dark-Backgrounds-%5BT%5D.jpg" height="350px" width="350px">
-      </div>
-   </div>
+    <div class="container main-content home-text" id="home-school">
+        <div class="row" style="width: 80%; margin-left: auto; margin-right: auto"> <!--SIZING ON MD+ ONLY-->
+            <div class="col-3">
+                <img class="img-fluid" src="/images/sponsor-logos/whs.jpg" alt="WHS logo">
+            </div>
+            <div class="col-9">
+                <p style="display: block; margin-top: auto; margin-bottom: auto">Westwood High School is a prestigious public school located in the Boston area of Massachusetts. Westwood High School aims to encourage and develop students education in all fields.</p>
+            </div>
+        </div>
+    </div>
 
     <!-- FRC -->
-    <div class="container main-content" id="home-frc">
+    <div class="container main-content home-text" id="home-frc">
         FRC
     </div>
 
