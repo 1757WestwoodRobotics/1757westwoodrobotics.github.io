@@ -112,6 +112,8 @@ body {
   body .main-content {
     padding-top: 75px;
     padding-bottom: 50px; }
+  body .home-text {
+    text-align: left; }
   body #home-news .card-deck {
     display: flex;
     justify-content: center;

@@ -141,6 +141,9 @@
         <br>
         <template id="robot-gallery-template" hidden>
             <div class="row no-gutters">
+
+
+
             {{#.}}
                 <div class="robot card col-6 col-md-3 hvr-shrink">
                     <a href="{{link}}">
@@ -157,13 +160,23 @@
         </div>
     </div>
 
+    <hr style="width:80%">
+
     <!-- WHS -->
-    <div class="container main-content" id="home-school">
-        WHS
+    <!-- TODO: Put CSS styles in main.css!!! -->
+    <div class="container main-content home-text" id="home-school">
+        <div class="row" style="width: 80%; margin-left: auto; margin-right: auto"> <!--SIZING ON MD+ ONLY-->
+            <div class="col-3">
+                <img class="img-fluid" src="/images/sponsor-logos/whs.jpg" alt="WHS logo">
+            </div>
+            <div class="col-9" style="display: flex; align-items: center;">
+                <p>Westwood High School is a prestigious public school located in the Greater Boston area. Westwood High School aims to encourage and develop students' education across all fields. <a href="#">Learn More</a></p>
+            </div>
+        </div>
     </div>
 
     <!-- FRC -->
-    <div class="container main-content" id="home-frc">
+    <div class="container main-content home-text" id="home-frc">
         FRC
     </div>
 
