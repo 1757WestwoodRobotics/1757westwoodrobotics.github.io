@@ -19,7 +19,7 @@
       "bio": "",
       "link": "http://www.driveprime.com/",
       "image": "primemotorgroup.jpg"
-    }
+    },
     {
      "name": "Foundation for Westwood Education",
      "bio": "",
@@ -54,11 +54,11 @@
     }
   ],
   "bronze": [
-        {
+    {
       "name": "Chipotle",
       "bio": "",
       "link": "https://www.chipotle.com/",
-      "image": "ChipotleLogo.png"
-    },
+      "image": "chipotle.png"
+    }
   ]
 }

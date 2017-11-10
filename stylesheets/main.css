@@ -157,8 +157,8 @@ body {
     margin-left: 20px;
     margin-right: 20px; }
     body #home-sponsors .home-bronze-sponsor img {
-      height: 40px;
-      width: 60px;
+      height: 60px;
+      width: 80px;
       object-fit: contain; }
   body #home-robot-gallery {
     overflow: hidden; }
