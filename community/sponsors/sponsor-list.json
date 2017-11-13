@@ -20,7 +20,7 @@
       "link": "http://www.driveprime.com/",
       "image": "primemotorgroup.jpg"
     },
-        {
+    {
       "name": "Foundation for Westwood Education",
       "bio": "",
       "link": "http://foundationforwestwoodeducation.org/",
@@ -41,12 +41,6 @@
       "image": "energid.jpg"
     },
     {
-      "name": "Onshape",
-      "bio": "",
-      "link": "https://www.onshape.com/",
-      "image": "onshape.jpg"
-    },
-    {
       "name": "Dedham Savings",
       "bio": "",
       "link": "http://www.dedhamsavings.com/",
@@ -60,5 +54,11 @@
     }
   ],
   "bronze": [
+    {
+      "name": "Chipotle",
+      "bio": "",
+      "link": "https://www.chipotle.com/",
+      "image": "chipotle.png"
+    }
   ]
 }
