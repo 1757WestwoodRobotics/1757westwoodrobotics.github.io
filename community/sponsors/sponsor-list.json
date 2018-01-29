@@ -15,6 +15,12 @@
   ],
   "gold": [
     {
+      "name": "US STEAM Academy",
+      "bio": "",
+      "link": "https://ussteam.org",
+      "image": "ussteam.jpg"
+    },
+    {
       "name": "Prime Motor Group",
       "bio": "",
       "link": "http://www.driveprime.com/",
@@ -28,12 +34,6 @@
     }
   ],
   "silver": [
-    {
-      "name": "US STEAM Academy",
-      "bio": "",
-      "link": "https://ussteam.org",
-      "image": "ussteam.jpg"
-    },
     {
       "name": "GitHub",
       "bio": "",
@@ -51,6 +51,12 @@
       "bio": "",
       "link": "http://www.engsolutions.com/",
       "image": "engineeredsolutions.jpg"
+    },
+    {
+      "name": "Wegmans",
+      "bio": "",
+      "link": "http://www.wegmans.com/",
+      "image": "wegmans.png"
     }
   ],
   "bronze": [
@@ -59,6 +65,24 @@
       "bio": "",
       "link": "https://www.chipotle.com/",
       "image": "chipotle.png"
+    },
+    {
+      "name": "Rockland Trust",
+      "bio": "",
+      "link": "https://www.rocklandtrust.com/",
+      "image": "rocklandtrust.png"
+    },
+    {
+      "name": "Verizon",
+      "bio": "",
+      "link": "https://www.verizon.com/",
+      "image": "verizon.png"
+    },
+    {
+      "name": "Roche. Bros",
+      "bio": "",
+      "link": "https://www.rochebros.com/",
+      "image": "rochebros.jpg"
     }
   ]
 }
