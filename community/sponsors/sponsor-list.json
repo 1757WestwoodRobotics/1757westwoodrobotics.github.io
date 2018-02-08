@@ -61,6 +61,12 @@
   ],
   "bronze": [
     {
+      "name": "Nvidia",
+      "bio": "",
+      "link": "http://www.nvidia.com/",
+      "image": "nvidialogo.png"
+    },
+    {
       "name": "Chipotle",
       "bio": "",
       "link": "https://www.chipotle.com/",
