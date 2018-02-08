@@ -60,10 +60,10 @@
     }
   ],
   "bronze": [
-        {
+    {
       "name": "Nvidia",
       "bio": "",
-      "link": "http://www.nvidia.com/content/global/global.php",
+      "link": "http://www.nvidia.com/",
       "image": "nvidialogo.png"
     },
     {
