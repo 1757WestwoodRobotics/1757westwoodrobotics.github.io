@@ -31,6 +31,12 @@
       "bio": "",
       "link": "http://foundationforwestwoodeducation.org/",
       "image": "foundationforwestwoodeducation.png"
+    },
+    {
+      "name": "Eversource",
+      "bio": "",
+      "link": "https://www.eversource.com/content/",
+      "image": "eversource.png"
     }
   ],
   "silver": [
@@ -57,6 +63,12 @@
       "bio": "",
       "link": "http://www.wegmans.com/",
       "image": "wegmans.png"
+    },
+    {
+      "name": "Savant",
+      "bio": "",
+      "link": "https://www.savant.com/",
+      "image": "savant.png"
     }
   ],
   "bronze": [
@@ -89,6 +101,35 @@
       "bio": "",
       "link": "https://www.rochebros.com/",
       "image": "rochebros.jpg"
+    },
+    {
+      "name": "Rush Order Tees",
+      "bio": "",
+      "link": "https://www.rushordertees.com/",
+      "image": "rushordertees.png"
+    },{
+      "name": "Slack",
+      "bio": "",
+      "link": "https://slack.com/",
+      "image": "slack.png"
+    },
+    {
+      "name": "Onshape",
+      "bio": "",
+      "link": "https://www.onshape.com/",
+      "image": "onshape.png"
+    },
+    {
+      "name": "AIG",
+      "bio": "",
+      "link": "http://www.aig.com//",
+      "image": "aig.png"
+    },
+    {
+      "name": "Whole Foods Market",
+      "bio": "",
+      "link": "http://www.wholefoodsmarket.com/",
+      "image": "wholefoodsmarket.png"
     }
   ]
 }
