@@ -130,6 +130,18 @@
       "bio": "",
       "link": "http://www.wholefoodsmarket.com/",
       "image": "wholefoodsmarket.png"
+    },
+    {
+      "name": "Heartlander Surgical",
+      "bio": "",
+      "link": "http://www.heartlandersurgical.com/",
+      "image": "heartlandersurgical.jpg"
+    },
+    {
+      "name": "Energid",
+      "bio": "",
+      "link": "http://www.energid.com/",
+      "image": "energid.png"
     }
   ]
 }
