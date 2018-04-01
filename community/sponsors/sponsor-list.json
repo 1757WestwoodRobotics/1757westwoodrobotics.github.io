@@ -11,15 +11,15 @@
       "bio": "",
       "link": "https://google.com",
       "image": "google.jpg"
-    }
-  ],
-  "gold": [
+    },
     {
       "name": "US STEAM Academy",
       "bio": "",
       "link": "https://ussteam.org",
       "image": "ussteam.jpg"
-    },
+    }
+  ],
+  "gold": [
     {
       "name": "Prime Motor Group",
       "bio": "",
@@ -37,6 +37,12 @@
       "bio": "",
       "link": "https://www.eversource.com/content/",
       "image": "eversource.png"
+    },
+    {
+      "name": "Serratore Associates, LLC",
+      "bio": "",
+      "link": "http://serratoreassociates.com/",
+      "image": "serratore.png"
     }
   ],
   "silver": [
