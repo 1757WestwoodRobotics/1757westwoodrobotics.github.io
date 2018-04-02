@@ -9,7 +9,7 @@ $(document).ready(function() {
 
     });
 
-    // Homepage JSON Data
+    // Homepage JSON Datas
 
     $.getJSON('/media/news/news-list.json', function(data) {
         data = data.slice(0, 3);    // Reduces the number of news articles displayed

@@ -24,6 +24,15 @@
     "content": "Amazing demo with our <a href='https://twitter.com/hashtag/firststeamworks?src=hash'>#firststeamworks</a> robot to the 8th graders at the middle school!"
   },
   {
+    "title": "Chairman's Award Video",
+    "date": "March 31, 2018 8:56 A.M.",
+    "link": "https://www.youtube.com/watch?v=NJI2qe9reDk",
+    "author": "Westwood Robotics - Youtube",
+    "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/NJI2qe9reDk' frameborder='0' allowfullscreen></iframe>",
+    "content":""
+
+  },
+  {
     "title": "What's New?",
     "date": "November 9, 2017 9:21 P.M.",
     "link": "http://mailchi.mp/61db3c14553b/westwood-robotics-newsletter-10251",
