@@ -12,7 +12,7 @@
     "date": "July 20, 2017 3:58 P.M.",
     "link": "https://youtu.be/xb6FzU0gx8k",
     "author": "Larry Tseng",
-    "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/xb6FzU0gx8k' frameborder='0' allowfullscreen></iframe>",
+    "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/xb6FzU0gx8k?showinfo=0' frameborder='0' allow='autoplay; encrypted-media' allowfullscreen></iframe>",
     "content": ""
   },
   {
