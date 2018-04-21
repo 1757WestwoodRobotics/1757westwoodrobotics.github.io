@@ -11,12 +11,19 @@ $(document).ready(function() {
 
     // Homepage JSON Datas
 
-    $.getJSON('/media/news/news-list.json', function(data) {
+    $.getJSON('https://blog.whsrobotics.org/posts.json', function(data) {
         data = data.slice(0, 3);    // Reduces the number of news articles displayed
         var template = $('#news-template').html();
         Mustache.parse(template);
         $('#news-gallery').html(Mustache.render(template, data));
     });
+
+    // $.getJSON('/media/news/news-list.json', function(data) {
+    //     data = data.slice(0, 3);    // Reduces the number of news articles displayed
+    //     var template = $('#news-template').html();
+    //     Mustache.parse(template);
+    //     $('#news-gallery').html(Mustache.render(template, data));
+    // });
 
     $.getJSON('/robots/robot-list.json', function(data) {
         data = data.slice(0, 4);    // Reduces the number of robots displayed
