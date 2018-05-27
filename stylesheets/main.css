@@ -67,7 +67,7 @@ body {
     width: 100%;
     overflow: hidden; }
     body .full-banner#home-main-banner {
-      background-image: url("../images/2017nedcmp_robot.jpg");
+      background-image: url("../images/2017nedcmp_robot_compress.jpg");
       background-color: #015723;
       padding-top: 100px;
       height: 101vh;
