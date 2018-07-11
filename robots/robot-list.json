@@ -1,5 +1,12 @@
 [
   {
+    "year":"2018",
+    "robotName":"",
+    "competition":"Power Up",
+    "image":"2018firstpowerup.png",
+    "link":"robots/frc/2018"
+  },
+  {
     "year": "2017",
     "robotName": "",
     "competition": "Steamworks",
