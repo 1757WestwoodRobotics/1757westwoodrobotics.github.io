@@ -4,34 +4,34 @@
     "robotName":"",
     "competition":"Power Up",
     "image":"2018firstpowerup.png",
-    "link":"robots/frc/2018"
+    "link":"robots/index.html"
   },
   {
     "year": "2017",
     "robotName": "",
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
-    "link": "robots/frc/2017/"
+    "link": "robots/index.html"
   },
   {
     "year": "2016",
     "robotName": "",
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
-    "link": "robots/frc/2016/"
+    "link": "robots/index.html"
   },
   {
     "year": "2015",
     "robotName": "",
     "competition": "Recycle Rush",
     "image": "2015recyclerush_compressed.png",
-    "link": "robots/frc/2015/"
+    "link": "robots/index.html"
   },
   {
     "year": "2015",
     "robotName": "T-shirt Cannon",
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
-    "link": "robots/other/2015/tshirtcannon/"
+    "link": "robots/index.html"
   }
 ]
