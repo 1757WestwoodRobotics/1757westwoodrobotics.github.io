@@ -9,63 +9,24 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-  <h1>Our Robots</h1>
-  <div class="card-deck">
-    <div class="card">
-      <img class="card-image-bottom" src="/images/robots/hub-page-images/2018firstpowerup.png">
-      <div class="card-body">
-        <div id="2018 Power Up">
-          <h2 class="card-title">2018 Power Up</h2>
-          <div class="card-body">
-            <p>This is where the info about this would go</p>
-          </div>
+<div id='robot-deck'>
+</div>
+
+  <template id='robot-cards-template' hidden>
+    <div class="card-deck">
+      {{#.}}
+      <div class="card">
+        <img class="card-image-bottom img-fluid" src="/images/robots/{{image}}">
+        <div class="card-body">
+            <h2 class="card-title">{{year}} {{competition}}{{robotName}}</h2>
+            <div class="card-body">
+              <p>{{description}}</p>
+            </div>
         </div>
       </div>
-    </div>
-    <div class="card">
-      <img class="card-image-bottom" src="/images/robots/hub-page-images/2017steamworks_compressed.png">
-      <div class="card-body">
-        <div id="2017 Steamworks">
-          <h2 class="card-title">2017 Steamworks</h2>
-          <div class="card-body">
-            <p>This is where the info about this would go</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="card-image-bottom" src="/images/robots/hub-page-images/2016stronghold_compressed.png">
-      <div class="card-body">
-        <div id="2016 Stronghold">
-          <h2 class="card-title">2016 Stronghold</h2>
-          <div class="card-body">
-            <p>This is where the info about this would go</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="card-image-bottom" src="/images/robots/hub-page-images/2015recyclerush_compressed.png">
-      <div class="card-body">
-        <div id="2015 Recycle">
-          <h2 class="card-title">2015 Recycle Rush</h2>
-          <div class="card-body">
-            <p>This is where the info about this would go</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <img class="card-image-bottom" src="/images/robots/hub-page-images/2015tshirtcannon_compressed.png">
-      <div class="card-body">
-        <div id="2015 tshirtcannon">
-          <h2 class="card-title">2015 T-Shirt Cannon</h2>
-          <div class="card-body">
-            <p>This is where the info about this would go</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+      {{/.}}
+  </template>
+  <script src="/scripts/mustache.min.js"></script>
+  <script src="/scripts/robothub.js"></script>
 </body>
 </html>
