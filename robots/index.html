@@ -9,9 +9,6 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div id='robot-deck'>
-</div>
-
   <template id='robot-cards-template' hidden>
     <div class="card-deck">
       {{#.}}
@@ -25,7 +22,10 @@
         </div>
       </div>
       {{/.}}
+    </div>
   </template>
+  <div id='robot-deck'>
+  </div>
   <script src="/scripts/mustache.min.js"></script>
   <script src="/scripts/robothub.js"></script>
 </body>
