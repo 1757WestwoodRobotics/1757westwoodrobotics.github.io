@@ -4,22 +4,22 @@
     <meta charset="UTF-8">
     <title>Our Robots</title>
     <link rel="stylesheet" href="/stylesheets/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <style>
         .bricklayer {
-      width: 1200px;
-      }
-      .bricklayer-column-sizer {
-        width: 100px;
-      }
+            width: 1000px;
+        }
+        .bricklayer-column-sizer {
+            width: 100px;
+        }
     </style>
 </head>
 <body>
+
   <template id='robot-cards-template' hidden>
-    <div class="bricklayer" style="margin: auto;">
       {{#.}}
       <div style="width:375px">
         <img src="/images/robots/{{image}}" style="width: 50%; height: 50%">
@@ -27,15 +27,16 @@
         <p>{{description}}</p>
       </div>
       {{/.}}
-    </div>
   </template>
-  <div id='robot-deck'>
+
+  <div class="bricklayer" id='robot-deck' style="margin: auto;">
   </div>
+
   <script>
     var bricklayer = new Bricklayer(document.querySelector('.bricklayer'))
   </script>
   <script src="/scripts/mustache.min.js"></script>
   <script src="/scripts/robothub.js"></script>
-  <script src="/scripts/dist/bricklayer.js"></script>
+  <!--<script src="/scripts/dist/bricklayer.js"></script>-->
 </body>
 </html>
