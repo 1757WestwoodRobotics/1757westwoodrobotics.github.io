@@ -5,7 +5,7 @@
     "competition":"Power Up",
     "image":"2018firstpowerup_compressed.png",
     "link":"robots/index.html",
-    "description":"This is a robot we made in 2018"
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
     "year": "2017",
@@ -13,7 +13,7 @@
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
     "link": "robots/index.html",
-    "description":"This is our best robot yet"
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
     "year": "2016",
@@ -21,7 +21,7 @@
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
     "link": "robots/index.html",
-    "description":"This one was not our best robot"
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
     "year": "2015",
@@ -29,7 +29,7 @@
     "competition": "Recycle Rush",
     "image": "2015recyclerush_compressed.png",
     "link": "robots/index.html",
-    "description":"This one was good at lifting boxes"
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
     "year": "2015",
@@ -37,6 +37,6 @@
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
     "link": "robots/index.html",
-    "description":"This one shot T-shirts pretty well"
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   }
 ]
