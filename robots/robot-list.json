@@ -4,7 +4,7 @@
     "robotName":"",
     "competition":"Power Up",
     "image":"2018firstpowerup_compressed.png",
-    "link":"robots/index.html",
+    "link":"robot-pages/2018powerup.html",
     "description":"This is a robot we made in 2018"
   },
   {
@@ -12,7 +12,7 @@
     "robotName": "",
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2017steamworks.html",
     "description":"This is our best robot yet"
   },
   {
@@ -20,7 +20,7 @@
     "robotName": "",
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2016stronghold.html",
     "description":"This one was not our best robot"
   },
   {
@@ -28,7 +28,7 @@
     "robotName": "",
     "competition": "Recycle Rush",
     "image": "2015recyclerush_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2015recyclerush.html",
     "description":"This one was good at lifting boxes"
   },
   {
@@ -36,7 +36,7 @@
     "robotName": "T-shirt Cannon",
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2015tshirtcannon.html",
     "description":"This one shot T-shirts pretty well"
   }
 ]

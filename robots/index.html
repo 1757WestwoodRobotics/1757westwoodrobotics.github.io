@@ -9,22 +9,100 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <style>
+      .bricklayer {
+          width: 1200px;
+      }
+      .card-spacer{
+          width:400px;
+          height:475px;
+          
+      }
+      .card{
+          width:350px;
+          margin: auto;
+      }
+      @media only screen and (max-width: 1175px) {
         .bricklayer {
-            width: 1000px;
+            width: 900px;
         }
-        .bricklayer-column-sizer {
-            width: 100px;
+        .card-spacer{
+            width:300px;
+            height:450px;
         }
+        .card{
+            width:275px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 890px) {
+        .bricklayer {
+            width: 750px;
+        }
+        .card-spacer{
+            width:250px;
+            height:475px;
+        }
+        .card{
+            width:225px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 740px) {
+        .bricklayer {
+            width: 600px;
+        }
+        .card-spacer{
+            width:300px;
+            height:450px;
+        }
+        .card{
+            width:275px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 590px) {
+        .bricklayer {
+            width: 500px;
+        }
+        .card-spacer{
+            width:250px;
+            height:450px;
+        }
+        .card{
+            width:225px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 490px) {
+        .bricklayer {
+            width: 250px;
+        }
+        .card-spacer{
+            width:250px;
+            height:460px;
+        }
+        .card{
+            width:225px;
+            margin: auto;
+        }
+      }
     </style>
 </head>
 <body>
 
   <template id='robot-cards-template' hidden>
       {{#.}}
-      <div style="width:375px">
-        <img src="/images/robots/{{image}}" style="width: 50%; height: 50%">
-        <h2>{{year}} {{competition}}{{robotName}}</h2>
-        <p>{{description}}</p>
+      <div class="card-spacer">
+        <div class="card border-success">
+          <div class="card-header">
+            <h2 class="card-title">{{year}} {{competition}}{{robotName}}</h2>
+          </div>
+          <img class="card-img-top" src="/images/robots/{{image}}" style="width: 100%; height: 100%">
+          <div class="card-body">
+            <p>{{description}}</p>
+            <a href="{{link}}" class="card-link">Learn more</a>
+          </div>
+        </div>
       </div>
       {{/.}}
   </template>
