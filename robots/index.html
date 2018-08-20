@@ -9,71 +9,108 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <style>
+      .bricklayer {
+          width: 1200px;
+          margin: auto;
+      }
+      .card-spacer{
+          width:400px;
+          height:475px;
+
+      }
+      .card{
+          width:350px;
+          margin: auto;
+      }
+      @media only screen and (max-width: 1225px) {
         .bricklayer {
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: start;
-            -webkit-align-items: flex-start;
-            -ms-flex-align: start;
-            align-items: flex-start;
-            -webkit-box-pack: center;
-            -webkit-justify-content: center;
-            -ms-flex-pack: center;
-            justify-content: center;
-            -webkit-flex-wrap: wrap;
-            -ms-flex-wrap: wrap;
-            flex-wrap: wrap;
+            width: 900px;
         }
-
-        .bricklayer-column-sizer {
-            width: 100%;
-            display: none;
+        .card-spacer{
+            width:300px;
+            height:450px;
         }
-
-        @media screen and (min-width: 640px) {
-            .bricklayer-column-sizer {
-                width: 50%;
-            }
+        .card{
+            width:275px;
+            margin: auto;
         }
-
-        @media screen and (min-width: 980px) {
-            .bricklayer-column-sizer {
-                width: 33.333%;
-            }
+      }
+      @media only screen and (max-width: 930px) {
+        .bricklayer {
+            width: 750px;
         }
-
-        @media screen and (min-width: 1200px) {
-            .bricklayer-column-sizer {
-                width: 25%;
-            }
+        .card-spacer{
+            width:250px;
+            height:475px;
         }
-
-        .bricklayer-column {
-            -webkit-box-flex: 1;
-            -webkit-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-            padding-left: 5px;
-            padding-right: 5px;
+        .card{
+            width:225px;
+            margin: auto;
         }
+      }
+      @media only screen and (max-width: 780px) {
+        .bricklayer {
+            width: 600px;
+        }
+        .card-spacer{
+            width:300px;
+            height:450px;
+        }
+        .card{
+            width:275px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 630px) {
+        .bricklayer {
+            width: 500px;
+        }
+        .card-spacer{
+            width:250px;
+            height:450px;
+        }
+        .card{
+            width:225px;
+            margin: auto;
+        }
+      }
+      @media only screen and (max-width: 530px) {
+        .bricklayer {
+            width: 250px;
+        }
+        .card-spacer{
+            width:250px;
+            height:460px;
+        }
+        .card{
+            width:225px;
+            margin: auto;
+        }
+      }
     </style>
 </head>
 <body>
 
   <template id='robot-cards-template' hidden>
       {{#.}}
-      <div style="width:375px">
-        <img src="/images/robots/{{image}}" style="width: 50%; height: 50%">
-        <h2>{{year}} {{competition}}{{robotName}}</h2>
-        <p>{{description}}</p>
+      <div class="card-spacer">
+        <div class="card border-success">
+          <div class="card-header">
+            <h2 class="card-title">{{year}} {{competition}}{{robotName}}</h2>
+          </div>
+          <img class="card-img-top" src="/images/robots/{{image}}" style="width: 100%; height: 100%">
+          <div class="card-body">
+            <p>{{description}}</p>
+            <a href="{{link}}" class="card-link">Learn more</a>
+          </div>
+        </div>
       </div>
       {{/.}}
   </template>
 
-  <div class="bricklayer" id='robot-deck' style="margin: auto;">
-
+<div class= "container-fluid">
+    <div class="bricklayer" id='robot-deck' >
+    </div>
   </div>
 
   <script>

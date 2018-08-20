@@ -4,7 +4,7 @@
     "robotName":"",
     "competition":"Power Up",
     "image":"2018firstpowerup_compressed.png",
-    "link":"robots/index.html",
+    "link":"robot-pages/2018powerup.html",
     "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -12,7 +12,7 @@
     "robotName": "",
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2017steamworks.html",
     "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -20,7 +20,7 @@
     "robotName": "",
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2016stronghold.html",
     "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -28,7 +28,7 @@
     "robotName": "",
     "competition": "Recycle Rush",
     "image": "2015recyclerush_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2015recyclerush.html",
     "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -36,7 +36,7 @@
     "robotName": "T-shirt Cannon",
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
-    "link": "robots/index.html",
+    "link": "robot-pages/2015tshirtcannon.html",
     "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   }
 ]
