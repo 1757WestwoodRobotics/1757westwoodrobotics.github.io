@@ -67,8 +67,8 @@ body {
     width: 100%;
     overflow: hidden; }
     body .full-banner#home-main-banner {
-      background-image: url("../images/2017nedcmp_robot_compress.jpg");
-      background-color: #015723;
+      background-image: url("../images/2017robot_photoshoot.jpg");
+      background-color: #115724;
       padding-top: 100px;
       height: 101vh;
       padding-bottom: 7em;
@@ -190,7 +190,7 @@ body {
 .hvr-grow {
   vertical-align: middle;
   transform: translateZ(0);
-  box-shadow: 0 0 1px transparent;
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
   backface-visibility: hidden;
   -moz-osx-font-smoothing: grayscale;
   transition-duration: 0.3s;
