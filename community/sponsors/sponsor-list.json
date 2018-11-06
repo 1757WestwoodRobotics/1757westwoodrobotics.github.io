@@ -48,6 +48,11 @@
       "bio": "",
       "link": "https://www.mathworks.com/",
       "image": "MathWorks.png"
+    },{
+      "name": "PhRMA",
+      "bio": "",
+      "link": "http://phrma.org",
+      "image": "phrma.png"
     }
   ],
   "silver": [
