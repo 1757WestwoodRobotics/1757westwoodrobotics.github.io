@@ -3,6 +3,8 @@
 
 Link to the website: <https://whsrobotics.org>.
 
+Link to the blog: <https://blog.whsrobotics.org>.
+
 ### Contributors
 - Larry Tseng
 - Bryce Parazin
