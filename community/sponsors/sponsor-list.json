@@ -91,6 +91,24 @@
       "bio": "",
       "link": "https://www.savant.com/",
       "image": "savant.jpg"
+    },
+    {
+      "name": "Version",
+      "bio": "",
+      "link": "https://www.verizon.com",
+      "image": "verizon.png"
+    },
+    {
+      "name": "iRobot",
+      "bio": "",
+      "link": "https://www.irobot.com/",
+      "image": "iRobot.png"
+    },
+    {
+      "name": "Ignite Research, LLC",
+      "bio": "",
+      "link": "http://www.igniteresearch.com/",
+      "image": "igniteResearch.png"
     }
   ],
   "bronze": [
@@ -111,12 +129,6 @@
       "bio": "",
       "link": "https://www.rocklandtrust.com/",
       "image": "rocklandtrust.png"
-    },
-    {
-      "name": "Verizon",
-      "bio": "",
-      "link": "https://www.verizon.com/",
-      "image": "verizon.png"
     },
     {
       "name": "Roche. Bros",
