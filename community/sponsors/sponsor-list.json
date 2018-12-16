@@ -17,6 +17,12 @@
       "bio": "",
       "link": "https://ussteam.org",
       "image": "ussteam.jpg"
+    },
+    {
+      "name": "Analog Devices",
+      "bio": "",
+      "link": "https://www.analog.com",
+      "image": "Analog Devices.png"
     }
   ],
   "gold": [
