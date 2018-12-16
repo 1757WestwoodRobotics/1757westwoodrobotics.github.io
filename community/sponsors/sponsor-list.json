@@ -33,23 +33,12 @@
       "image": "primemotorgroup.jpg"
     },
     {
-      "name": "Foundation for Westwood Education",
-      "bio": "",
-      "link": "http://foundationforwestwoodeducation.org/",
-      "image": "foundationforwestwoodeducation.png"
-    },
-    {
       "name": "Eversource",
       "bio": "",
       "link": "https://www.eversource.com/content/",
       "image": "eversource.png"
     },
     {
-      "name": "Serratore Associates, LLC",
-      "bio": "",
-      "link": "http://serratoreassociates.com/",
-      "image": "serratore.png"
-    },{
       "name": "MathWorks",
       "bio": "",
       "link": "https://www.mathworks.com/",
@@ -73,12 +62,6 @@
       "bio": "",
       "link": "http://www.dedhamsavings.com/",
       "image": "dedhamsavings.jpg"
-    },
-    {
-      "name": "Engineered Solutions, Inc.",
-      "bio": "",
-      "link": "http://www.engsolutions.com/",
-      "image": "engineeredsolutions.jpg"
     },
     {
       "name": "Wegmans",
@@ -113,35 +96,12 @@
   ],
   "bronze": [
     {
-      "name": "NVIDIA",
-      "bio": "",
-      "link": "http://www.nvidia.com/",
-      "image": "nvidia.png"
-    },
-    {
-      "name": "Chipotle",
-      "bio": "",
-      "link": "https://www.chipotle.com/",
-      "image": "chipotle.png"
-    },
-    {
-      "name": "Rockland Trust",
-      "bio": "",
-      "link": "https://www.rocklandtrust.com/",
-      "image": "rocklandtrust.png"
-    },
-    {
       "name": "Roche. Bros",
       "bio": "",
       "link": "https://www.rochebros.com/",
       "image": "rochebros.jpg"
     },
     {
-      "name": "Rush Order Tees",
-      "bio": "",
-      "link": "https://www.rushordertees.com/",
-      "image": "rushordertees.png"
-    },{
       "name": "Slack",
       "bio": "",
       "link": "https://slack.com/",
