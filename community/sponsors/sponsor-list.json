@@ -182,11 +182,18 @@
       "bio": "",
       "link": "https://www.siteleaf.com/",
       "image": "siteleaf.png"
-    },{
-      "name": "Connect Tech",
+    },
+    {
+      "name": "Staples",
       "bio": "",
-      "link": "http://connecttech.com/",
-      "image": "Connect Tech.jpg"
+      "link": "https://www.staples.com/",
+      "image": "staples.png"
+    },
+    {
+      "name": "J. P. Licks",
+      "bio": "",
+      "link": "http://www.jplicks.com/",
+      "image": "JPLicks.jpg"
     }
   ]
 }
