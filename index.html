@@ -16,6 +16,43 @@
     <link href="/stylesheets/main.css" rel="stylesheet" type="text/css">
     <link href="/favicon.ico" type="image/x-icon" rel="icon">
 
+    <style>
+    .videoPlayer {
+        width: 1200px;
+        height: 600px;
+    }
+    @media only screen and (max-width: 1225px) {
+      .videoPlayer {
+          width: 900px;
+          height: 450px;
+      }
+    }
+    @media only screen and (max-width: 930px) {
+      .videoPlayer {
+          width: 750px;
+          height: 375px;
+      }
+    }
+    @media only screen and (max-width: 780px) {
+      .videoPlayer {
+          width: 600px;
+          height: 300px;
+      }
+    }
+    @media only screen and (max-width: 630px) {
+      .videoPlayer {
+          width: 500px;
+          height: 250px;
+      }
+    }
+    @media only screen and (max-width: 530px) {
+      .videoPlayer {
+          width: 250px;
+          height: 125px;
+      }
+    }
+    </style>
+
     <title>Westwood Robotics | Home</title>
 </head>
 
@@ -108,9 +145,8 @@
             <p id="home-mission-statement">Founded in 2006, we are a high-school robotics team from Westwood, MA with a mission to inspire young people to become leaders in science, technology, art, engineering, and mathematics by engaging them in team-based programs that build important technical and life skills such as leadership, innovation, communication, and self-confidence.</p>
         </div>
         <br>
-        <div id="chairmanVideo">
-          <iframe src="https://player.vimeo.com/video/313237557" width="640" height="360" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-          <p><a href="https://vimeo.com/313237557">Chairman&#039;s Award Video - Team 1757</a> from <a href="https://vimeo.com/user94289793">Westwood Robotics</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
+        <div id="chairmanVideo" style="margin:0;">
+          <iframe class= "videoPlayer" src="https://player.vimeo.com/video/313237557" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen ></iframe>
         </div>
         <br>
         <a role="button" class="btn btn-primary btn-lg" href="https://docs.google.com/forms/d/e/1FAIpQLSe5859-Z9GyY4C6QS42c0NeAMJEDgpgCaGlun9RcQXqQOzMYg/viewform">Join Our Team This Year!</a>
