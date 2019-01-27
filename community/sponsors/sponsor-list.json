@@ -17,6 +17,12 @@
       "bio": "",
       "link": "https://ussteam.org",
       "image": "ussteam.jpg"
+    },
+    {
+      "name": "Analog Devices",
+      "bio": "",
+      "link": "https://www.analog.com",
+      "image": "Analog Devices.png"
     }
   ],
   "gold": [
@@ -27,23 +33,12 @@
       "image": "primemotorgroup.jpg"
     },
     {
-      "name": "Foundation for Westwood Education",
-      "bio": "",
-      "link": "http://foundationforwestwoodeducation.org/",
-      "image": "foundationforwestwoodeducation.png"
-    },
-    {
       "name": "Eversource",
       "bio": "",
       "link": "https://www.eversource.com/content/",
       "image": "eversource.png"
     },
     {
-      "name": "Serratore Associates, LLC",
-      "bio": "",
-      "link": "http://serratoreassociates.com/",
-      "image": "serratore.png"
-    },{
       "name": "MathWorks",
       "bio": "",
       "link": "https://www.mathworks.com/",
@@ -69,12 +64,6 @@
       "image": "dedhamsavings.jpg"
     },
     {
-      "name": "Engineered Solutions, Inc.",
-      "bio": "",
-      "link": "http://www.engsolutions.com/",
-      "image": "engineeredsolutions.jpg"
-    },
-    {
       "name": "Wegmans",
       "bio": "",
       "link": "http://www.wegmans.com/",
@@ -85,45 +74,34 @@
       "bio": "",
       "link": "https://www.savant.com/",
       "image": "savant.jpg"
-    }
-  ],
-  "bronze": [
-    {
-      "name": "NVIDIA",
-      "bio": "",
-      "link": "http://www.nvidia.com/",
-      "image": "nvidia.png"
-    },
-    {
-      "name": "Chipotle",
-      "bio": "",
-      "link": "https://www.chipotle.com/",
-      "image": "chipotle.png"
-    },
-    {
-      "name": "Rockland Trust",
-      "bio": "",
-      "link": "https://www.rocklandtrust.com/",
-      "image": "rocklandtrust.png"
     },
     {
       "name": "Verizon",
       "bio": "",
-      "link": "https://www.verizon.com/",
+      "link": "https://www.verizon.com",
       "image": "verizon.png"
     },
     {
-      "name": "Roche. Bros",
+      "name": "iRobot",
+      "bio": "",
+      "link": "https://www.irobot.com/",
+      "image": "iRobot.png"
+    },
+    {
+      "name": "Ignite Research, LLC",
+      "bio": "",
+      "link": "http://www.igniteresearch.com/",
+      "image": "igniteResearch.png"
+    }
+  ],
+  "bronze": [
+    {
+      "name": "Roche Bros",
       "bio": "",
       "link": "https://www.rochebros.com/",
       "image": "rochebros.jpg"
     },
     {
-      "name": "Rush Order Tees",
-      "bio": "",
-      "link": "https://www.rushordertees.com/",
-      "image": "rushordertees.png"
-    },{
       "name": "Slack",
       "bio": "",
       "link": "https://slack.com/",
@@ -164,11 +142,18 @@
       "bio": "",
       "link": "https://www.siteleaf.com/",
       "image": "siteleaf.png"
-    },{
-      "name": "Connect Tech",
+    },
+    {
+      "name": "Staples",
       "bio": "",
-      "link": "http://connecttech.com/",
-      "image": "Connect Tech.jpg"
+      "link": "https://www.staples.com/",
+      "image": "staples.png"
+    },
+    {
+      "name": "J.P. Licks",
+      "bio": "",
+      "link": "http://www.jplicks.com/",
+      "image": "JPLicks.jpg"
     }
   ]
 }
