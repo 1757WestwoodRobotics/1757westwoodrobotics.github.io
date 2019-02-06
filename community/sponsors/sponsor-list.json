@@ -154,6 +154,12 @@
       "bio": "",
       "link": "http://www.jplicks.com/",
       "image": "JPLicks.jpg"
+    },
+    {
+      "name": "PrintMaster",
+      "bio": "",
+      "link": "https://printmasteronline.com/",
+      "image": "PrintMaster.png"
     }
   ]
 }
