@@ -5,14 +5,7 @@
       "bio": "",
       "link": "http://www.westwood.k12.ma.us/westwood-high-school/",
       "image": "whs.jpg"
-    },
-    {
-      "name": "Google",
-      "bio": "",
-      "link": "https://google.com",
-      "image": "google.jpg"
-    },
-    {
+    },{
       "name": "US STEAM Academy",
       "bio": "",
       "link": "https://ussteam.org",
@@ -43,20 +36,9 @@
       "bio": "",
       "link": "https://www.mathworks.com/",
       "image": "MathWorks.png"
-    },{
-      "name": "PhRMA",
-      "bio": "",
-      "link": "http://phrma.org",
-      "image": "phrma.png"
     }
   ],
   "silver": [
-    {
-      "name": "GitHub",
-      "bio": "",
-      "link": "https://www.github.com/",
-      "image": "github.jpg"
-    },
     {
       "name": "Dedham Savings",
       "bio": "",
@@ -92,6 +74,12 @@
       "bio": "",
       "link": "http://www.igniteresearch.com/",
       "image": "igniteResearch.png"
+    },
+    {
+      "name": "PrintMaster",
+      "bio": "",
+      "link": "https://printmasteronline.com/",
+      "image": "PrintMaster.png"
     }
   ],
   "bronze": [
@@ -106,12 +94,6 @@
       "bio": "",
       "link": "https://slack.com/",
       "image": "slack.png"
-    },
-    {
-      "name": "Onshape",
-      "bio": "",
-      "link": "https://www.onshape.com/",
-      "image": "onshape.png"
     },
     {
       "name": "AIG",
@@ -154,12 +136,6 @@
       "bio": "",
       "link": "http://www.jplicks.com/",
       "image": "JPLicks.jpg"
-    },
-    {
-      "name": "PrintMaster",
-      "bio": "",
-      "link": "https://printmasteronline.com/",
-      "image": "PrintMaster.png"
     }
   ]
 }
