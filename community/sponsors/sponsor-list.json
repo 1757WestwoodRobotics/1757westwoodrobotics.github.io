@@ -36,15 +36,14 @@
       "bio": "",
       "link": "https://www.mathworks.com/",
       "image": "MathWorks.png"
-    }
-  ],
-  "silver": [
-    {
+    },{
       "name": "Dedham Savings",
       "bio": "",
       "link": "http://www.dedhamsavings.com/",
       "image": "dedhamsavings.jpg"
-    },
+    }
+  ],
+  "silver": [
     {
       "name": "Wegmans",
       "bio": "",
@@ -80,6 +79,12 @@
       "bio": "",
       "link": "https://printmasteronline.com/",
       "image": "PrintMaster.png"
+    },
+    {
+      "name": "Costco",
+      "bio": "",
+      "link": "https://www.costco.com/",
+      "image": "Costco_Logo.png"
     }
   ],
   "bronze": [
@@ -136,6 +141,11 @@
       "bio": "",
       "link": "http://www.jplicks.com/",
       "image": "JPLicks.jpg"
+    },{
+      "name": "Launie & Marino",
+      "bio": "",
+      "link": "https://www.launiemarino.com/",
+      "image": "Launie and Marino.png"
     }
   ]
 }
