@@ -1,5 +1,12 @@
 [
   {
+    "year":"2019",
+    "robotName":"",
+    "competition":"Deep Space",
+    "image":"2019deepspace_compressed.png",
+    "link":"robot-pages/2019deepspace.html",
+    "description":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+  },{
     "year":"2018",
     "robotName":"",
     "competition":"Power Up",
