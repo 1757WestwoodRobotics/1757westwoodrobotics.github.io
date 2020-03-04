@@ -1,0 +1,237 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400|Nunito+Sans:400|Raleway:500,600");
+@media (max-width: 350px) {
+  h5 {
+    font-size: 1.1rem; } }
+@media (min-width: 576px) {
+  body nav .navbar-brand img {
+    height: 40px;
+    width: 40px; } }
+@media (max-width: 576px) {
+  body nav {
+    background-color: white !important; }
+    body nav .navbar-brand img {
+      height: 40px;
+      width: 40px; }
+  body #home-sponsors .home-platinum-sponsor img {
+    height: 144px;
+    width: 180px; }
+  body #home-sponsors .home-bronze-sponsor img {
+    height: 80px;
+    width: 100px; } }
+@media (min-width: 768px) {
+  body nav .navbar-brand img {
+    height: 100px;
+    width: 100px; }
+  body .full-banner#home-main-banner {
+    margin-top: -125px; } }
+@media (max-width: 768px) {
+  .full-banner#home-main-banner {
+    margin-top: -64px; }
+
+  #news-gallery {
+    display: block !important; }
+    #news-gallery .card {
+      margin-left: 0;
+      margin-right: 0;
+      margin-bottom: 25px; } }
+@media (min-width: 992px) {
+  .full-banner-text, .container-text {
+    padding-left: 15%;
+    padding-right: 15%; } }
+body {
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  text-align: center;
+  font-weight: 400;
+  background-repeat: no-repeat;
+  background-blend-mode: multiply;
+  background-size: cover;
+  background-position: top center;
+  width: 100%;
+  /*overflow: hidden;*/
+  background-image: url("../images/2017robot_photoshoot.jpg");
+  background-color: #115724;
+  /*padding-top: 100px;*/
+  height: 101vh;
+  /*padding-bottom: 7em;*/
+  text-align: center;
+}
+  body h1, body h2 {
+    font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: white; }
+  .resources a {
+    color: lightgray;
+    text-decoration: underline;
+  }
+  body h1 {
+    font-weight: 600; }
+  body h2 {
+    font-weight: 500; }
+  body nav {
+    font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    z-index: 1; }
+    body nav.navbar {
+      background-color: rgba(247, 247, 247, 0.75);
+      margin-top: -2px; }
+    body nav .navbar-brand h5 {
+      font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      display: inline-block; }
+    body nav .navbar-collapse .navbar-nav {
+      text-align: right; }
+  body .full-banner {
+    background-repeat: no-repeat;
+    background-blend-mode: multiply;
+    background-size: cover;
+    background-position: top center;
+    width: 100%;
+    overflow: hidden; }
+    body .full-banner#home-main-banner {
+      background-image: url("../images/2017robot_photoshoot.jpg");
+      background-color: #115724;
+      padding-top: 100px;
+      height: 101vh;
+      padding-bottom: 7em;
+      text-align: center; }
+      body .full-banner#home-main-banner #home-main-banner-text {
+        position: relative;
+        top: 50%;
+        transform: translate(0%, -50%); }
+      body .full-banner#home-main-banner #home-scroll-down {
+        background-color: transparent;
+        position: absolute;
+        top: 90vh;
+        color: white;
+        left: 50%;
+        transform: translate(-50%); }
+    body .full-banner#home-news-banner {
+      background-color: #494949;
+      padding-bottom: 50px; }
+      body .full-banner#home-news-banner h2 {
+        color: white; }
+    body .full-banner#social-media-main-banner {
+      background-image: url("../images/2017nedcmp_robot.jpg");
+      background-color: #015723;
+      margin-top: -125px;
+      padding-top: 200px;
+      padding-bottom: 200px; }
+    body .full-banner#home-donate-banner {
+      background-color: #820f26;
+      padding-top: 2em;
+      padding-bottom: 2em;
+      vertical-align: middle; }
+      body .full-banner#home-donate-banner * {
+        display: inline-block;
+        color: white; }
+    body .full-banner .full-banner-text * {
+      text-align: center;
+      color: white; }
+    body .full-banner .full-banner-text h5 {
+      font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 300; }
+  body .main-content {
+    padding-top: 75px;
+    padding-bottom: 50px; }
+  body .home-text {
+    text-align: left; }
+  body #home-news .card-deck {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap; }
+    body #home-news .card-deck .card {
+      display: inline-block;
+      border-radius: 0; }
+      body #home-news .card-deck .card .card-img-top {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 0; }
+      body #home-news .card-deck .card .card-text {
+        text-align: left; }
+  body #home-sponsors .home-platinum-sponsor {
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px; }
+    body #home-sponsors .home-platinum-sponsor img {
+      height: 180px;
+      width: 225px;
+      object-fit: contain; }
+  body #home-sponsors .home-gold-sponsor {
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px; }
+    body #home-sponsors .home-gold-sponsor img {
+      height: 120px;
+      width: 180px;
+      object-fit: contain; }
+  body #home-sponsors .home-silver-sponsor {
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px; }
+    body #home-sponsors .home-silver-sponsor img {
+      height: 80px;
+      width: 120px;
+      object-fit: contain; }
+  body #home-sponsors .home-bronze-sponsor {
+    display: inline-block;
+    margin-left: 20px;
+    margin-right: 20px; }
+    body #home-sponsors .home-bronze-sponsor img {
+      height: 60px;
+      width: 80px;
+      object-fit: contain; }
+  body #home-robot-gallery {
+    overflow: hidden; }
+    body #home-robot-gallery .card {
+      border: hidden; }
+      body #home-robot-gallery .card :hover {
+        background-color: #015723; }
+        body #home-robot-gallery .card :hover h6 {
+          color: white; }
+      body #home-robot-gallery .card .card-block * {
+        color: black; }
+  body .footer {
+    background-color: #00840d;
+    margin-bottom: -20px; }
+    body .footer .footer-container * {
+      color: white; }
+    body .footer .footer-container .footer-contact-button {
+      height: 2em;
+      width: 2em;
+      padding: 0; }
+    body .footer #footer-copyright {
+      margin-left: -1em;
+      margin-right: -0.9em;
+      padding-top: 1em;
+      padding-bottom: 0.01em;
+      background-color: #00750b; }
+
+/* Grow */
+.hvr-grow {
+  vertical-align: middle;
+  transform: translateZ(0);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0);
+  backface-visibility: hidden;
+  -moz-osx-font-smoothing: grayscale;
+  transition-duration: 0.3s;
+  transition-property: transform; }
+
+.hvr-grow:hover,
+.hvr-grow:focus,
+.hvr-grow:active {
+  transform: scale(1.1); }
+
+/* Shrink */
+.hvr-shrink {
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px transparent;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform; }
+
+.hvr-shrink:hover, .hvr-shrink:focus, .hvr-shrink:active {
+  -webkit-transform: scale(0.9);
+  transform: scale(0.9); }
+
+/*# sourceMappingURL=main.css.map */
