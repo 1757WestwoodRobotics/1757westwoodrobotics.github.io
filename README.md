@@ -9,6 +9,7 @@ Link to the blog: <https://blog.whsrobotics.org>.
 - Larry Tseng
 - Bryce Parazin
 - Billy Girard
+- Sean Lendrum
 - James Grassi
 - Keith Webber
 - Chetan Gopal
