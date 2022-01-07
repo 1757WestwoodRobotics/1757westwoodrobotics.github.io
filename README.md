@@ -16,3 +16,4 @@ Link to the blog: <https://blog.whsrobotics.org>.
 - Eric Yamaguchi
 - Landon Bayer :)
 - Ivan Cai
+- Sean Tao
