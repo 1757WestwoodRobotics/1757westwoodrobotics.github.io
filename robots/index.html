@@ -1,104 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Our Robots</title>
-    <link rel="stylesheet" href="/stylesheets/bootstrap/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap/bootstrap.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <style>
       .bricklayer {
-          width: 1200px;
-          margin: auto;
+        width: 1200px;
+        margin: auto;
       }
-      .card-spacer{
-          width:400px;
-          height:600px;
-
+      .card-spacer {
+        width: 400px;
+        height: 600px;
       }
-      .card{
-          width:350px;
-          margin: auto;
+      .card {
+        width: 350px;
+        margin: auto;
       }
       @media only screen and (max-width: 1225px) {
         .bricklayer {
-            width: 900px;
+          width: 900px;
         }
-        .card-spacer{
-            width:300px;
-            height:600px;
+        .card-spacer {
+          width: 300px;
+          height: 600px;
         }
-        .card{
-            width:275px;
-            margin: auto;
+        .card {
+          width: 275px;
+          margin: auto;
         }
       }
       @media only screen and (max-width: 930px) {
         .bricklayer {
-            width: 750px;
+          width: 750px;
         }
-        .card-spacer{
-            width:250px;
-            height:600px;
+        .card-spacer {
+          width: 250px;
+          height: 600px;
         }
-        .card{
-            width:225px;
-            margin: auto;
+        .card {
+          width: 225px;
+          margin: auto;
         }
       }
       @media only screen and (max-width: 780px) {
         .bricklayer {
-            width: 600px;
+          width: 600px;
         }
-        .card-spacer{
-            width:300px;
-            height:600px;
+        .card-spacer {
+          width: 300px;
+          height: 600px;
         }
-        .card{
-            width:275px;
-            margin: auto;
+        .card {
+          width: 275px;
+          margin: auto;
         }
       }
       @media only screen and (max-width: 630px) {
         .bricklayer {
-            width: 500px;
+          width: 500px;
         }
-        .card-spacer{
-            width:250px;
-            height:600px;
+        .card-spacer {
+          width: 250px;
+          height: 600px;
         }
-        .card{
-            width:225px;
-            margin: auto;
+        .card {
+          width: 225px;
+          margin: auto;
         }
       }
       @media only screen and (max-width: 530px) {
         .bricklayer {
-            width: 250px;
+          width: 250px;
         }
-        .card-spacer{
-            width:250px;
-            height:620px;
+        .card-spacer {
+          width: 250px;
+          height: 620px;
         }
-        .card{
-            width:225px;
-            margin: auto;
+        .card {
+          width: 225px;
+          margin: auto;
         }
       }
     </style>
-</head>
-<body>
-
-  <template id='robot-cards-template' hidden>
+  </head>
+  <body>
+    <template id="robot-cards-template" hidden>
       {{#.}}
       <div class="card-spacer">
         <div class="card border-success">
           <div class="card-header">
             <h2 class="card-title">{{year}} {{competition}} {{robotName}}</h2>
           </div>
-          <img class="card-img-top" src="/images/robots/{{image}}" style="width: 100%; height: 100%; padding: 10px">
+          <img
+            class="card-img-top"
+            src="/images/robots/{{image}}"
+            style="width: 100%; height: 100%; padding: 10px"
+          />
           <div class="card-body">
             <p>{{description}}</p>
             <a href="{{link}}" class="card-link">Learn more</a>
@@ -106,17 +111,14 @@
         </div>
       </div>
       {{/.}}
-  </template>
+    </template>
 
-<div class= "container-fluid">
-    <div class="bricklayer" id='robot-deck' >
+    <div class="container-fluid">
+      <div class="bricklayer" id="robot-deck"></div>
     </div>
-  </div>
 
-  <script>
-
-  </script>
-  <script src="/scripts/mustache.min.js"></script>
-  <script src="/scripts/robothub.js"></script>
-</body>
+    <script></script>
+    <script src="/scripts/mustache.min.js"></script>
+    <script src="/scripts/robothub.js"></script>
+  </body>
 </html>

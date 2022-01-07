@@ -1,348 +1,596 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
     <!-- TODO: SEO OPTIMIZATION -->
-    <meta name="description" content="Westwood Robotics">
-    <meta name="keywords" content="Robotics">
+    <meta name="description" content="Westwood Robotics" />
+    <meta name="keywords" content="Robotics" />
 
-    <link href="/stylesheets/bootstrap/bootstrap.min.css" rel="stylesheet" type="text/css">
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css" rel="stylesheet" integrity="sha256-j+P6EZJVrbXgwSR5Mx+eCS6FvP9Wq27MBRC/ogVriY0=" crossorigin="anonymous">
-    <link href="/stylesheets/main.css" rel="stylesheet" type="text/css">
-    <link href="/favicon.ico" type="image/x-icon" rel="icon">
+    <link
+      href="/stylesheets/bootstrap/bootstrap.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      rel="stylesheet"
+      integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css"
+      rel="stylesheet"
+      integrity="sha256-j+P6EZJVrbXgwSR5Mx+eCS6FvP9Wq27MBRC/ogVriY0="
+      crossorigin="anonymous"
+    />
+    <link href="/stylesheets/main.css" rel="stylesheet" type="text/css" />
+    <link href="/favicon.ico" type="image/x-icon" rel="icon" />
 
     <title>Westwood Robotics | Home</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- NAVIGATION -->
     <nav class="navbar navbar-expand-md navbar-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <img src="images/wwrobotics_logo.png" alt="Westwood Robotics Logo">
-                <h5>Westwood Robotics</h5>
-            </a>
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+          <img src="images/wwrobotics_logo.png" alt="Westwood Robotics Logo" />
+          <h5>Westwood Robotics</h5>
+        </a>
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarMain"
+          aria-controls="navbarMain"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <div class="collapse navbar-collapse justify-content-end" id="navbarMain">
-                <div class="navbar-nav">
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarAboutMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            ABOUT
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarAboutMenu">
-                            <a class="dropdown-item" href="about/team/team_info.pdf">Team</a>
-                            <a class="dropdown-item" href="#home-frc"><i>FIRST</i> Robotics Competition</a>
-                            <!--<a class="dropdown-item" href="about/team/handbook">Team Handbook</a>-->
-                            <!--<a class="dropdown-item" href="/about/team/">Team</a>-->
-                            <!--<a class="dropdown-item" href="/about/history/">History</a>-->
-                            <!--<a class="dropdown-item" href="/about/frc/"><i>FIRST</i> Robotics Competition</a>-->
-                        </div>
-                    </div>
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarRobotsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            ROBOTS
-                        </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarRobotsMenu">
-                            <!-- Go-Kart and 2018 T-shirt Cannon -->
-                            <a class="dropdown-item" href="/robots/index.html" target="_blank">Our Robots</a>
-                            <a class="dropdown-item" href="https://youtu.be/YrOXxlsnZ70" target="_blank">2017 Steamworks</a>
-                            <a class="dropdown-item" href="https://youtu.be/VqOKzoHJDjA" target="_blank">2016 Stronghold</a>
-                            <a class="dropdown-item" href="https://youtu.be/FYH0VvNjenA" target="_blank">2015 T-shirt Cannon</a>
-                            <!--<a class="dropdown-item" href="/robots/frc/2017/">2017 Steamworks</a>-->
-                            <!--<a class="dropdown-item" href="/robots/frc/2016/">2016 Stronghold</a>-->
-                            <!--<a class="dropdown-item" href="/robots/other/2015/tshirtcannon/">2015 T-shirt Cannon</a>-->
-                        </div>
-                    </div>
-                    <a class="nav-link" href="/community/sponsors/Robotics Sponsorship Packet 2019-20.pdf" target="_blank">SPONSOR US</a>
-                    <a class="nav-link" href="/resources">RESOURCES</a>
-                    <!--<div class="nav-item dropdown">-->
-                    <!--<a class="nav-link dropdown-toggle" href="#" id="navbarCommunityMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-                    <!--COMMUNITY-->
-                    <!--</a>-->
-                    <!--<div class="dropdown-menu" aria-labelledby="navbarCommunityMenu">-->
-                    <!--<a class="dropdown-item" href="#">Projects</a>-->
-                    <!--<a class="dropdown-item" href="/community/sponsors/">Sponsors</a>-->
-                    <!--<a class="dropdown-item" href="#">Events</a>-->
-                    <!--<a class="dropdown-item" href="#">Fundraising</a>-->
-                    <!--</div>-->
-                    <!--</div>-->
-                    <!--<div class="nav-item dropdown">-->
-                    <!--<a class="nav-link dropdown-toggle" href="#" id="navbarMediaMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
-                    <!--MEDIA-->
-                    <!--</a>-->
-                    <!--<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarMediaMenu">-->
-                    <!--<a class="dropdown-item" href="/media/news/">News</a>-->
-                    <!--<a class="dropdown-item" href="/media/social-media/">Social Media</a>-->
-                    <!--<a class="dropdown-item" href="/media/photos-videos/">Photos and Videos</a>-->
-                    <!--</div>-->
-                    <!--</div>-->
-                </div>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarMain"
+        >
+          <div class="navbar-nav">
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarAboutMenu"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                ABOUT
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarAboutMenu">
+                <a class="dropdown-item" href="about/team/team_info.pdf"
+                  >Team</a
+                >
+                <a class="dropdown-item" href="#home-frc"
+                  ><i>FIRST</i> Robotics Competition</a
+                >
+                <!--<a class="dropdown-item" href="about/team/handbook">Team Handbook</a>-->
+                <!--<a class="dropdown-item" href="/about/team/">Team</a>-->
+                <!--<a class="dropdown-item" href="/about/history/">History</a>-->
+                <!--<a class="dropdown-item" href="/about/frc/"><i>FIRST</i> Robotics Competition</a>-->
+              </div>
             </div>
+            <div class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarRobotsMenu"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                ROBOTS
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarRobotsMenu">
+                <!-- Go-Kart and 2018 T-shirt Cannon -->
+                <a
+                  class="dropdown-item"
+                  href="/robots/index.html"
+                  target="_blank"
+                  >Our Robots</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="https://youtu.be/YrOXxlsnZ70"
+                  target="_blank"
+                  >2017 Steamworks</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="https://youtu.be/VqOKzoHJDjA"
+                  target="_blank"
+                  >2016 Stronghold</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="https://youtu.be/FYH0VvNjenA"
+                  target="_blank"
+                  >2015 T-shirt Cannon</a
+                >
+                <!--<a class="dropdown-item" href="/robots/frc/2017/">2017 Steamworks</a>-->
+                <!--<a class="dropdown-item" href="/robots/frc/2016/">2016 Stronghold</a>-->
+                <!--<a class="dropdown-item" href="/robots/other/2015/tshirtcannon/">2015 T-shirt Cannon</a>-->
+              </div>
+            </div>
+            <a
+              class="nav-link"
+              href="/community/sponsors/Robotics Sponsorship Packet 2019-20.pdf"
+              target="_blank"
+              >SPONSOR US</a
+            >
+            <a class="nav-link" href="/resources">RESOURCES</a>
+            <!--<div class="nav-item dropdown">-->
+            <!--<a class="nav-link dropdown-toggle" href="#" id="navbarCommunityMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+            <!--COMMUNITY-->
+            <!--</a>-->
+            <!--<div class="dropdown-menu" aria-labelledby="navbarCommunityMenu">-->
+            <!--<a class="dropdown-item" href="#">Projects</a>-->
+            <!--<a class="dropdown-item" href="/community/sponsors/">Sponsors</a>-->
+            <!--<a class="dropdown-item" href="#">Events</a>-->
+            <!--<a class="dropdown-item" href="#">Fundraising</a>-->
+            <!--</div>-->
+            <!--</div>-->
+            <!--<div class="nav-item dropdown">-->
+            <!--<a class="nav-link dropdown-toggle" href="#" id="navbarMediaMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+            <!--MEDIA-->
+            <!--</a>-->
+            <!--<div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarMediaMenu">-->
+            <!--<a class="dropdown-item" href="/media/news/">News</a>-->
+            <!--<a class="dropdown-item" href="/media/social-media/">Social Media</a>-->
+            <!--<a class="dropdown-item" href="/media/photos-videos/">Photos and Videos</a>-->
+            <!--</div>-->
+            <!--</div>-->
+          </div>
         </div>
+      </div>
     </nav>
 
     <!-- MAIN BANNER -->
     <div class="full-banner" id="home-main-banner">
-        <div class="container full-banner-text" id="home-main-banner-text">
-            <h1>Westwood Robotics</h1>
-            <h5><i>FIRST</i> Robotics Competition - Team 1757: Wolverines</h5>
-        </div>
-        <a href="#home-main-about_us" id="home-scroll-down">
-            <i class="fa fa-angle-down fa-3x" aria-hidden="true"></i>
-        </a>
+      <div class="container full-banner-text" id="home-main-banner-text">
+        <h1>Westwood Robotics</h1>
+        <h5><i>FIRST</i> Robotics Competition - Team 1757: Wolverines</h5>
+      </div>
+      <a href="#home-main-about_us" id="home-scroll-down">
+        <i class="fa fa-angle-down fa-3x" aria-hidden="true"></i>
+      </a>
     </div>
 
     <!-- ABOUT US / OUR MISSION -->
     <div class="container main-content" id="home-main-about_us">
-        <div class="container-text">
-            <h2>OUR MISSION</h2>
-            <br>
-            <p id="home-mission-statement">Founded in 2006, we are a high-school robotics team from Westwood, MA with a mission to inspire young people to become leaders in science, technology, art, engineering, and mathematics by engaging them in team-based programs that build important technical and life skills such as leadership, innovation, communication, and self-confidence.</p>
-        </div>
-        <br>
-        <div id="chairmanVideo">
-            <iframe style="max-width: 100%" width="560" height="315" src="https://www.youtube.com/embed/NJI2qe9reDk?rel=0&amp;showinfo=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        </div>
-        <br>
-        <a role="button" class="btn btn-primary btn-lg" href="https://docs.google.com/forms/d/e/1FAIpQLSdkkT89wJck55Y0TYxxq5gudIrd969rrOJlUGCf20ysnj-R7Q/viewform?usp=sf_link">Join Our Team This Year!</a>
-        <br>
-        <br>
-        <span class="fa-stack fa-lg">
-          <i class="fa fa-circle-thin fa-stack-2x"></i>
-          <i class="fa fa-info fa-stack-1x"></i>
-        </span>
-        <br>
+      <div class="container-text">
+        <h2>OUR MISSION</h2>
+        <br />
+        <p id="home-mission-statement">
+          Founded in 2006, we are a high-school robotics team from Westwood, MA
+          with a mission to inspire young people to become leaders in science,
+          technology, art, engineering, and mathematics by engaging them in
+          team-based programs that build important technical and life skills
+          such as leadership, innovation, communication, and self-confidence.
+        </p>
+      </div>
+      <br />
+      <div id="chairmanVideo">
+        <iframe
+          style="max-width: 100%"
+          width="560"
+          height="315"
+          src="https://www.youtube.com/embed/NJI2qe9reDk?rel=0&amp;showinfo=0"
+          frameborder="0"
+          allow="autoplay; encrypted-media"
+          allowfullscreen
+        ></iframe>
+      </div>
+      <br />
+      <a
+        role="button"
+        class="btn btn-primary btn-lg"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSdkkT89wJck55Y0TYxxq5gudIrd969rrOJlUGCf20ysnj-R7Q/viewform?usp=sf_link"
+        >Join Our Team This Year!</a
+      >
+      <br />
+      <br />
+      <span class="fa-stack fa-lg">
+        <i class="fa fa-circle-thin fa-stack-2x"></i>
+        <i class="fa fa-info fa-stack-1x"></i>
+      </span>
+      <br />
     </div>
 
     <!-- NEWS -->
     <div class="full-banner" id="home-news-banner">
-        <div class="container main-content" id="home-news">
-            <h2>NEWS</h2>
-            <br>
-            <template id="news-template" hidden>
-                {{#.}}
-                <div class="card">
-                    {{{media}}}
-                    <div class="card-body">
-                        <a href="{{link}}" target="_blank">
-                            <h4 class="card-title">{{title}}</h4>
-                        </a>
-                        <p class="card-text">{{{content}}}</p>
-                    </div>
-                </div>
-                {{/.}}
-            </template>
-            <div class="card-deck" id="news-gallery">
+      <div class="container main-content" id="home-news">
+        <h2>NEWS</h2>
+        <br />
+        <template id="news-template" hidden>
+          {{#.}}
+          <div class="card">
+            {{{media}}}
+            <div class="card-body">
+              <a href="{{link}}" target="_blank">
+                <h4 class="card-title">{{title}}</h4>
+              </a>
+              <p class="card-text">{{{content}}}</p>
             </div>
-        </div>
-        <a href="https://blog.whsrobotics.org" class="btn btn-info" role="button">Read More on our Blog</a>
+          </div>
+          {{/.}}
+        </template>
+        <div class="card-deck" id="news-gallery"></div>
+      </div>
+      <a href="https://blog.whsrobotics.org" class="btn btn-info" role="button"
+        >Read More on our Blog</a
+      >
     </div>
 
     <!-- ROBOT GALLERY -->
     <div class="main-content" id="home-robot-gallery">
-        <!-- Scrollable Carousel? -->
-        <h2>MEET OUR ROBOTS</h2>
-        <br>
-        <template id="robot-gallery-template" hidden>
-            <div class="row no-gutters">
-
-            {{#.}}
-                <div class="robot card col-6 col-md-3 hvr-shrink">
-                    <a href="robots/index.html">
-                        <img class="card-img-top img-fluid" src="/images/robots/{{image}}" alt="{{year}} {{robotName}}{{competition}}">
-                        <div class="card-body">
-                            <h6 class="card-title">{{year}} {{competition}} {{robotName}}</h6>
-                        </div>
-                    </a>
-                </div>
-            {{/.}}
-            </div>
-        </template>
-        <div class="container" id="robot-gallery">
+      <!-- Scrollable Carousel? -->
+      <h2>MEET OUR ROBOTS</h2>
+      <br />
+      <template id="robot-gallery-template" hidden>
+        <div class="row no-gutters">
+          {{#.}}
+          <div class="robot card col-6 col-md-3 hvr-shrink">
+            <a href="robots/index.html">
+              <img
+                class="card-img-top img-fluid"
+                src="/images/robots/{{image}}"
+                alt="{{year}} {{robotName}}{{competition}}"
+              />
+              <div class="card-body">
+                <h6 class="card-title">
+                  {{year}} {{competition}} {{robotName}}
+                </h6>
+              </div>
+            </a>
+          </div>
+          {{/.}}
         </div>
+      </template>
+      <div class="container" id="robot-gallery"></div>
     </div>
 
-    <hr style="width:80%">
+    <hr style="width: 80%" />
 
     <!-- TODO: Put CSS styles in main.css!!! FIX MOBILE STYLES!!! -->
     <div class="container main-content home-text" id="home-school-frc">
-        <!-- WHS -->
-        <div class="row" style="width: 80%; margin-left: auto; margin-right: auto; margin-bottom: 4em;"> <!--SIZING ON MD+ ONLY-->
-            <div class="col-3">
-                <img class="img-fluid" src="/images/sponsor-logos/whs.jpg" alt="WHS logo">
-            </div>
-            <div class="col-9" style="display: flex; align-items: center;">
-                <p style="margin-bottom: 0;">Westwood High School is a public high school located in the Greater Boston area. Westwood High School aims to encourage and develop students' education across all fields. <a href="http://www.westwood.k12.ma.us/westwood-high-school/">Learn More</a></p>
-            </div>
+      <!-- WHS -->
+      <div
+        class="row"
+        style="
+          width: 80%;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 4em;
+        "
+      >
+        <!--SIZING ON MD+ ONLY-->
+        <div class="col-3">
+          <img
+            class="img-fluid"
+            src="/images/sponsor-logos/whs.jpg"
+            alt="WHS logo"
+          />
         </div>
+        <div class="col-9" style="display: flex; align-items: center">
+          <p style="margin-bottom: 0">
+            Westwood High School is a public high school located in the Greater
+            Boston area. Westwood High School aims to encourage and develop
+            students' education across all fields.
+            <a href="http://www.westwood.k12.ma.us/westwood-high-school/"
+              >Learn More</a
+            >
+          </p>
+        </div>
+      </div>
 
-        <!-- FRC -->
-        <div class="row" style="width: 80%; margin-left: auto; margin-right: auto; margin-bottom: 4em;"> <!--SIZING ON MD+ ONLY-->
-            <div class="col-9" style="display: flex; align-items: center;">
-                <p style="margin-bottom: 0;"><i>FIRST</i> Robotics Competition (FRC) is an international high-school competition. FIRST is a foundation whose mission is to inspire young people to become science and technology leaders by engaging them in exciting mentor-based programs that build science, engineering, and technology skills. <a href="https://www.firstinspires.org/robotics/frc">Learn More</a></p>
-            </div>
-            <div class="col-3">
-                <img class="img-fluid" src="/images/frc_logo.jpg" alt="FRC logo">
-            </div>
+      <!-- FRC -->
+      <div
+        class="row"
+        style="
+          width: 80%;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 4em;
+        "
+      >
+        <!--SIZING ON MD+ ONLY-->
+        <div class="col-9" style="display: flex; align-items: center">
+          <p style="margin-bottom: 0">
+            <i>FIRST</i> Robotics Competition (FRC) is an international
+            high-school competition. FIRST is a foundation whose mission is to
+            inspire young people to become science and technology leaders by
+            engaging them in exciting mentor-based programs that build science,
+            engineering, and technology skills.
+            <a href="https://www.firstinspires.org/robotics/frc">Learn More</a>
+          </p>
         </div>
+        <div class="col-3">
+          <img class="img-fluid" src="/images/frc_logo.jpg" alt="FRC logo" />
+        </div>
+      </div>
 
-        <!--Westwood Robotics INC -->
-        <div class="row" style="width:80%;margin-left:auto; margin-right: auto; margin-bottom:4em;">
-          <div class="col-3">
-            <img class="img-fluid" src="/images/westwoodroboticsinc.png">
-          </div>
-          <div class="col-9" style="display: flex; align-items: center;">
-            <p style="margin-bottom: 0;">Westwood Robotics, Inc. is a 501(c)(3) non-profit organization designed to support Westwood Robotics and promote STEM education throughout the community.</p>
-          </div>
+      <!--Westwood Robotics INC -->
+      <div
+        class="row"
+        style="
+          width: 80%;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 4em;
+        "
+      >
+        <div class="col-3">
+          <img class="img-fluid" src="/images/westwoodroboticsinc.png" />
         </div>
+        <div class="col-9" style="display: flex; align-items: center">
+          <p style="margin-bottom: 0">
+            Westwood Robotics, Inc. is a 501(c)(3) non-profit organization
+            designed to support Westwood Robotics and promote STEM education
+            throughout the community.
+          </p>
+        </div>
+      </div>
     </div>
 
-    <hr style="width: 80%;">
+    <hr style="width: 80%" />
 
     <!-- SPONSORS -->
     <div class="container main-content" id="home-sponsors">
-
-        <h2>SPONSORS</h2>
-        <br>
-        <template id="sponsors-template" hidden>
-            <div>
-                {{#platinum}}
-                <div class="home-platinum-sponsor">
-                    <a href="{{link}}" target="_blank"><img src="/images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                </div>
-                {{/platinum}}
-            </div>
-            <div>
-                {{#gold}}
-                <div class="home-gold-sponsor">
-                    <a href="{{link}}" target="_blank"><img src="/images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                </div>
-                {{/gold}}
-            </div>
-            <div>
-                {{#silver}}
-                <div class="home-silver-sponsor">
-                    <a href="{{link}}" target="_blank"><img src="/images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                </div>
-                {{/silver}}
-            </div>
-            <div>
-                {{#bronze}}
-                <div class="home-bronze-sponsor">
-                    <a href="{{link}}" target="_blank"><img src="/images/sponsor-logos/{{image}}" class="img-fluid"></a>
-                </div>
-                {{/bronze}}
-            </div>
-        </template>
-
-        <div id="sponsors-container">
-
+      <h2>SPONSORS</h2>
+      <br />
+      <template id="sponsors-template" hidden>
+        <div>
+          {{#platinum}}
+          <div class="home-platinum-sponsor">
+            <a href="{{link}}" target="_blank"
+              ><img src="/images/sponsor-logos/{{image}}" class="img-fluid"
+            /></a>
+          </div>
+          {{/platinum}}
         </div>
+        <div>
+          {{#gold}}
+          <div class="home-gold-sponsor">
+            <a href="{{link}}" target="_blank"
+              ><img src="/images/sponsor-logos/{{image}}" class="img-fluid"
+            /></a>
+          </div>
+          {{/gold}}
+        </div>
+        <div>
+          {{#silver}}
+          <div class="home-silver-sponsor">
+            <a href="{{link}}" target="_blank"
+              ><img src="/images/sponsor-logos/{{image}}" class="img-fluid"
+            /></a>
+          </div>
+          {{/silver}}
+        </div>
+        <div>
+          {{#bronze}}
+          <div class="home-bronze-sponsor">
+            <a href="{{link}}" target="_blank"
+              ><img src="/images/sponsor-logos/{{image}}" class="img-fluid"
+            /></a>
+          </div>
+          {{/bronze}}
+        </div>
+      </template>
 
-        <br>
+      <div id="sponsors-container"></div>
 
-        <p>Interested in sponsoring us? Westwood Robotics Inc. is a 501(c)(3) non-profit organization, and your donations are tax-deductible.</p>
-        <a href="/community/sponsors/Westwood%20Robotics%20Sponsorship%20Information%202018-19.pdf" class="btn btn-outline-primary" role="button">Learn More</a>
+      <br />
 
-        <br>
+      <p>
+        Interested in sponsoring us? Westwood Robotics Inc. is a 501(c)(3)
+        non-profit organization, and your donations are tax-deductible.
+      </p>
+      <a
+        href="/community/sponsors/Westwood%20Robotics%20Sponsorship%20Information%202018-19.pdf"
+        class="btn btn-outline-primary"
+        role="button"
+        >Learn More</a
+      >
 
-        <hr>
+      <br />
 
-        <br>
-        <h2 id="calendar">CALENDAR</h2>
+      <hr />
 
-        <div data-tockify-component="calendar" data-tockify-calendar="wwrobotics"></div>
+      <br />
+      <h2 id="calendar">CALENDAR</h2>
+
+      <div
+        data-tockify-component="calendar"
+        data-tockify-calendar="wwrobotics"
+      ></div>
     </div>
 
     <!-- DONATE -->
     <div class="full-banner" id="home-donate-banner">
-        <h5>Westwood Robotics Inc. is a 501(c)(3) non-profit organization. Want to contribute? Donate to our GoFundMe!</h5>
-        &nbsp;
-        <a class="btn btn-danger" href="https://www.gofundme.com/whsroboticsteam" target="_blank" role="button">Click Here</a>
+      <h5>
+        Westwood Robotics Inc. is a 501(c)(3) non-profit organization. Want to
+        contribute? Donate to our GoFundMe!
+      </h5>
+      &nbsp;
+      <a
+        class="btn btn-danger"
+        href="https://www.gofundme.com/whsroboticsteam"
+        target="_blank"
+        role="button"
+        >Click Here</a
+      >
     </div>
 
     <!-- FOOTER  -->
     <div class="footer container-fluid">
-        <div class="footer-container">
-            <br>
-            <div class="row">
-                <div class="col-12 col-sm-6 col-md-3">
-                    <h5>CONTACT</h5>
-                    <br>
-                    <p>Email: <a href="mailto:contact@whsrobotics.org" target="_blank">contact@whsrobotics.org</a></p>
+      <div class="footer-container">
+        <br />
+        <div class="row">
+          <div class="col-12 col-sm-6 col-md-3">
+            <h5>CONTACT</h5>
+            <br />
+            <p>
+              Email:
+              <a href="mailto:contact@whsrobotics.org" target="_blank"
+                >contact@whsrobotics.org</a
+              >
+            </p>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <h5>LOCATION</h5>
+            <br />
+            <p>Westwood High School</p>
+            <p>200 Nahatan Street #A160</p>
+            <p>Westwood, MA 02090</p>
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <h5>NEWSLETTER</h5>
+            <br />
+            <!-- Begin MailChimp Signup Form -->
+            <div id="mc_embed_signup">
+              <form
+                action="https://whsrobotics.us17.list-manage.com/subscribe/post?u=1a841be67728af703f81a05ab&amp;id=e2da47682f"
+                method="post"
+                id="mc-embedded-subscribe-form"
+                name="mc-embedded-subscribe-form"
+                class="validate"
+                target="_blank"
+                novalidate
+              >
+                <div class="form-group">
+                  <input
+                    style="color: black"
+                    type="email"
+                    name="EMAIL"
+                    class="form-control-sm"
+                    placeholder="Email Address"
+                    required
+                  />
+                  <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                  <div
+                    style="position: absolute; left: -5000px"
+                    aria-hidden="true"
+                  >
+                    <input
+                      type="text"
+                      name="b_1a841be67728af703f81a05ab_e2da47682f"
+                      tabindex="-1"
+                      value=""
+                    />
+                  </div>
+                  <br />
+                  <br />
+                  <button type="submit" class="btn btn-primary">
+                    Subscribe
+                  </button>
                 </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                    <h5>LOCATION</h5>
-                    <br>
-                    <p>Westwood High School</p>
-                    <p>200 Nahatan Street #A160</p>
-                    <p>Westwood, MA 02090</p>
-                </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                    <h5>NEWSLETTER</h5>
-                    <br>
-                    <!-- Begin MailChimp Signup Form -->
-                    <div id="mc_embed_signup">
-                        <form action="https://whsrobotics.us17.list-manage.com/subscribe/post?u=1a841be67728af703f81a05ab&amp;id=e2da47682f" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                            <div class="form-group">
-                                <input style="color: black;" type="email" name="EMAIL" class="form-control-sm" placeholder="Email Address" required>
-                                <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-                                <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_1a841be67728af703f81a05ab_e2da47682f" tabindex="-1" value=""></div>
-                                <br>
-                                <br>
-                                <button type="submit" class="btn btn-primary">Subscribe</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!--End mc_embed_signup-->
-                </div>
-                <div class="col-12 col-sm-6 col-md-3">
-                    <h5>STAY CONNECTED</h5>
-                    <br>
-                    <a href="https://twitter.com/WWRobotics1757" role="button" class="btn btn-outline-secondary rounded-circle footer-contact-button" target="_blank">
-                        <i class="fa fa-twitter fa-lg" aria-hidden="true" style="padding-top: 0.395em; padding-left: 0.1em"></i>
-                    </a>
-
-                    <a href="https://www.snapchat.com/add/wwrobotics" role="button" class="btn btn-outline-secondary rounded-circle footer-contact-button" target="_blank">
-                        <i class="fa fa-snapchat-ghost fa-lg" aria-hidden="true" style="padding-top: 0.39em;"></i>
-                    </a>
-
-                    <a href="https://www.facebook.com/WWRobotics1757" role="button" class="btn btn-outline-secondary rounded-circle footer-contact-button" target="_blank">
-                        <i class="fa fa-facebook fa-lg" aria-hidden="true" style="padding-top: 0.40em;"></i>
-                    </a>
-
-                    <a href="https://www.instagram.com/wwrobotics1757" role="button" class="btn btn-outline-secondary rounded-circle footer-contact-button" target="_blank">
-                        <i class="fa fa-instagram fa-lg" aria-hidden="true" style="padding-top: 0.395em; padding-left: 0.015em"></i>
-                    </a>
-                </div>
+              </form>
             </div>
-            <br>
+
+            <!--End mc_embed_signup-->
+          </div>
+          <div class="col-12 col-sm-6 col-md-3">
+            <h5>STAY CONNECTED</h5>
+            <br />
+            <a
+              href="https://twitter.com/WWRobotics1757"
+              role="button"
+              class="btn btn-outline-secondary rounded-circle footer-contact-button"
+              target="_blank"
+            >
+              <i
+                class="fa fa-twitter fa-lg"
+                aria-hidden="true"
+                style="padding-top: 0.395em; padding-left: 0.1em"
+              ></i>
+            </a>
+
+            <a
+              href="https://www.snapchat.com/add/wwrobotics"
+              role="button"
+              class="btn btn-outline-secondary rounded-circle footer-contact-button"
+              target="_blank"
+            >
+              <i
+                class="fa fa-snapchat-ghost fa-lg"
+                aria-hidden="true"
+                style="padding-top: 0.39em"
+              ></i>
+            </a>
+
+            <a
+              href="https://www.facebook.com/WWRobotics1757"
+              role="button"
+              class="btn btn-outline-secondary rounded-circle footer-contact-button"
+              target="_blank"
+            >
+              <i
+                class="fa fa-facebook fa-lg"
+                aria-hidden="true"
+                style="padding-top: 0.4em"
+              ></i>
+            </a>
+
+            <a
+              href="https://www.instagram.com/wwrobotics1757"
+              role="button"
+              class="btn btn-outline-secondary rounded-circle footer-contact-button"
+              target="_blank"
+            >
+              <i
+                class="fa fa-instagram fa-lg"
+                aria-hidden="true"
+                style="padding-top: 0.395em; padding-left: 0.015em"
+              ></i>
+            </a>
+          </div>
         </div>
-        <div id="footer-copyright">
-            <p>Created and © 2020 by Westwood Robotics. All Rights Reserved.</p>
-        </div>
+        <br />
+      </div>
+      <div id="footer-copyright">
+        <p>Created and © 2020 by Westwood Robotics. All Rights Reserved.</p>
+      </div>
     </div>
 
     <!-- NOSCRIPT FOR USERS WITHOUT JAVASCRIPT -->
     <noscript>
-        <div class="alert alert-warning" role="alert" style="position: fixed; bottom: 5vh; margin-left: 28%; z-index: 10; ">
-            <strong>Heads up!</strong> This site requires JavaScript to be enabled to get the best experience!
-        </div>
+      <div
+        class="alert alert-warning"
+        role="alert"
+        style="position: fixed; bottom: 5vh; margin-left: 28%; z-index: 10"
+      >
+        <strong>Heads up!</strong> This site requires JavaScript to be enabled
+        to get the best experience!
+      </div>
     </noscript>
 
     <!-- JAVASCRIPT -->
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"
+      integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4"
+      crossorigin="anonymous"
+    ></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <script src="/scripts/mustache.min.js"></script>
 
@@ -358,19 +606,22 @@
     <script src="/scripts/smooth-scroll.js"></script>
 
     <!-- CALENDAR -->
-    <script data-cfasync="false" data-tockify-script="embed" src="https://public.tockify.com/browser/embed.js"></script>
+    <script
+      data-cfasync="false"
+      data-tockify-script="embed"
+      src="https://public.tockify.com/browser/embed.js"
+    ></script>
 
     <!-- GOOGLE ANALYTICS -->
     <!--<script>-->
-        <!--(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){-->
-                <!--(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),-->
-            <!--m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)-->
-        <!--})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');-->
+    <!--(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){-->
+    <!--(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),-->
+    <!--m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)-->
+    <!--})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');-->
 
-        <!--ga('create', 'UA-101214885-1', 'auto');-->
-        <!--ga('send', 'pageview');-->
+    <!--ga('create', 'UA-101214885-1', 'auto');-->
+    <!--ga('send', 'pageview');-->
 
     <!--</script>-->
-</body>
-
+  </body>
 </html>
