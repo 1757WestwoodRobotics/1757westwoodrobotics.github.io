@@ -15,3 +15,7 @@ Link to the blog: <https://blog.whsrobotics.org>.
 - Chetan Gopal
 - Eric Yamaguchi
 - Ivan Cai
+- Landon Bayer
+- Sean Tao
+- Luke Maxwell
+
