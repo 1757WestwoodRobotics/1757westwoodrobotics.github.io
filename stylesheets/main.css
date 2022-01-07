@@ -62,16 +62,13 @@
   }
 }
 body {
-  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui,
-    BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   text-align: center;
   font-weight: 400;
 }
 body h1,
 body h2 {
-  font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system,
-    system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
-    sans-serif;
+  font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 body h1 {
   font-weight: 600;
@@ -81,8 +78,7 @@ body h2 {
   font-weight: 500;
 }
 body nav {
-  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui,
-    BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   z-index: 1;
 }
 body nav.navbar {
@@ -90,9 +86,7 @@ body nav.navbar {
   margin-top: -2px;
 }
 body nav .navbar-brand h5 {
-  font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system,
-    system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial,
-    sans-serif;
+  font-family: "Raleway", "Nunito Sans", "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   display: inline-block;
 }
 body nav .navbar-collapse .navbar-nav {
@@ -156,8 +150,7 @@ body .full-banner .full-banner-text * {
   color: white;
 }
 body .full-banner .full-banner-text h5 {
-  font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont,
-    "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Roboto Condensed", -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   font-weight: 300;
 }
 body .main-content {
