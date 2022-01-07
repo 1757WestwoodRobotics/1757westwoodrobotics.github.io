@@ -29,8 +29,7 @@
     "link": "https://www.youtube.com/watch?v=NJI2qe9reDk",
     "author": "Westwood Robotics - Youtube",
     "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/NJI2qe9reDk' frameborder='0' allowfullscreen></iframe>",
-    "content":""
-
+    "content": ""
   },
   {
     "title": "What's New?",
@@ -48,7 +47,7 @@
     "media": "<iframe class='card-img-top' src='https://www.youtube.com/embed/YrOXxlsnZ70' frameborder='0' allowfullscreen></iframe>",
     "content": ""
   },
-    {
+  {
     "title": "Support Us!",
     "date": "October 28, 2017 12:44 P.M.",
     "link": "/media/news/chipotle-fundraiser.png",
@@ -64,7 +63,7 @@
     "media": "<img class='card-img-top' src='https://pbs.twimg.com/media/C86MUZsWAAA-9Z6.jpg' alt='2017 FRC Competition, New England District Championships at UNH'>",
     "content": "<a href='mailto:contact@whsrobotics.org'>Send us an email</a> for more details!"
   },
-    {
+  {
     "title": "FIRST Power Up",
     "date": "September 21, 2017 5:20 P.M.",
     "link": "https://twitter.com/WWRobotics1757/status/910977037648715776",
