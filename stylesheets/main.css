@@ -3,6 +3,10 @@
   h5 {
     font-size: 1.1rem;
   }
+
+  #home-main-banner-text {
+    font-size: 0.35rem;
+  }
 }
 @media (min-width: 576px) {
   body nav .navbar-brand img {
@@ -26,8 +30,11 @@
     height: 80px;
     width: 100px;
   }
+  body #home-main-banner-text {
+    font-size: 0.39rem;
+  }
 }
-@media (min-width: 768px) {
+@media (min-width: 820px) {
   body nav .navbar-brand img {
     height: 100px;
     width: 100px;
@@ -36,7 +43,7 @@
     margin-top: -125px;
   }
 }
-@media (max-width: 768px) {
+@media (max-width: 820px) {
   .full-banner#home-main-banner {
     margin-top: -64px;
   }
@@ -49,12 +56,9 @@
     margin-right: 0;
     margin-bottom: 25px;
   }
-}
-@media (min-width: 992px) {
-  .full-banner-text,
-  .container-text {
-    padding-left: 15%;
-    padding-right: 15%;
+
+  #home-main-banner-text {
+    font-size: 0.66rem;
   }
 }
 body {
@@ -71,6 +75,7 @@ body h2 {
 }
 body h1 {
   font-weight: 600;
+  font-size: 5.5em;
 }
 body h2 {
   font-weight: 500;
