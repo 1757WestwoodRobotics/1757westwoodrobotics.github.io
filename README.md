@@ -17,3 +17,4 @@ Link to the blog: <https://blog.whsrobotics.org>.
 - Landon Bayer :)
 - Ivan Cai
 - Sean Tao
+- Luke Maxwell
