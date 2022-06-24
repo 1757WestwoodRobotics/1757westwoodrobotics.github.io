@@ -7,16 +7,10 @@
       "image": "whs.jpg"
     },
     {
-      "name": "US STEAM Academy",
+      "name": "Heartlander Surgical",
       "bio": "",
-      "link": "https://ussteam.org",
-      "image": "ussteam.jpg"
-    },
-    {
-      "name": "Analog Devices",
-      "bio": "",
-      "link": "https://www.analog.com",
-      "image": "Analog Devices.png"
+      "link": "http://www.heartlandersurgical.com/",
+      "image": "heartlandersurgical.jpg"
     }
   ],
   "gold": [
@@ -31,6 +25,12 @@
       "bio": "",
       "link": "https://www.eversource.com/content/",
       "image": "eversource.png"
+    },
+    {
+      "name": "Analog Devices",
+      "bio": "",
+      "link": "https://www.analog.com",
+      "image": "Analog Devices.png"
     },
     {
       "name": "MathWorks",
@@ -107,12 +107,6 @@
       "bio": "",
       "link": "http://www.aig.com/",
       "image": "aig.png"
-    },
-    {
-      "name": "Heartlander Surgical",
-      "bio": "",
-      "link": "http://www.heartlandersurgical.com/",
-      "image": "heartlandersurgical.jpg"
     },
     {
       "name": "Energid",
