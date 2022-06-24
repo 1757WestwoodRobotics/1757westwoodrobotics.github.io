@@ -68,7 +68,7 @@ body {
   background-position: top center;
   width: 100%;
   /*overflow: hidden;*/
-  background-image: url("../images/2017robot_photoshoot.jpg");
+  background-image: url("../images/skadi.jpg");
   background-color: #115724;
   /*padding-top: 100px;*/
   height: 101vh;
@@ -119,7 +119,7 @@ body .full-banner {
   overflow: hidden;
 }
 body .full-banner#home-main-banner {
-  background-image: url("../images/2017robot_photoshoot.jpg");
+  background-image: url("../images/skadi.jpg");
   background-color: #115724;
   padding-top: 100px;
   height: 101vh;

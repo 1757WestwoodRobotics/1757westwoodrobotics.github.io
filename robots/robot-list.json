@@ -1,10 +1,23 @@
 [
   {
+    "year": "2022",
+    "robotName": "\"Skadi\"",
+    "competition": "Rapid React",
+    "image": "2022rapidreact.png",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+  },
+  {
+    "year": "2022",
+    "robotName": "",
+    "competition": "T-Shirt Cannon",
+    "image": "2022tshirtcannon.png",
+    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+  },
+  {
     "year": "2019",
     "robotName": "\"Rampothy\"",
     "competition": "Deep Space",
     "image": "2019deepspace_compressed.png",
-    "link": "robot-pages/2019deepspace.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -12,7 +25,6 @@
     "robotName": "",
     "competition": "Power Up",
     "image": "2018firstpowerup_compressed.png",
-    "link": "robot-pages/2018powerup.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -20,7 +32,6 @@
     "robotName": "",
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
-    "link": "robot-pages/2017steamworks.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -28,7 +39,6 @@
     "robotName": "",
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
-    "link": "robot-pages/2016stronghold.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -36,7 +46,6 @@
     "robotName": "",
     "competition": "Recycle Rush",
     "image": "2015recyclerush_compressed.png",
-    "link": "robot-pages/2015recyclerush.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   },
   {
@@ -44,7 +53,6 @@
     "robotName": "T-shirt Cannon",
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
-    "link": "robot-pages/2015tshirtcannon.html",
     "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
   }
 ]
