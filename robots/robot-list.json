@@ -4,42 +4,42 @@
     "robotName": "\"Skadi\"",
     "competition": "Rapid React",
     "image": "2022rapidreact.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "After a long pandemic hibernation we dusted off the tools, warmed up the laser cutter, repaired the 3D printer, refilled the coffee pot and set off to build our highest performing robot to date. Named for the Norse God of Archery, this fast and nimble sniper was quick to grab balls and precisely put them on target with its Computer-Vision assisted aiming. In addition to securing playoff berths at every event it competed in - including NE Championship - Skadi took home the judges awards for both Innovation in Controls and overall Quality. "
   },
   {
     "year": "2022",
     "robotName": "",
     "competition": "T-Shirt Cannon",
     "image": "2022tshirtcannon.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "This off season learning robot restarted our tradition of creating a t-shirt cannon for the school and town events. With 120psi of pressure in two tanks, it could fire a t-shirt shell far into the crowd of the bleachers. "
   },
   {
     "year": "2019",
     "robotName": "\"Rampothy\"",
     "competition": "Deep Space",
     "image": "2019deepspace_compressed.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "Designed to be the most accommodating Ramp Bot in FRC that year, this hunchbacked robot flew of the starting platform and spent most of the game fitting hatch panels to the cargo ship. When the 30 second warning bell rang it unfolded into one of the widest ramps in FRC: a feature which helped it to secure an elusive and entertaining double ramp bot climb at the Manchester District Event. "
   },
   {
     "year": "2018",
     "robotName": "",
     "competition": "Power Up",
     "image": "2018firstpowerup_compressed.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "This crate stacking behemouth could extend to almost 10 feet tall! "
   },
   {
     "year": "2017",
     "robotName": "",
     "competition": "Steamworks",
     "image": "2017steamworks_compressed.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "A fast and agile Mecanum drive coupled with robust scoring mechanism and a fast climb made this bot a serious contender on the field. "
   },
   {
     "year": "2016",
     "robotName": "",
     "competition": "Stronghold",
     "image": "2016stronghold_compressed.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "Inspired by prototype drive systems for the US Military, this robots custom designed fully gear-driven all wheel drive system was capable of quickly fording any obstacle on the field. "
   },
   {
     "year": "2015",
@@ -53,6 +53,6 @@
     "robotName": "T-shirt Cannon",
     "competition": "",
     "image": "2015tshirtcannon_compressed.png",
-    "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. "
+    "description": "This Magazine fed, shell ejecting T-shirt cannon mounted to an experimental Mecanum drive test bed was a fun learning opportunity for new team members and was a hit with local school and town events. Capable of a 3 round per minute rate of fire and the ability to drive sideways as it strafed the crowd of pep rallies and sporting events. "
   }
 ]
