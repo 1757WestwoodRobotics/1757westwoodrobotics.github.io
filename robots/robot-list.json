@@ -4,7 +4,25 @@
     "robotName": "\"Skadi\"",
     "competition": "Rapid React",
     "image": "2022rapidreact.png",
-    "description": "After a long pandemic hibernation we dusted off the tools, warmed up the laser cutter, repaired the 3D printer, refilled the coffee pot and set off to build our highest performing robot to date. Named for the Norse God of Archery, this fast and nimble sniper was quick to grab balls and precisely put them on target with its Computer-Vision assisted aiming. In addition to securing playoff berths at every event it competed in - including NE Championship - Skadi took home the judges awards for both Innovation in Controls and overall Quality. "
+    "description": "After a long pandemic hibernation we dusted off the tools, warmed up the laser cutter, repaired the 3D printer, refilled the coffee pot and set off to build our highest performing robot to date. Named for the Norse God of Archery, this fast and nimble sniper was quick to grab balls and precisely put them on target with its Computer-Vision assisted aiming. In addition to securing playoff berths at every event it competed in - including NE Championship - Skadi took home the judges awards for both Innovation in Controls and overall Quality. ",
+        "videos": [
+            {
+                "name": "Season recap",
+                "url": "https://youtu.be/s1iLbVFduqE"
+            },
+            {
+                "name": "WPI Match 60",
+                "url": "https://youtu.be/P2qm6jk8zN8"
+            },
+            {
+                "name": "Best point-wise match",
+                "url": "https://youtu.be/xDQo_OFQs5Q"
+            },
+            {
+                "name": "robot capabilities match",
+                "url": "https://youtu.be/0Y-nsykazT0"
+            }
+        ]
   },
   {
     "year": "2022",
