@@ -4,21 +4,23 @@
     <meta charset="UTF-8" />
     <title>Our Robots</title>
     <link rel="stylesheet" href="/stylesheets/bootstrap/bootstrap.min.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/scripts/bootstrap.min.js"></script>
     <style>
       .bricklayer {
         width: 1200px;
+        display:flex;
+        flex-wrap: wrap;
         margin: auto;
+
+      }
+        .card-body {
+          max-height: 30vh;
+          overflow: auto;
       }
       .card-spacer {
         width: 400px;
-        height: 600px;
+          padding-bottom: 1em;
       }
       .card {
         width: 350px;
@@ -30,7 +32,6 @@
         }
         .card-spacer {
           width: 300px;
-          height: 600px;
         }
         .card {
           width: 275px;
@@ -43,7 +44,6 @@
         }
         .card-spacer {
           width: 250px;
-          height: 600px;
         }
         .card {
           width: 225px;
@@ -56,7 +56,6 @@
         }
         .card-spacer {
           width: 300px;
-          height: 600px;
         }
         .card {
           width: 275px;
@@ -69,7 +68,6 @@
         }
         .card-spacer {
           width: 250px;
-          height: 600px;
         }
         .card {
           width: 225px;
@@ -82,7 +80,6 @@
         }
         .card-spacer {
           width: 250px;
-          height: 620px;
         }
         .card {
           width: 225px;
