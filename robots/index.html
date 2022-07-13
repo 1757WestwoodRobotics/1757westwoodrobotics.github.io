@@ -86,6 +86,10 @@
           margin: auto;
         }
       }
+        .card-video {
+          padding: 0.3em;
+            border-top: 1px solid green;
+      }
     </style>
   </head>
   <body>
@@ -104,6 +108,11 @@
           <div class="card-body">
             <p>{{description}}</p>
           </div>
+                    {{#videos}}
+                    <div class="card-video">
+                        <a href="{{url}}">{{name}}</a>
+                    </div>
+                    {{/videos}}
         </div>
       </div>
       {{/.}}
