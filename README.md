@@ -1,22 +1,21 @@
-# create-svelte
+# 1757 Website
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+The complete website of team 1757, written in svelte
 
-## Creating a project
+## Dependancies
 
-If you're seeing this, you've probably already done this step. Congrats!
+### sys deps 
+
+this project requires [Node JS](https://nodejs.org/en/)
+
+install dependancies like any other nodejs application
 
 ```bash
-# create a new project in the current directory
-npm init svelte
-
-# create a new project in my-app
-npm init svelte my-app
+npm i
 ```
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
 npm run dev
@@ -35,4 +34,12 @@ npm run build
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+You can clean out the build directory with `npm run clean`.
+
+## Deploying
+
+To deploy, ensure that you have already built the environment and then simply run
+
+```bash
+npm run deploy
+```
