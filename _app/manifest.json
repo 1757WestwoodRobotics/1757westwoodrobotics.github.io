@@ -1,0 +1,77 @@
+{
+  ".svelte-kit/runtime/client/start.js": {
+    "file": "immutable/start-a7343a15.js",
+    "src": ".svelte-kit/runtime/client/start.js",
+    "isEntry": true,
+    "imports": [
+      "_index-708de3b2.js"
+    ],
+    "dynamicImports": [
+      "src/routes/__layout.svelte",
+      ".svelte-kit/runtime/components/error.svelte",
+      "src/routes/index.svelte",
+      "src/routes/robots.svelte"
+    ]
+  },
+  "src/routes/__layout.svelte": {
+    "file": "immutable/pages/__layout.svelte-b2093de8.js",
+    "src": "src/routes/__layout.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-708de3b2.js"
+    ],
+    "css": [
+      "immutable/assets/__layout-cc8f3550.css"
+    ]
+  },
+  ".svelte-kit/runtime/components/error.svelte": {
+    "file": "immutable/error.svelte-4e6cdb98.js",
+    "src": ".svelte-kit/runtime/components/error.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-708de3b2.js"
+    ]
+  },
+  "src/routes/index.svelte": {
+    "file": "immutable/pages/index.svelte-cb5fc153.js",
+    "src": "src/routes/index.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-708de3b2.js",
+      "_navbar-3ec16bd3.js"
+    ]
+  },
+  "src/routes/robots.svelte": {
+    "file": "immutable/pages/robots.svelte-2096601a.js",
+    "src": "src/routes/robots.svelte",
+    "isEntry": true,
+    "isDynamicEntry": true,
+    "imports": [
+      "_index-708de3b2.js",
+      "_navbar-3ec16bd3.js"
+    ],
+    "css": [
+      "immutable/assets/robots-144d1137.css"
+    ]
+  },
+  "_index-708de3b2.js": {
+    "file": "immutable/chunks/index-708de3b2.js"
+  },
+  "_navbar-3ec16bd3.js": {
+    "file": "immutable/chunks/navbar-3ec16bd3.js",
+    "imports": [
+      "_index-708de3b2.js"
+    ]
+  },
+  "src/routes/robots.css": {
+    "file": "immutable/assets/robots-144d1137.css",
+    "src": "src/routes/robots.css"
+  },
+  "src/routes/__layout.css": {
+    "file": "immutable/assets/__layout-cc8f3550.css",
+    "src": "src/routes/__layout.css"
+  }
+}
