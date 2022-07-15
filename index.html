@@ -217,31 +217,6 @@
         <br>
     </div>
 
-    <!-- NEWS -->
-    <div class="full-banner" id="home-news-banner">
-      <div class="container main-content" id="home-news">
-        <h2>NEWS</h2>
-        <br />
-        <template id="news-template" hidden>
-          {{#.}}
-          <div class="card">
-            {{{media}}}
-            <div class="card-body">
-              <a href="{{link}}" target="_blank">
-                <h4 class="card-title">{{title}}</h4>
-              </a>
-              <p class="card-text">{{{content}}}</p>
-            </div>
-          </div>
-          {{/.}}
-        </template>
-        <div class="card-deck" id="news-gallery"></div>
-      </div>
-      <a href="https://blog.whsrobotics.org" class="btn btn-info" role="button"
-        >Read More on our Blog</a
-      >
-    </div>
-
     <!-- ROBOT GALLERY -->
     <div class="main-content" id="home-robot-gallery">
       <!-- Scrollable Carousel? -->
