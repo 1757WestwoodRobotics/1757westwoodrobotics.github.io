@@ -23,6 +23,13 @@
 			videos: []
 		},
 		{
+			name: 'Mrk. XV',
+			year: '2020',
+			image: '/img/robots/2020infiniterecharge.png',
+			desc: 'Our 15th Competition robot, while its season was cut short due to the outbreak of SARs-COVID 19 this bot was set to be a contender. With a long range turreted shooter this bot was designed to lurk in the backfield firing balls over the opponents head all match long.',
+			videos: []
+		},
+		{
 			name: 'Rampothy',
 			year: '2019',
 			image: '/img/robots/2019deepspace_compressed.png',
@@ -44,7 +51,7 @@
 			videos: []
 		},
 		{
-			name: '',
+			name: 'The Tank',
 			year: '2016',
 			image: '/img/robots/2016stronghold_compressed.png',
 			desc: 'Inspired by prototype drive systems for the US Military, this robots custom designed fully gear-driven all wheel drive system was capable of quickly fording any obstacle on the field.',

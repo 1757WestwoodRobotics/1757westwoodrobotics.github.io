@@ -15,7 +15,7 @@
 	<div class="text-center w-full p-4 text-white flex-auto basis-7/12">
 		<h2 class="text-3xl">{year}{name !== '' ? ' - ' : ''}{name}</h2>
 		<p>{desc}</p>
-		<br>
+		<br />
 		{#if videos != ''}
 			<div
 				class="bottom-0 inset-x-0 text-blue-400 underline hover:cursor-pointer text-xl"
