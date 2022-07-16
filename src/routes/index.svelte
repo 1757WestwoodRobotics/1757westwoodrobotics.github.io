@@ -22,6 +22,10 @@
 
 <svelte:head>
 	<title>Westwood Robotics</title>
+	<meta name="description" content="Team 1757's page detailing their history and future" />
+	<meta name="keywords" content="FRC, FIRST, Robotics" />
+	<meta name="author" content="Westwood Robotics" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </svelte:head>
 
 <Navbar />

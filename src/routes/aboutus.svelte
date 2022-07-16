@@ -5,6 +5,10 @@
 
 <svelte:head>
 	<title>About Us</title>
+	<meta name="description" content="About team 1757" />
+	<meta name="keywords" content="FRC, FIRST, Robotics" />
+	<meta name="author" content="Westwood Robotics" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 </svelte:head>
 
 <Navbar />
