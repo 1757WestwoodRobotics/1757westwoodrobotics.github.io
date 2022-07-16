@@ -1,6 +1,7 @@
 <script>
 	import RobotPage from '../components/robotPage.svelte';
 	import Navbar from '../components/navbar.svelte';
+	import Footer from '../components/footer.svelte';
 
 	let robots = [
 		{
@@ -70,12 +71,12 @@
 </svelte:head>
 
 <Navbar />
-<br />
-<div class="container mx-auto grid grid-cols-fr grid-cols-1 lg:grid-cols-2 gap-3">
+<div>
 	{#each robots as { name, year, image, desc, videos }}
 		<RobotPage {name} {year} {image} {desc} {videos} />
 	{/each}
 </div>
+<Footer />
 
 <style>
 	:global(body) {
