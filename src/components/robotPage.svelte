@@ -25,13 +25,13 @@
 				Videos
 			</div>
 			<div class="flex w-full justify-around items-center flex-wrap">
-			{#if showVideos}
-				{#each videos as { name, id }}
-					<a class="text-blue-500 hover:underline" target="_blank" href="https://youtu.be/{id}"
-						>{name}</a
-					>
-				{/each}
-			{/if}
+				{#if showVideos}
+					{#each videos as { name, id }}
+						<a class="text-blue-500 hover:underline" target="_blank" href="https://youtu.be/{id}"
+							>{name}</a
+						>
+					{/each}
+				{/if}
 			</div>
 		{/if}
 	</div>

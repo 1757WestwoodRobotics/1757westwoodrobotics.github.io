@@ -66,8 +66,9 @@
 		}
 	];
 </script>
+
 <svelte:head>
-    <title>Past Robots</title>
+	<title>Past Robots</title>
 </svelte:head>
 
 <Navbar />

@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-    <title>Westwood Robotics</title>
+	<title>Westwood Robotics</title>
 </svelte:head>
 
 <Navbar />

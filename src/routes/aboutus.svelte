@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-    <title>About Us</title>
+	<title>About Us</title>
 </svelte:head>
 
 <Navbar />
@@ -28,19 +28,19 @@
 </div>
 <div class="max-w-full h-[70vh] bg-[url('/img/robot_pic.png')] min-h-5 bg-center bg-cover">
 	<div
-		class="text-white flex items-center justify-center text-center align-center h-full text-lg px-10 backdrop-blur-sm w-full"
+		class="text-white flex items-center justify-center text-center align-center h-full text-lg backdrop-blur-sm w-full"
 	>
-		<div class="flex items-center justify-center align-center">
+		<div class="flex items-center justify-around align-center px-4 gap-4">
 			<p class="basis-1 grow">
 				Affiliated with the Westwood High School as a club, FRC Team 1757 looks to give back to the
 				community by introducing young students to robot design, programming, and other STEAM
 				skills.
 			</p>
 			<p class="basis-1 grow">
-				We participate in the FIRST Robotics Competition. FIRST, “For Inspiration and Recognition of
-				Science and Technology”, is a foundation whose mission is to inspire young people to become
-				science and technology leaders by engaging them in exciting mentor-based programs that build
-				science, engineering, and technology skills.
+				We participate in the FIRST Robotics Competition. <i>FIRST</i>, “For Inspiration and
+				Recognition of Science and Technology”, is a foundation whose mission is to inspire young
+				people to become science and technology leaders by engaging them in exciting mentor-based
+				programs that build science, engineering, and technology skills.
 			</p>
 		</div>
 	</div>
@@ -65,23 +65,100 @@
 			<img src="/img/frc_logo.jpg" />
 		</span>
 	</div>
-
 </div>
-<div class="max-w-full h-[80vh] bg-[url('/img/dcmp_team.jpg')] min-h-5 bg-center bg-cover">
-    <span class="h-full w-full flex backdrop-blur text-white flex align-center justify-center items-center flex-col gap-4">
-        <h2 class="text-3xl"><b>Meet the team</b></h2>
-        <div class="flex justify-around text-center flex-wrap gap-5">
-            <div class="flex justify-center align-center items-center flex-col gap-5">
-                <img src="/img/team/charley.jpg" class="rounded-full aspect-square ring-4 w-32 ring-red-800"/>
-                <b>Charley Marsland</b>
-                Captain
-            </div>
-            <div class="flex justify-center align-center items-center flex-col gap-5">
-                <img src="/img/team/luke.png" class="rounded-full aspect-square ring-4 w-32"/>
-                <b>Luke Maxwell</b>
-                Vice Captain, Technical Lead
-            </div>
-        </div>
-    </span>
+<div class="max-w-full bg-[url('/img/dcmp_team.jpg')] min-h-5 bg-center bg-cover">
+	<span
+		class="h-full w-full flex backdrop-blur text-white flex align-center justify-center items-center flex-col gap-4 py-10"
+	>
+		<h2 class="text-3xl"><b>Meet the team</b></h2>
+		<h3 class="text-xl">E-Board</h3>
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/charley.jpg"
+					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
+				/>
+				<b>Charley Marsland</b>
+				Captain
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img src="/img/team/luke.png" class="rounded-full aspect-square ring-4 w-32 mb-5" />
+				<b>Luke Maxwell</b>
+				Vice Captain<br />Technical Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/landon.jpg"
+					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[270deg] ring-green-800"
+				/>
+				<b>Landon Bayer</b>
+				Business Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/sean.jpg"
+					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[30deg] ring-orange-400"
+				/>
+				<b>Sean Tao</b>
+				Secretary
+			</div>
+		</div>
+		<br />
+		<h3 class="text-xl">Mentors</h3>
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/dwight.png"
+					class="rounded-full aspect-square ring-4 w-32 rotate-[19deg] ring-emerald-600 mb-5"
+				/>
+				<b>Dwight Meglan</b>
+				Lead Mentor
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/chris.png"
+					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
+				/>
+				<b>Chris Aloisio</b>
+				Programming Mentor<br />Cad Mentor
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/steven.png"
+					class="rounded-full aspect-square ring-4 w-32 ring-rose-800 mb-5"
+				/>
+				<b>Steven Harrington</b>
+				Mechanical Mentor<br />Business Mentor
+			</div>
+		</div>
+		<br />
+		<h3 class="text-xl">Other Roles</h3>
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/ivan.jpg"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-fuchsia-800 mb-5"
+				/>
+				<b>Ivan Cai</b>
+				Programming Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/jeff.jpg"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-5"
+				/>
+				<b>Jeffery Pan</b>
+				Treasurer
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/rachel.jpg"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+				/>
+				<b>Rachel Qu</b>
+				Media Manager
+			</div>
+		</div>
+	</span>
 </div>
 <Footer />
