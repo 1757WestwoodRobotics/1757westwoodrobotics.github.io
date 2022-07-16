@@ -74,7 +74,7 @@
             <div class="flex justify-center align-center items-center flex-col gap-5">
                 <img src="/img/team/charley.jpg" class="rounded-full aspect-square ring-4 w-32 ring-red-800"/>
                 <b>Charley Marsland</b>
-                Captin
+                Captain
             </div>
             <div class="flex justify-center align-center items-center flex-col gap-5">
                 <img src="/img/team/luke.png" class="rounded-full aspect-square ring-4 w-32"/>
