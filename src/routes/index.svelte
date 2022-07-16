@@ -44,10 +44,9 @@
 		<iframe
 			id="ivplayer"
 			title="2022 Season Recap"
-			width="640"
-			height="360"
 			src="https://yewtu.be/embed/s1iLbVFduqE?t=23"
 			style="border:none;"
+			class="aspect-video w-full"
 		/>
 		<br />
 		<hr class="p-8" />
