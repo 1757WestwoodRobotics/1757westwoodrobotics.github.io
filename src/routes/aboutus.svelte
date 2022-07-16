@@ -3,6 +3,10 @@
 	import Footer from '../components/footer.svelte';
 </script>
 
+<svelte:head>
+    <title>About Us</title>
+</svelte:head>
+
 <Navbar />
 
 <div
@@ -11,7 +15,7 @@
 	<div class="flex mx-4">
 		<span class="shrink basis-1/3 flex hidden sm:block"> <img src="/favicon.png" /></span>
 		<div class="text-center basis-auto sm:basis-2/3">
-			<h2 class="text-5xl">THIS is 1757</h2>
+			<h2 class="text-5xl"><i><b>THIS</b></i> is 1757</h2>
 			<br />
 			<h6>
 				Founded in 2006, we are a team of students and mentors from Westwood High School who are
@@ -61,5 +65,23 @@
 			<img src="/img/frc_logo.jpg" />
 		</span>
 	</div>
+
+</div>
+<div class="max-w-full h-[80vh] bg-[url('/img/dcmp_team.jpg')] min-h-5 bg-center bg-cover">
+    <span class="h-full w-full flex backdrop-blur text-white flex align-center justify-center items-center flex-col gap-4">
+        <h2 class="text-3xl"><b>Meet the team</b></h2>
+        <div class="flex justify-around text-center flex-wrap gap-5">
+            <div class="flex justify-center align-center items-center flex-col gap-5">
+                <img src="/img/team/charley.jpg" class="rounded-full aspect-square ring-4 w-32 ring-red-800"/>
+                <b>Charley Marsland</b>
+                Captin
+            </div>
+            <div class="flex justify-center align-center items-center flex-col gap-5">
+                <img src="/img/team/luke.png" class="rounded-full aspect-square ring-4 w-32"/>
+                <b>Luke Maxwell</b>
+                Vice Captain, Technical Lead
+            </div>
+        </div>
+    </span>
 </div>
 <Footer />

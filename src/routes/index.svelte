@@ -11,6 +11,10 @@
 	});
 </script>
 
+<svelte:head>
+    <title>Westwood Robotics</title>
+</svelte:head>
+
 <Navbar />
 <div
 	class="max-w-full bg-[#115724] h-screen min-h-5 align-center bg-[url('/img/banner.jpg')] bg-center bg-cover bg-blend-multiply text-white text-center flex items-center justify-center"
