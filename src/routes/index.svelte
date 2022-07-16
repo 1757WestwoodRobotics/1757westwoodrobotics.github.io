@@ -47,6 +47,7 @@
 		<br />
 		<iframe
 			id="ivplayer"
+			loading="lazy"
 			title="2022 Season Recap"
 			src="https://yewtu.be/embed/s1iLbVFduqE?t=23"
 			style="border:none;"
@@ -54,7 +55,9 @@
 		/>
 		<br />
 		<hr class="p-8" />
-		<a class="text-3xl m-3 text-sky-500 hover:underline mb-9" href="/robots">CHECK OUT OUR ROBOTS!</a>
+		<a class="text-3xl m-3 text-sky-500 hover:underline mb-9" href="/robots"
+			>CHECK OUT OUR ROBOTS!</a
+		>
 		<div class="bg-slate-800 rounded-xl drop-shadow-md mt-9">
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
 				<div>

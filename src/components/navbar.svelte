@@ -103,6 +103,12 @@
 				>
 					About Us
 				</a>
+				<a
+					href="/gallery"
+					class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+				>
+					Media
+				</a>
 			</div>
 		</div>
 	</div>
