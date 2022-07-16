@@ -49,7 +49,7 @@
 			id="ivplayer"
 			loading="lazy"
 			title="2022 Season Recap"
-			src="https://yewtu.be/embed/s1iLbVFduqE?t=23"
+			src="https://yewtu.be/embed/s1iLbVFduqE"
 			style="border:none;"
 			class="aspect-video w-full"
 		/>
