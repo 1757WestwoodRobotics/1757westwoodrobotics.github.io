@@ -14,7 +14,9 @@
 >
 	<div class="flex mx-4">
 		<span class="shrink basis-1/3 flex hidden sm:block"> <img src="/favicon.png" /></span>
-		<div class="text-center basis-auto sm:basis-2/3 flex flex-col align-center justify-center items-center">
+		<div
+			class="text-center basis-auto sm:basis-2/3 flex flex-col align-center justify-center items-center"
+		>
 			<h2 class="text-5xl"><i><b>THIS</b></i> is 1757</h2>
 			<br />
 			<h6>
