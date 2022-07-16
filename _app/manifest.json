@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "immutable/start-8612c7d8.js",
+    "file": "immutable/start-a0e43dbb.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -37,7 +37,7 @@
     ]
   },
   "src/routes/aboutus.svelte": {
-    "file": "immutable/pages/aboutus.svelte-4be27304.js",
+    "file": "immutable/pages/aboutus.svelte-626471a7.js",
     "src": "src/routes/aboutus.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -107,13 +107,13 @@
       "immutable/assets/main-7d0fc666.css"
     ]
   },
-  "footer.css": {
-    "file": "immutable/assets/footer-32503cb2.css",
-    "src": "footer.css"
-  },
   "src/routes/robots.css": {
     "file": "immutable/assets/robots-144d1137.css",
     "src": "src/routes/robots.css"
+  },
+  "footer.css": {
+    "file": "immutable/assets/footer-32503cb2.css",
+    "src": "footer.css"
   },
   "node_modules/svelte-carousel/src/main.css": {
     "file": "immutable/assets/main-7d0fc666.css",
