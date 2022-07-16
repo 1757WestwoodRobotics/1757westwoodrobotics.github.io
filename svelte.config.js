@@ -14,9 +14,9 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-		    pages: 'build',
-		    assets: 'build',
-		    fallback: null
+			pages: 'build',
+			assets: 'build',
+			fallback: null
 		}),
 		/* paths: {
 			base: '/new'
@@ -26,7 +26,7 @@ const config = {
 			enabled: true,
 			onError: 'continue',
 			default: true
-		},
+		}
 	}
 };
 

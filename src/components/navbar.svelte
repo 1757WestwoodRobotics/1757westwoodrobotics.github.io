@@ -6,7 +6,7 @@
 </script>
 
 <!-- This example requires Tailwind CSS v2.0+ -->
-<nav class="bg-gray-800 sticky top-0">
+<nav class="bg-gray-800 sticky top-0 z-50">
 	<div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
 		<div class="relative flex items-center justify-between h-16">
 			<div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -70,7 +70,7 @@
 						<!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
 						<a
 							href="/"
-							class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium"
+							class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
 							aria-current="page">Home</a
 						>
 
@@ -87,13 +87,18 @@
 						>
 
 						<a
-							href="#"
+							href="/Sponsorship Packet.pdf"
 							class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-							>Calendar</a
+							>Sponsor Us!</a
 						>
 					</div>
 				</div>
 			</div>
+		    <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+		        <a href="/aboutus" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+		            About Us
+		        </a>
+		    </div>
 		</div>
 	</div>
 
@@ -121,9 +126,9 @@
 				>
 
 				<a
-					href="#"
+					href="/Sponsorship Packet.pdf"
 					class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-					>Calendar</a
+					>Sponsor Us!</a
 				>
 			</div>
 		</div>

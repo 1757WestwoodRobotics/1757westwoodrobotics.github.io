@@ -4,7 +4,7 @@ The complete website of team 1757, written in svelte
 
 ## Dependancies
 
-### sys deps 
+### sys deps
 
 this project requires [Node JS](https://nodejs.org/en/)
 
@@ -15,7 +15,6 @@ npm i
 ```
 
 ## Developing
-
 
 ```bash
 npm run dev

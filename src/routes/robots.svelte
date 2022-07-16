@@ -13,13 +13,62 @@
 				{ name: 'highest scoring match', id: 'xDQo_OFQs5Q' },
 				{ name: 'WPI point high score', id: 'P2qm6jk8zN8 ' }
 			]
+		},
+		{
+			name: 'T Shirt Cannon',
+			year: '2022',
+			image: '/img/robots/2022tshirtcannon.png',
+			desc: 'This off season learning robot restarted our tradition of creating a t-shirt cannon for the school and town events. With 120psi of pressure in two tanks, it could fire a t-shirt shell far into the crowd of the bleachers.',
+			videos: []
+		},
+		{
+			name: 'Rampothy',
+			year: '2019',
+			image: '/img/robots/2019deepspace_compressed.png',
+			desc: 'Designed to be the most accommodating Ramp Bot in FRC that year, this hunchbacked robot flew of the starting platform and spent most of the game fitting hatch panels to the cargo ship. When the 30 second warning bell rang it unfolded into one of the widest ramps in FRC: a feature which helped it to secure an elusive and entertaining double ramp bot climb at the Manchester District Event.',
+			videos: []
+		},
+		{
+			name: '',
+			year: '2018',
+			image: '/img/robots/2018firstpowerup_compressed.png',
+			desc: 'This crate stacking behemouth could extend to almost 10 feet tall!',
+			videos: []
+		},
+		{
+			name: '',
+			year: '2017',
+			image: '/img/robots/2017steamworks_compressed.png',
+			desc: 'A fast and agile Mecanum drive coupled with robust scoring mechanism and a fast climb made this bot a serious contender on the field.',
+			videos: []
+		},
+		{
+			name: '',
+			year: '2016',
+			image: '/img/robots/2016stronghold_compressed.png',
+			desc: 'Inspired by prototype drive systems for the US Military, this robots custom designed fully gear-driven all wheel drive system was capable of quickly fording any obstacle on the field.',
+			videos: []
+		},
+		{
+			name: '',
+			year: '2015',
+			image: '/img/robots/2015recyclerush_compressed.png',
+			desc: 'Stacking high this robot could pick up totes.',
+			videos: []
+		},
+		{
+			name: 'T-shirt Cannon',
+			year: '2015',
+			image: '/img/robots/2015tshirtcannon_compressed.png',
+			desc: 'This Magazine fed, shell ejecting T-shirt cannon mounted to an experimental Mecanum drive test bed was a fun learning opportunity for new team members and was a hit with local school and town events. Capable of a 3 round per minute rate of fire and the ability to drive sideways as it strafed the crowd of pep rallies and sporting events.',
+			videos: []
 		}
 	];
 </script>
 
-<Navbar/>
-<br>
-<div class="container mx-auto">
+<Navbar />
+<br />
+<div class="container mx-auto grid grid-cols-fr grid-cols-1 lg:grid-cols-2 gap-3">
 	{#each robots as { name, year, image, desc, videos }}
 		<RobotPage {name} {year} {image} {desc} {videos} />
 	{/each}
