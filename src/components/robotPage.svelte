@@ -4,6 +4,7 @@
 	export let desc;
 	export let videos;
 	export let year;
+	export let techbinder;
 
 	let showVideos = false;
 </script>
@@ -15,6 +16,9 @@
 	<div class="text-center w-full p-4 text-white flex-auto basis-7/12">
 		<h2 class="text-3xl">{year}{name !== '' ? ' - ' : ''}{name}</h2>
 		<p>{desc}</p>
+		{#if techbinder != ''}
+		<a href={techbinder} class="m-4 text-blue-500 underline">View the technical binder</a>
+		{/if}
 		<br />
 		{#if videos != ''}
 			<div
