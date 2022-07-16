@@ -1,11 +1,9 @@
 <script>
 	import Fa from 'svelte-fa/src/fa.svelte';
-	import {
-		faTwitter,
-		faYoutube,
-		faFacebook,
-		faInstagram
-	} from '@fortawesome/free-brands-svg-icons';
+	import { faTwitter } from '@fortawesome/free-brands-svg-icons/faTwitter';
+	import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
+	import { faFacebook } from '@fortawesome/free-brands-svg-icons/faFacebook';
+	import { faYoutube } from '@fortawesome/free-brands-svg-icons/faYoutube';
 </script>
 
 <div class="w-full flex text-white bg-green-600 flex-wrap">
