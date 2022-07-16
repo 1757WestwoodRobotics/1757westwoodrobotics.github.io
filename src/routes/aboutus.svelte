@@ -134,7 +134,7 @@
 			</div>
 		</div>
 		<br />
-		<h3 class="text-xl">Other Roles</h3>
+		<h3 class="text-xl">Other Leadership</h3>
 		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
