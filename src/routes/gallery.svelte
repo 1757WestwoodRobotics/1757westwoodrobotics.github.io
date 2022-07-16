@@ -34,7 +34,15 @@
 			'/img/gallery/2022/_36A9612.png',
 			'/img/gallery/2022/_36A9618.png',
 			'/img/gallery/2022/_36A9628.png',
-			'/img/gallery/2022/_36A9631_01.png'
+			'/img/gallery/2022/_36A9631_01.png',
+			'/img/gallery/2022/20220409-DSC01375.jpg',
+			'/img/gallery/2022/20220409-DSC01281.jpg',
+			'/img/gallery/2022/20220409-DSC01349.jpg',
+			'/img/gallery/2022/20220409-DSC01388.jpg',
+			'/img/gallery/2022/20220409-DSC01405.jpg',
+			'/img/gallery/2022/20220409-DSC01409.jpg',
+			'/img/gallery/2022/20220409-DSC01418.jpg',
+			'/img/gallery/2022/20220409-DSC01395.jpg'
 		]
 	};
 </script>
