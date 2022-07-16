@@ -93,8 +93,8 @@
 
 <Navbar />
 <div>
-	{#each robots as { name, year, image, desc, videos, techbinder}}
-		<RobotPage {name} {year} {image} {desc} {videos} {techbinder}/>
+	{#each robots as { name, year, image, desc, videos, techbinder }}
+		<RobotPage {name} {year} {image} {desc} {videos} {techbinder} />
 	{/each}
 </div>
 <Footer />

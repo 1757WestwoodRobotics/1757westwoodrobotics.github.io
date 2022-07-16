@@ -81,20 +81,20 @@
 		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/charley.jpg"
+					src="/img/team/charley.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
 				/>
 				<b>Charley Marsland</b>
 				Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
-				<img src="/img/team/luke.png" class="rounded-full aspect-square ring-4 w-32 mb-5" />
+				<img src="/img/team/luke.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
 				<b>Luke Maxwell</b>
 				Vice Captain<br />Technical Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/landon.jpg"
+					src="/img/team/landon.webp"
 					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[270deg] ring-green-800"
 				/>
 				<b>Landon Bayer</b>
@@ -102,7 +102,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/sean.jpg"
+					src="/img/team/sean.webp"
 					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[30deg] ring-orange-400"
 				/>
 				<b>Sean Tao</b>
@@ -114,7 +114,7 @@
 		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/dwight.png"
+					src="/img/team/dwight.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-[19deg] ring-emerald-600 mb-5"
 				/>
 				<b>Dwight Meglan</b>
@@ -122,7 +122,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/chris.png"
+					src="/img/team/chris.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
 				/>
 				<b>Chris Aloisio</b>
@@ -130,7 +130,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/steven.png"
+					src="/img/team/steven.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-rose-800 mb-5"
 				/>
 				<b>Steven Harrington</b>
@@ -142,7 +142,7 @@
 		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/ivan.jpg"
+					src="/img/team/ivan.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-fuchsia-800 mb-5"
 				/>
 				<b>Ivan Cai</b>
@@ -150,7 +150,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/jeff.jpg"
+					src="/img/team/jeff.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-5"
 				/>
 				<b>Jeffery Pan</b>
@@ -158,7 +158,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/rachel.jpg"
+					src="/img/team/rachel.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
 				/>
 				<b>Rachel Qu</b>

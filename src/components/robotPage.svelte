@@ -9,7 +9,7 @@
 	let showVideos = false;
 </script>
 
-<div class="bg-slate-900 flex flex-wrap overflow-auto p-5 h-full m-4 rounded-lg">
+<div class="bg-slate-900 flex flex-wrap overflow-auto p-5 h-full m-4 rounded-lg items-center">
 	<span class="grow flex-col md:basis-5/12 flex justify-center items-center shrink basis-full">
 		<img src={image} class="bg-[url('{image}')] aspect-auto" />
 	</span>
@@ -17,7 +17,7 @@
 		<h2 class="text-3xl">{year}{name !== '' ? ' - ' : ''}{name}</h2>
 		<p>{desc}</p>
 		{#if techbinder != ''}
-		<a href={techbinder} class="m-4 text-blue-500 underline">View the technical binder</a>
+			<a href={techbinder} class="m-4 text-blue-500 underline">View the technical binder</a>
 		{/if}
 		<br />
 		{#if videos != ''}

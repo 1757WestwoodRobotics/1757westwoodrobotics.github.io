@@ -82,8 +82,8 @@
 					<h1>2022 T Shirt Cannon</h1>
 				</div>
 				<div>
-				    <img src="/img/robots/2020infiniterecharge.png" alt="2020 robot" class="mx-auto"/>
-				    <h1>2020 Infinite Recharge</h1>
+					<img src="/img/robots/2020infiniterecharge.png" alt="2020 robot" class="mx-auto" />
+					<h1>2020 Infinite Recharge</h1>
 				</div>
 				<div>
 					<img src="/img/robots/2019deepspace_compressed.png" alt="2019 robot" />
