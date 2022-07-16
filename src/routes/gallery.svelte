@@ -43,6 +43,72 @@
 			'/img/gallery/2022/20220409-DSC01409.webp',
 			'/img/gallery/2022/20220409-DSC01418.webp',
 			'/img/gallery/2022/20220409-DSC01395.webp'
+		],
+		'2019': [
+			'/img/gallery/2019/DSC_7196.webp',
+			'/img/gallery/2019/DSC_7198.webp',
+			'/img/gallery/2019/DSC_7200.webp',
+			'/img/gallery/2019/DSC_7203.webp',
+			'/img/gallery/2019/DSC_7205.webp',
+			'/img/gallery/2019/DSC_7213.webp',
+			'/img/gallery/2019/DSC_7221.webp',
+			'/img/gallery/2019/DSC_7226.webp',
+			'/img/gallery/2019/DSC_7230.webp',
+			'/img/gallery/2019/DSC_7236.webp',
+			'/img/gallery/2019/DSC_7238.webp',
+			'/img/gallery/2019/DSC_7242.webp',
+			'/img/gallery/2019/DSC_7246.webp',
+			'/img/gallery/2019/DSC_7252.webp',
+			'/img/gallery/2019/DSC_7255.webp',
+			'/img/gallery/2019/DSC_7259.webp',
+			'/img/gallery/2019/DSC_7262.webp',
+			'/img/gallery/2019/DSC_7264.webp',
+			'/img/gallery/2019/DSC_7266.webp',
+			'/img/gallery/2019/DSC_7269.webp',
+			'/img/gallery/2019/DSC_7274.webp',
+			'/img/gallery/2019/DSC_7278.webp',
+			'/img/gallery/2019/DSC_7283.webp',
+			'/img/gallery/2019/DSC_7288.webp',
+			'/img/gallery/2019/DSC_7292.webp',
+			'/img/gallery/2019/DSC_7295.webp',
+			'/img/gallery/2019/DSC_7296.webp',
+			'/img/gallery/2019/DSC_7301.webp',
+			'/img/gallery/2019/DSC_7303.webp',
+			'/img/gallery/2019/DSC_7308.webp',
+			'/img/gallery/2019/DSC_7318.webp',
+			'/img/gallery/2019/DSC_7321.webp',
+			'/img/gallery/2019/DSC_7335.webp',
+			'/img/gallery/2019/DSC_7336.webp',
+			'/img/gallery/2019/DSC_7339.webp',
+			'/img/gallery/2019/DSC_7343.webp',
+			'/img/gallery/2019/DSC_7345.webp',
+			'/img/gallery/2019/DSC_7348.webp',
+			'/img/gallery/2019/DSC_7365.webp',
+			'/img/gallery/2019/DSC_7367.webp',
+			'/img/gallery/2019/DSC_7379.webp',
+			'/img/gallery/2019/DSC_7385.webp',
+			'/img/gallery/2019/DSC_7393.webp',
+			'/img/gallery/2019/IMG_1970.webp',
+			'/img/gallery/2019/IMG_1981.webp',
+			'/img/gallery/2019/IMG_1992.webp',
+			'/img/gallery/2019/IMG_2008.webp',
+			'/img/gallery/2019/IMG_2015.webp',
+			'/img/gallery/2019/IMG_20190316_103839854_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_104104476_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_104803677_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_105157182_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_113451371_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_113807462_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_114459280_Looney.webp',
+			'/img/gallery/2019/IMG_20190316_120043874_Looney.webp',
+			'/img/gallery/2019/IMG_20190317_123100282_Looney.webp',
+			'/img/gallery/2019/IMG_2022.webp',
+			'/img/gallery/2019/IMG_2117.webp',
+			'/img/gallery/2019/IMG_2131.webp',
+			'/img/gallery/2019/IMG_2142.webp',
+			'/img/gallery/2019/IMG_2169.webp',
+			'/img/gallery/2019/IMG_5080.webp',
+			'/img/gallery/2019/IMG_5094.webp'
 		]
 	};
 </script>
@@ -63,6 +129,25 @@
 			{#each urls['2022'] as url}
 				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
 					<img src={url} class="max-h-[70vh]" />
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
+	<h3 class="w-full text-center text-5xl">2019: Deep Space</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2019'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
 				</div>
 			{/each}
 		</svelte:component>
