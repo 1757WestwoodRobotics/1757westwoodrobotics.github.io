@@ -54,7 +54,7 @@
 			name: '',
 			year: '2015',
 			image: '/img/robots/2015recyclerush_compressed.png',
-			desc: 'Stacking high this robot could pick up totes.',
+			desc: 'This tote stacker parks itself at the human terminal and stacks up boxes sky high with its claw arms that lift for another to slide into place.',
 			videos: []
 		},
 		{
