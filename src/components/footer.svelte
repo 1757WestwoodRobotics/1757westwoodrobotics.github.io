@@ -8,7 +8,7 @@
 	} from '@fortawesome/free-brands-svg-icons';
 </script>
 
-<div class="w-full flex text-white bg-teal-500 flex-wrap">
+<div class="w-full flex text-white bg-green-600 flex-wrap">
 	<div class="text-center p-5 grow shrink basis-1/2 md:basis-1/3">
 		<h2 class="text-xl"><b>CONTACT</b></h2>
 		<br />
