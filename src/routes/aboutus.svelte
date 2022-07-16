@@ -52,7 +52,7 @@
 		class="h-full w-full flex items-center justify-center align-center backdrop-blur-sm text-white text-center px-6 gap-7"
 	>
 		<span class="basis-2/3">
-			<h4 class="text-3xl">What if FRC?</h4>
+			<h4 class="text-3xl mb-5">What is FRC?</h4>
 			<p>
 				<i>FIRST</i> Robotics Competition (FRC) is an international high school robotics competition.
 				Each year teams obtain new game details in the beginning of January; they are given six weeks

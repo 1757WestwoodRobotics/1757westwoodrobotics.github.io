@@ -26,7 +26,7 @@
 </div>
 <div class="bg-zinc-800">
 	<div class="container mx-auto text-center p-4 max-w-prose text-white">
-		<div class="bg-green-600 p-3 mx-auto rounded-lg max-w-md text-black">
+		<div class="bg-green-600 p-3 mx-auto rounded-lg max-w-md text-black my-10">
 			Westwood Robotics Inc. is a 501(c)(3) non-profit organization. Want to contribute? Donate to
 			our <b
 				><a
@@ -54,8 +54,8 @@
 		/>
 		<br />
 		<hr class="p-8" />
-		<a class="text-3xl m-3 text-sky-500 hover:underline" href="/robots">CHECK OUT OUR ROBOTS!</a>
-		<div class="bg-slate-800 rounded-xl drop-shadow-md">
+		<a class="text-3xl m-3 text-sky-500 hover:underline mb-9" href="/robots">CHECK OUT OUR ROBOTS!</a>
+		<div class="bg-slate-800 rounded-xl drop-shadow-md mt-9">
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
 				<div>
 					<img src="/img/robots/2022rapidreact.png" alt="Rapid React" />
@@ -93,11 +93,11 @@
 		</div>
 		<hr class="p-8" />
 		<div class="bg-white text-black p-6 rounded-xl">
-			<div class="flex">
+			<div class="flex items-center">
 				<img src="/img/sponsors/whs.jpg" class="flex-none basis-1/3 max-w-[25%]" alt="WHS logo" />
 				<p class="basis-2/3 flex-none">
 					Westwood High School is a public high school located in the Greater Boston area. Westwood
-					High School aims to encourage and develop students' education across all fields.<a
+					High School aims to encourage and develop students' education across all fields. <a
 						class="text-sky-500 hover:underline"
 						href="http://www.westwood.k12.ma.us/westwood-high-school">Learn More</a
 					>
@@ -109,7 +109,7 @@
 					FIRST Robotics Competition (FRC) is an international high-school competition. FIRST is a
 					foundation whose mission is to inspire young people to become science and technology
 					leaders by engaging them in exciting mentor-based programs that build science,
-					engineering, and technology skills.<a
+					engineering, and technology skills. <a
 						class="text-sky-500 hover:underline"
 						href="https://www.firstinspires.org/robotics/frc">Learn More</a
 					>
@@ -131,7 +131,7 @@
 		</div>
 		<hr class="p-8" />
 		<div class="p-9 bg-gray-100 rounded-xl drop-shadow-md text-black">
-			<h1 class="text-3xl">SPONSORS</h1>
+			<h1 class="text-3xl mb-9">SPONSORS</h1>
 			<div
 				class="flex p-8 bg-cyan-400 rounded-xl drop-shadow-md justify-around items-center flex-wrap m-2 gap-2"
 			>
