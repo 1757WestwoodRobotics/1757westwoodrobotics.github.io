@@ -3,12 +3,21 @@
 	import Footer from '../components/footer.svelte';
 	import { onMount } from 'svelte';
 
+	import { browser } from '$app/env';
+
 	let Carousel; // for saving Carousel component class
 	let carousel; // for calling methods of the carousel instance
 	onMount(async () => {
 		const module = await import('svelte-carousel');
 		Carousel = module.default;
 	});
+
+	let showPopup = browser && localStorage.showPopup === undefined ? true : false;
+
+	let hidePopup = () => {
+		showPopup = false;
+		localStorage.showPopup = false;
+	};
 </script>
 
 <svelte:head>
@@ -46,12 +55,12 @@
 		</p>
 		<br />
 		<iframe
-			id="ivplayer"
-			loading="lazy"
-			title="2022 Season Recap"
-			src="https://yewtu.be/embed/s1iLbVFduqE"
-			style="border:none;"
 			class="aspect-video w-full"
+			src="https://www.youtube.com/embed/s1iLbVFduqE"
+			title="YouTube video player"
+			frameborder="0"
+			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+			allowfullscreen
 		/>
 		<br />
 		<hr class="p-8" />
@@ -222,5 +231,16 @@
 			</div>
 		</div>
 	</div>
+	{#if showPopup}
+		<div class="fixed bottom-5 rounded-xl bg-green-600 p-5 drop-shadow-md mx-5">
+			Like the new look? We updated our website!
+			<br />
+			<b
+				><button type="button" class="text-red-600 text-sm" on:click={hidePopup}
+					>Click here to dismiss</button
+				></b
+			>
+		</div>
+	{/if}
 	<Footer />
 </div>
