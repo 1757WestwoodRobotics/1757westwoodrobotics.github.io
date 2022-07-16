@@ -190,6 +190,23 @@
 			'/img/gallery/2017/IMG_4797.webp',
 			'/img/gallery/2017/IMG_4803.webp',
 			'/img/gallery/2017/IMG_4807.webp'
+		],
+		'2020': [
+			'/img/gallery/2020/IMG_0067.webp',
+			'/img/gallery/2020/IMG_0071.webp',
+			'/img/gallery/2020/IMG_0072.webp',
+			'/img/gallery/2020/IMG_0073.webp',
+			'/img/gallery/2020/IMG_0196.webp',
+			'/img/gallery/2020/IMG_0198.webp',
+			'/img/gallery/2020/IMG_0202.webp',
+			'/img/gallery/2020/IMG_0203.webp',
+			'/img/gallery/2020/IMG_0207.webp',
+			'/img/gallery/2020/IMG_0208.webp',
+			'/img/gallery/2020/IMG_0209.webp',
+			'/img/gallery/2020/IMG_0219.webp',
+			'/img/gallery/2020/IMG_0220.webp',
+			'/img/gallery/2020/IMG_0221.webp',
+			'/img/gallery/2020/IMG_4974.webp'
 		]
 	};
 </script>
@@ -209,6 +226,26 @@
 			let:loaded
 		>
 			{#each urls['2022'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
+	<h3 class="w-full text-center text-5xl">2020: Infinite Recharge</h3>
+	<h4 class="text-md w-full text-center">Note: 2020 was cut short, due to this there is limited team media</h4>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2020'] as url, imageIndex}
 				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
 					{#if loaded.includes(imageIndex)}
 						<img src={url} class="max-h-[70vh]" />
