@@ -152,90 +152,94 @@
 		<hr class="p-8" />
 		<div class="p-9 bg-gray-100 rounded-xl drop-shadow-md text-black">
 			<h1 class="text-3xl mb-9">SPONSORS</h1>
-			<div
-				class="flex p-8 bg-cyan-400 rounded-xl drop-shadow-md justify-around items-center flex-wrap m-2 gap-2"
-			>
-				<a class="w-48">
-					<img src="/img/sponsors/whs.jpg" />
-				</a>
-				<a class="w-48">
-					<img src="/img/sponsors/heartlandersurgical.jpg" />
-				</a>
+			<div class="bg-cyan-400 p-8 rounded-xl drop-shadow-md m-2">
+				<p class="mb-4"><b>Platinum Tier</b></p>
+				<div class="flex justify-around items-center flex-wrap gap-2">
+					<a class="w-48">
+						<img src="/img/sponsors/whs.jpg" />
+					</a>
+					<a class="w-48">
+						<img src="/img/sponsors/heartlandersurgical.jpg" />
+					</a>
+				</div>
 			</div>
-			<div
-				class="flex p-8 bg-yellow-300 rounded-xl drop-shadow-md justify-around items-center flex-wrap m-2 gap-2"
-			>
-				<a class="w-32">
-					<img src="/img/sponsors/primemotorgroup.jpg" />
-				</a>
-				<a class="w-32">
-					<img src="/img/sponsors/eversource.png" />
-				</a>
-				<a class="w-32">
-					<img src="/img/sponsors/Analog Devices.png" />
-				</a>
-				<a class="w-32">
-					<img src="/img/sponsors/MathWorks.png" />
-				</a>
-				<a class="w-32">
-					<img src="/img/sponsors/dedhamsavings.jpg" />
-				</a>
+			<div class="p-8 bg-yellow-300 rounded-xl drop-shadow-md m-2">
+				<p class="mb-4"><b>Gold Tier</b></p>
+				<div class="flex justify-around items-center flex-wrap gap-2">
+					<a class="w-32">
+						<img src="/img/sponsors/primemotorgroup.jpg" />
+					</a>
+					<a class="w-32">
+						<img src="/img/sponsors/eversource.png" />
+					</a>
+					<a class="w-32">
+						<img src="/img/sponsors/Analog Devices.png" />
+					</a>
+					<a class="w-32">
+						<img src="/img/sponsors/MathWorks.png" />
+					</a>
+					<a class="w-32">
+						<img src="/img/sponsors/dedhamsavings.jpg" />
+					</a>
+				</div>
 			</div>
-			<div
-				class="flex p-8 bg-stone-400 rounded-xl drop-shadow-md justify-around items-center flex-wrap m-2 gap-2"
-			>
-				<a class="w-24">
-					<img src="/img/sponsors/wegmans.png" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/savant.jpg" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/verizon.png" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/iRobot.png" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/igniteResearch.png" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/PrintMaster.png" />
-				</a>
-				<a class="w-24">
-					<img src="/img/sponsors/Costco_Logo.png" />
-				</a>
+			<div class="p-8 bg-stone-400 rounded-xl drop-shadow-md m-2">
+				<p class="mb-4"><b>Silver Tier</b></p>
+				<div class="flex justify-around items-center flex-wrap gap-2">
+					<a class="w-24">
+						<img src="/img/sponsors/wegmans.png" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/savant.jpg" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/verizon.png" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/iRobot.png" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/igniteResearch.png" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/PrintMaster.png" />
+					</a>
+					<a class="w-24">
+						<img src="/img/sponsors/Costco_Logo.png" />
+					</a>
+				</div>
 			</div>
-			<div
-				class="flex p-8 bg-yellow-800 rounded-xl drop-shadow-md justify-around items-center flex-wrap m-2 gap-2"
-			>
-				<a class="w-20">
-					<img src="/img/sponsors/rochebros.jpg" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/slack.png" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/aig.png" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/energid.png" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/tockify.jpg" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/siteleaf.png" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/staples.png" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/JPLicks.jpg" />
-				</a>
-				<a class="w-20">
-					<img src="/img/sponsors/Launie and Marino.png" />
-				</a>
+			<div class="p-8 bg-yellow-800 rounded-xl drop-shadow-md m-2 ">
+				<p class="mb-4"><b>Bronze Tier</b></p>
+				<div class="flex justify-around items-center flex-wrap gap-2">
+					<a class="w-20">
+						<img src="/img/sponsors/rochebros.jpg" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/slack.png" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/aig.png" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/energid.png" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/tockify.jpg" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/siteleaf.png" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/staples.png" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/JPLicks.jpg" />
+					</a>
+					<a class="w-20">
+						<img src="/img/sponsors/Launie and Marino.png" />
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>
