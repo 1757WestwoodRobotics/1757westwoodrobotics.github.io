@@ -125,10 +125,13 @@
 			autoplay
 			pauseOnFocus
 			autoplayProgressVisible
+			let:loaded
 		>
-			{#each urls['2022'] as url}
+			{#each urls['2022'] as url, imageIndex}
 				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
-					<img src={url} class="max-h-[70vh]" />
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
 				</div>
 			{/each}
 		</svelte:component>
