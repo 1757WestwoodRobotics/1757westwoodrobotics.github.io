@@ -9,6 +9,9 @@
 	<meta name="keywords" content="FRC, FIRST, Robotics" />
 	<meta name="author" content="Westwood Robotics" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:title" content="About Westwood Robotics team 1757" />
+	<meta property="og:description" content="Information regarding the formation and current status of the team" />
+	<meta property="og:image" content="https://whsrobotics.org/favicon.png" />
 </svelte:head>
 
 <Navbar />

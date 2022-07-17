@@ -26,6 +26,9 @@
 	<meta name="keywords" content="FRC, FIRST, Robotics" />
 	<meta name="author" content="Westwood Robotics" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:title" content="Westwood Robotics team 1757" />
+	<meta property="og:description" content="First Robotics Competition team 1757 from Westwood MA" />
+	<meta property="og:image" content="https://whsrobotics.org/img/team_bg.jpg" />
 </svelte:head>
 
 <Navbar />

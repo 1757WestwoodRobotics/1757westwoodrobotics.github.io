@@ -89,6 +89,9 @@
 	<meta name="keywords" content="FRC, FIRST, Robotics" />
 	<meta name="author" content="Westwood Robotics" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:title" content="1757 Past Robots" />
+	<meta property="og:description" content="a brief summary of all of the team's past robots" />
+	<meta property="og:image" content="https://whsrobotics.org/img/robots/2022rapidreact.png" />
 </svelte:head>
 
 <Navbar />
