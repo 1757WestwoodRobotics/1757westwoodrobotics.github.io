@@ -114,7 +114,7 @@
 		<hr class="p-8" />
 		<div class="bg-white text-black p-6 rounded-xl">
 			<div class="flex items-center">
-				<img src="/img/sponsors/whs.jpg" class="flex-none basis-1/3 max-w-[25%]" alt="WHS logo" />
+				<img src="/img/sponsors/whs.png" class="flex-none basis-1/3 max-w-[25%]" alt="WHS logo" />
 				<p class="basis-2/3 flex-none">
 					Westwood High School is a public high school located in the Greater Boston area. Westwood
 					High School aims to encourage and develop students' education across all fields. <a
@@ -155,11 +155,11 @@
 			<div class="bg-cyan-400 p-8 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Platinum Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-48">
-						<img src="/img/sponsors/whs.jpg" />
+					<a class="w-48 aspect-square bg-white flex items-center rounded-xl">
+						<img src="/img/sponsors/whs.png" />
 					</a>
-					<a class="w-48">
-						<img src="/img/sponsors/heartlandersurgical.jpg" />
+					<a class="w-48 aspect-square bg-white flex items-center rounded-xl">
+						<img src="/img/sponsors/heartlandersurgical.png" />
 					</a>
 				</div>
 			</div>
@@ -167,7 +167,7 @@
 				<p class="mb-4"><b>Gold Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
 					<a class="w-32">
-						<img src="/img/sponsors/primemotorgroup.jpg" />
+						<img src="/img/sponsors/primemotorgroup.png" />
 					</a>
 					<a class="w-32">
 						<img src="/img/sponsors/eversource.png" />
@@ -179,7 +179,7 @@
 						<img src="/img/sponsors/MathWorks.png" />
 					</a>
 					<a class="w-32">
-						<img src="/img/sponsors/dedhamsavings.jpg" />
+						<img src="/img/sponsors/dedhamsavings.png" />
 					</a>
 				</div>
 			</div>
@@ -190,7 +190,7 @@
 						<img src="/img/sponsors/wegmans.png" />
 					</a>
 					<a class="w-24">
-						<img src="/img/sponsors/savant.jpg" />
+						<img src="/img/sponsors/savant.png" />
 					</a>
 					<a class="w-24">
 						<img src="/img/sponsors/verizon.png" />
@@ -213,7 +213,7 @@
 				<p class="mb-4"><b>Bronze Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
 					<a class="w-20">
-						<img src="/img/sponsors/rochebros.jpg" />
+						<img src="/img/sponsors/rochebros.png" />
 					</a>
 					<a class="w-20">
 						<img src="/img/sponsors/slack.png" />
@@ -225,7 +225,7 @@
 						<img src="/img/sponsors/energid.png" />
 					</a>
 					<a class="w-20">
-						<img src="/img/sponsors/tockify.jpg" />
+						<img src="/img/sponsors/tockify.png" />
 					</a>
 					<a class="w-20">
 						<img src="/img/sponsors/siteleaf.png" />
@@ -234,7 +234,7 @@
 						<img src="/img/sponsors/staples.png" />
 					</a>
 					<a class="w-20">
-						<img src="/img/sponsors/JPLicks.jpg" />
+						<img src="/img/sponsors/JPLicks.png" />
 					</a>
 					<a class="w-20">
 						<img src="/img/sponsors/Launie and Marino.png" />
