@@ -297,6 +297,17 @@
 	};
 </script>
 
+<svelte:head>
+	<title>Westwood Robotics - Media Gallery</title>
+	<meta name="description" content="Team pictures taken throughout multiple years" />
+	<meta name="keywords" content="FRC, FIRST, Robotics" />
+	<meta name="author" content="Westwood Robotics" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta property="og:title" content="1757 Media Gallery" />
+	<meta property="og:description" content="Team competition media for 1757" />
+	<meta property="og:image" content="https://whsrobotics.org/img/gallery/2022/_36A9642.webp" />
+</svelte:head>
+
 <Navbar />
 
 <div class="w-full min-h-screen bg-slate-900 text-white">
