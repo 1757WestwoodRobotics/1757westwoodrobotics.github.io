@@ -17,24 +17,54 @@
 			'/img/team_bg.jpg',
 			'/img/robot_pic.png',
 			'/img/coolio.png',
-			'/img/gallery/2022/_36A9645.webp',
-			'/img/gallery/2022/_36A9650.webp',
-			'/img/gallery/2022/_36A9659.webp',
-			'/img/gallery/2022/_36A9661_02.webp',
-			'/img/gallery/2022/_36A9677.webp',
-			'/img/gallery/2022/_36A9684.webp',
-			'/img/gallery/2022/_36A9702.webp',
-			'/img/gallery/2022/_36A9706.webp',
-			'/img/gallery/2022/_36A9711.webp',
-			'/img/gallery/2022/_36A9731.webp',
-			'/img/gallery/2022/_36A9911_03.webp',
+			'/img/gallery/2022/_36A0001.webp',
+			'/img/gallery/2022/_36A0009.webp',
+			'/img/gallery/2022/_36A0013.webp',
+			'/img/gallery/2022/_36A0016.webp',
+			'/img/gallery/2022/_36A0017.webp',
 			'/img/gallery/2022/_36A9539.webp',
 			'/img/gallery/2022/_36A9562.webp',
+			'/img/gallery/2022/_36A9575.webp',
 			'/img/gallery/2022/_36A9585.webp',
 			'/img/gallery/2022/_36A9612.webp',
 			'/img/gallery/2022/_36A9618.webp',
 			'/img/gallery/2022/_36A9628.webp',
 			'/img/gallery/2022/_36A9631_01.webp',
+			'/img/gallery/2022/_36A9638.webp',
+			'/img/gallery/2022/_36A9641_01.webp',
+			'/img/gallery/2022/_36A9645.webp',
+			'/img/gallery/2022/_36A9646.webp',
+			'/img/gallery/2022/_36A9650.webp',
+			'/img/gallery/2022/_36A9652.webp',
+			'/img/gallery/2022/_36A9659.webp',
+			'/img/gallery/2022/_36A9660_01.webp',
+			'/img/gallery/2022/_36A9661_02.webp',
+			'/img/gallery/2022/_36A9662_02.webp',
+			'/img/gallery/2022/_36A9675.webp',
+			'/img/gallery/2022/_36A9677.webp',
+			'/img/gallery/2022/_36A9679.webp',
+			'/img/gallery/2022/_36A9684.webp',
+			'/img/gallery/2022/_36A9689.webp',
+			'/img/gallery/2022/_36A9690.webp',
+			'/img/gallery/2022/_36A9691_01.webp',
+			'/img/gallery/2022/_36A9692.webp',
+			'/img/gallery/2022/_36A9693.webp',
+			'/img/gallery/2022/_36A9697_01.webp',
+			'/img/gallery/2022/_36A9701.webp',
+			'/img/gallery/2022/_36A9702.webp',
+			'/img/gallery/2022/_36A9706.webp',
+			'/img/gallery/2022/_36A9710.webp',
+			'/img/gallery/2022/_36A9711.webp',
+			'/img/gallery/2022/_36A9717.webp',
+			'/img/gallery/2022/_36A9720.webp',
+			'/img/gallery/2022/_36A9728.webp',
+			'/img/gallery/2022/_36A9731.webp',
+			'/img/gallery/2022/_36A9733.webp',
+			'/img/gallery/2022/_36A9736.webp',
+			'/img/gallery/2022/_36A9741.webp',
+			'/img/gallery/2022/_36A9827_01.webp',
+			'/img/gallery/2022/_36A9905.webp',
+			'/img/gallery/2022/_36A9911_03.webp',
 			'/img/gallery/2022/20220409-DSC01375.webp',
 			'/img/gallery/2022/20220409-DSC01281.webp',
 			'/img/gallery/2022/20220409-DSC01349.webp',
@@ -207,6 +237,52 @@
 			'/img/gallery/2020/IMG_0220.webp',
 			'/img/gallery/2020/IMG_0221.webp',
 			'/img/gallery/2020/IMG_4974.webp'
+		],
+		'2016': [
+			'/img/gallery/2016/Boston-1.webp',
+			'/img/gallery/2016/Boston-3.webp',
+			'/img/gallery/2016/DSC_0007.webp',
+			'/img/gallery/2016/DSC_0011.webp',
+			'/img/gallery/2016/DSC_0015.webp',
+			'/img/gallery/2016/DSC_0021.webp',
+			'/img/gallery/2016/DSC_0027.webp',
+			'/img/gallery/2016/DSC_0032.webp',
+			'/img/gallery/2016/DSC_0037.webp',
+			'/img/gallery/2016/DSC_0041.webp',
+			'/img/gallery/2016/DSC_0053.webp',
+			'/img/gallery/2016/DSC_0055.webp',
+			'/img/gallery/2016/DSC_0067.webp',
+			'/img/gallery/2016/DSC_0073.webp',
+			'/img/gallery/2016/DSC_0079.webp',
+			'/img/gallery/2016/DSC_0086.webp',
+			'/img/gallery/2016/DSC_0091.webp',
+			'/img/gallery/2016/DSC_0104.webp',
+			'/img/gallery/2016/DSC_0113.webp',
+			'/img/gallery/2016/DSC_0114.webp',
+			'/img/gallery/2016/DSC_0119.webp',
+			'/img/gallery/2016/DSC_9863.webp',
+			'/img/gallery/2016/DSC_9868.webp',
+			'/img/gallery/2016/DSC_9870.webp',
+			'/img/gallery/2016/DSC_9876.webp',
+			'/img/gallery/2016/DSC_9916.webp',
+			'/img/gallery/2016/DSC_9947.webp',
+			'/img/gallery/2016/DSC_9954.webp',
+			'/img/gallery/2016/DSC_9959.webp',
+			'/img/gallery/2016/DSC_9967.webp',
+			'/img/gallery/2016/DSC_9969.webp',
+			'/img/gallery/2016/DSC_9974.webp',
+			'/img/gallery/2016/DSC_9979.webp',
+			'/img/gallery/2016/DSC_9984.webp',
+			'/img/gallery/2016/DSC_9991.webp',
+			'/img/gallery/2016/DSC_9996.webp',
+			'/img/gallery/2016/IMG_1454.webp',
+			'/img/gallery/2016/IMG_1490.webp',
+			'/img/gallery/2016/IMG_1496.webp',
+			'/img/gallery/2016/IMG_1510.webp',
+			'/img/gallery/2016/IMG_5592.webp',
+			'/img/gallery/2016/IMG_5599.webp',
+			'/img/gallery/2016/IMG_5603.webp',
+			'/img/gallery/2016/IMG_5607.webp'
 		]
 	};
 </script>
@@ -305,6 +381,25 @@
 			let:loaded
 		>
 			{#each urls['2017'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
+	<h3 class="w-full text-center text-5xl">2016: Stronghold</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2016'] as url, imageIndex}
 				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
 					{#if loaded.includes(imageIndex)}
 						<img src={url} class="max-h-[70vh]" />
