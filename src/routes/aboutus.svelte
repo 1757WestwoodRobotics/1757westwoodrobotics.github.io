@@ -10,7 +10,10 @@
 	<meta name="author" content="Westwood Robotics" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta property="og:title" content="About Westwood Robotics team 1757" />
-	<meta property="og:description" content="Information regarding the formation and current status of the team" />
+	<meta
+		property="og:description"
+		content="Information regarding the formation and current status of the team"
+	/>
 	<meta property="og:image" content="https://whsrobotics.org/favicon.png" />
 </svelte:head>
 
@@ -35,9 +38,13 @@
 		</div>
 	</div>
 </div>
-<div class="max-w-full h-[70vh] bg-[url('/img/robot_pic.png')] min-h-5 bg-center bg-cover">
+<div class="max-w-full h-[70vh] min-h-5 bg-center bg-cover relative -z-20 bg-slate-500">
+	<img
+		class="w-full h-full blur-sm inline-block -z-10 object-cover object-center block absolute top-1/2 -translate-x-2/4 -translate-y-2/4 left-1/2"
+		src="/img/robot_pic.png"
+	/>
 	<div
-		class="text-white flex items-center justify-center text-center align-center h-full text-lg backdrop-blur-sm w-full"
+		class="text-white flex items-center justify-center text-center align-center h-full text-lg w-full inline-block"
 	>
 		<div class="flex items-center justify-around align-center px-4 gap-4">
 			<p class="basis-1 grow">
@@ -54,11 +61,13 @@
 		</div>
 	</div>
 </div>
-<div
-	class="max-w-full h-[70vh] bg-blend-multiply bg-slate-300 bg-[url('/img/coolio.png')] min-h-5 bg-center bg-cover"
->
+<div class="max-w-full h-[70vh] min-h-5 relative -z-20 bg-slate-500 relative bg-cover bg-center">
+	<img
+		class="w-full h-full blur-sm inline-block -z-10 object-cover object-center block absolute top-1/2 -translate-x-2/4 -translate-y-2/4 left-1/2"
+		src="/img/coolio.png"
+	/>
 	<div
-		class="h-full w-full flex items-center justify-center align-center backdrop-blur-sm text-white text-center px-6 gap-7"
+		class="h-full w-full flex items-center justify-center align-center text-white text-center px-6 gap-7 inline-block"
 	>
 		<span class="basis-2/3">
 			<h4 class="text-3xl mb-5">What is FRC?</h4>
@@ -75,7 +84,11 @@
 		</span>
 	</div>
 </div>
-<div class="max-w-full bg-[url('/img/dcmp_team.jpg')] min-h-5 bg-center bg-cover">
+<div class="max-w-full min-h-5 bg-center bg-cover relative bg-slate-500 -z-20">
+	<img
+		class="w-full h-full blur-sm inline-block -z-10 object-cover object-center block absolute top-1/2 -translate-x-2/4 -translate-y-2/4 left-1/2"
+		src="/img/dcmp_team.jpg"
+	/>
 	<span
 		class="h-full w-full flex backdrop-blur text-white flex align-center justify-center items-center flex-col gap-4 py-10"
 	>
