@@ -158,10 +158,18 @@
 			<div class="bg-cyan-400 p-8 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Platinum Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-48 aspect-square bg-white flex items-center rounded-xl">
+					<a
+						class="w-48 aspect-square bg-white flex items-center rounded-xl"
+						href="http://www.westwood.k12.ma.us/westwood-high-school/"
+						target="_blank"
+					>
 						<img src="/img/sponsors/whs.png" />
 					</a>
-					<a class="w-48 aspect-square bg-white flex items-center rounded-xl">
+					<a
+						class="w-48 aspect-square bg-white flex items-center rounded-xl"
+						href="http://www.heartlandersurgical.com/"
+						target="_blank"
+					>
 						<img src="/img/sponsors/heartlandersurgical.png" />
 					</a>
 				</div>
@@ -169,19 +177,19 @@
 			<div class="p-8 bg-yellow-300 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Gold Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-32">
+					<a class="w-32" href="http://www.driveprime.com/" target="_blank">
 						<img src="/img/sponsors/primemotorgroup.png" />
 					</a>
-					<a class="w-32">
+					<a class="w-32" href="https://www.eversource.com/content/" target="_blank">
 						<img src="/img/sponsors/eversource.png" />
 					</a>
-					<a class="w-32">
+					<a class="w-32" href="https://www.analog.com/" target="_blank">
 						<img src="/img/sponsors/Analog Devices.png" />
 					</a>
-					<a class="w-32">
+					<a class="w-32" href="https://www.mathworks.com/" target="_blank">
 						<img src="/img/sponsors/MathWorks.png" />
 					</a>
-					<a class="w-32">
+					<a class="w-32" href="http://www.dedhamsavings.com/" target="_blank">
 						<img src="/img/sponsors/dedhamsavings.png" />
 					</a>
 				</div>
@@ -189,25 +197,25 @@
 			<div class="p-8 bg-stone-400 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Silver Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-24">
+					<a class="w-24" href="http://www.wegmans.com/" target="_blank">
 						<img src="/img/sponsors/wegmans.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="https://www.savant.com/" target="_blank">
 						<img src="/img/sponsors/savant.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="https://www.verizon.com/" target="_blank">
 						<img src="/img/sponsors/verizon.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="https://www.irobot.com/" target="_blank">
 						<img src="/img/sponsors/iRobot.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="http://www.igniteresearch.com/" target="_blank">
 						<img src="/img/sponsors/igniteResearch.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="https://printmasteronline.com/" target="_blank">
 						<img src="/img/sponsors/PrintMaster.png" />
 					</a>
-					<a class="w-24">
+					<a class="w-24" href="https://www.costco.com/" target="_blank">
 						<img src="/img/sponsors/Costco_Logo.png" />
 					</a>
 				</div>
@@ -215,31 +223,31 @@
 			<div class="p-8 bg-yellow-800 rounded-xl drop-shadow-md m-2 ">
 				<p class="mb-4"><b>Bronze Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-20">
+					<a class="w-20" href="https://www.rochebros.com/" target="_blank">
 						<img src="/img/sponsors/rochebros.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="https://slack.com/" target="_blank">
 						<img src="/img/sponsors/slack.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="http://www.aig.com/" target="_blank">
 						<img src="/img/sponsors/aig.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="http://www.energid.com/" target="_blank">
 						<img src="/img/sponsors/energid.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="https://tockify.com/" target="_blank">
 						<img src="/img/sponsors/tockify.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="https://www.siteleaf.com/" target="_blank">
 						<img src="/img/sponsors/siteleaf.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="https://www.staples.com/" target="_blank">
 						<img src="/img/sponsors/staples.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="http://www.jplicks.com/" target="_blank">
 						<img src="/img/sponsors/JPLicks.png" />
 					</a>
-					<a class="w-20">
+					<a class="w-20" href="https://www.launiemarino.com/" target="_blank">
 						<img src="/img/sponsors/Launie and Marino.png" />
 					</a>
 				</div>
