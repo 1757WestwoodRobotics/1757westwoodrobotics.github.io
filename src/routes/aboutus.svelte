@@ -131,7 +131,7 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/dwight.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-[19deg] ring-emerald-600 mb-5"
+					class="rounded-full aspect-square ring-4 w-32 ring-emerald-600 mb-5"
 				/>
 				<b>Dwight Meglan</b>
 				Lead Mentor
