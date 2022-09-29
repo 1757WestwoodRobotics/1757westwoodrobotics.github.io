@@ -94,7 +94,7 @@
 	>
 		<h2 class="text-3xl"><b>Meet the team</b></h2>
 		<h3 class="text-xl">E-Board</h3>
-		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm items-start">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/charley.webp"
@@ -127,7 +127,7 @@
 		</div>
 		<br />
 		<h3 class="text-xl">Mentors</h3>
-		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm items-start">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/dwight.webp"
@@ -155,7 +155,7 @@
 		</div>
 		<br />
 		<h3 class="text-xl">Other Leadership</h3>
-		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm">
+		<div class="flex justify-around text-center flex-wrap gap-5 mx-10 w-full max-w-screen-sm items-start">
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/ivan.webp"
