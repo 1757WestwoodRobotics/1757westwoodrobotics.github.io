@@ -33,7 +33,7 @@
 
 <Navbar />
 <div
-	class="max-w-full bg-[#115724] h-screen min-h-5 align-center bg-[url('/img/banner.jpg')] bg-center bg-cover bg-blend-multiply text-white text-center flex items-center justify-center"
+	class="max-w-full bg-[#115724] h-screen min-h-5 align-center bg-[url('/img/banner.webp')] bg-center bg-cover bg-blend-multiply text-white text-center flex items-center justify-center"
 >
 	<span>
 		<h1 class="text-7xl">Westwood Robotics</h1>
@@ -51,6 +51,35 @@
 				></b
 			>
 		</div>
+		<div class="banner-center">
+			<div class="banner">
+				<img src="https://thebluealliance.com/images/first_icon.svg" />
+				<div class="award-name">
+					<span>Winner</span>
+				</div>
+				<div class="award-event">
+					<span>2023 WPI District</span>
+				</div>
+			</div>
+			<div class="banner">
+				<img src="https://thebluealliance.com/images/first_icon.svg" />
+				<div class="award-name">
+					<span>Winner</span>
+				</div>
+				<div class="award-event-long">
+					<span>2023 NEDC - WILSON District Championship Division</span>
+				</div>
+			</div>
+			<div class="banner">
+				<img src="https://thebluealliance.com/images/first_icon.svg" />
+				<div class="award-name">
+					<span>Winner</span>
+				</div>
+				<div class="award-event-long">
+					<span>2023 New England District Championship</span>
+				</div>
+			</div>
+		</div>
 		<br />
 		<h3 class="text-4xl">OUR MISSION</h3>
 		<br />
@@ -63,7 +92,7 @@
 		<br />
 		<iframe
 			class="aspect-video w-full"
-			src="https://www.youtube.com/embed/s1iLbVFduqE"
+			src="https://www.youtube.com/embed/HeokAZa2hfo"
 			title="YouTube video player"
 			frameborder="0"
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -76,6 +105,10 @@
 		>
 		<div class="bg-slate-800 rounded-xl drop-shadow-md mt-9">
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
+				<div>
+					<img src="/img/robots/2023chargedup.png" alt="Charged Up" />
+					<h1>2023 Charged Up - "LUXO"</h1>
+				</div>
 				<div>
 					<img src="/img/robots/2022rapidreact.png" alt="Rapid React" />
 					<h1>2022 Rapid React - "SKADI"</h1>
@@ -220,7 +253,7 @@
 					</a>
 				</div>
 			</div>
-			<div class="p-8 bg-yellow-800 rounded-xl drop-shadow-md m-2 ">
+			<div class="p-8 bg-yellow-800 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Bronze Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
 					<a class="w-20" href="https://www.rochebros.com/" target="_blank">
@@ -267,3 +300,126 @@
 	{/if}
 	<Footer />
 </div>
+
+<style>
+	.banner {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		font-family: Roboto, sans-serif;
+		font-size: 14px;
+		box-sizing: border-box;
+		background: #0f4bcb;
+		color: #fff;
+		display: inline-block;
+		height: 170px;
+		line-height: 1.2;
+		margin: 0 0 40px;
+		padding: 8px;
+		position: relative;
+		vertical-align: top;
+		white-space: normal;
+		width: 140px;
+		filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
+		text-align: center;
+	}
+	.banner:after {
+		box-sizing: border-box;
+		-webkit-filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
+		filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.1));
+		border-bottom: 70px solid #0f4bcb;
+		border-color: #0f4bcb #0f4bcb transparent;
+		border-style: solid;
+		border-width: 5px 70px 20px;
+		content: '';
+		display: block;
+		left: 0;
+		position: absolute;
+		top: 100%;
+	}
+	.banner img {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		font-family: Roboto, sans-serif;
+		font-size: 14px;
+		color: #fff;
+		line-height: 1.2;
+		text-align: center;
+		white-space: normal;
+		box-sizing: border-box;
+		border: 0;
+		vertical-align: middle;
+		margin-bottom: 10px;
+		margin-top: 10px;
+		max-height: 45px;
+		width: 75px;
+		display: inline;
+	}
+	.banner .award-name,
+	.banner .award-name-long {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		font-family: Roboto, sans-serif;
+		font-size: 14px;
+		color: #fff;
+		line-height: 1.2;
+		text-align: center;
+		white-space: normal;
+		box-sizing: border-box;
+		display: table;
+		font-weight: bolder;
+		height: 35px;
+		margin: 3px 0;
+		width: 100%;
+	}
+	.banner .award-event,
+	.banner .award-event-long {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		font-family: Roboto, sans-serif;
+		color: #fff;
+		text-align: center;
+		white-space: normal;
+		box-sizing: border-box;
+		display: table;
+		height: 50px;
+		text-transform: uppercase;
+		width: 100%;
+		font-size: 85%;
+		line-height: 130%;
+	}
+	.banner .award-event span,
+	.banner .award-event-long span {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		font-family: Roboto, sans-serif;
+		color: #fff;
+		text-align: center;
+		white-space: normal;
+		text-transform: uppercase;
+		font-size: 85%;
+		line-height: 130%;
+		box-sizing: border-box;
+		display: table-cell;
+		max-width: 124px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		vertical-align: middle;
+	}
+	.banner .award-name span,
+	.banner .award-name-long span {
+		display: table-cell;
+		font-style: italic;
+		text-transform: uppercase;
+		vertical-align: middle;
+	}
+	.banner-center {
+		-webkit-text-size-adjust: 100%;
+		-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+		color: #333;
+		font-family: Roboto, sans-serif;
+		font-size: 14px;
+		line-height: 1.42857143;
+		box-sizing: border-box;
+		text-align: center;
+	}
+</style>

@@ -5,6 +5,19 @@
 
 	let robots = [
 		{
+			name: 'Luxo',
+			year: '2023',
+			image: '/img/robots/2023chargedup.png',
+			desc: 'Building off the success of last year, we aimed to once again build the even greater performing robot than ever before. Named after the Pixar Lamp, this fast and elegant industrial arm on wheels is build with robustness in mind and precise control implemented. The first bot in team history to win any event, and taking home a total of 3 blue banners. In addition, Luxo took home the Excelence in Engineering award and a team award, the Engineering Inspiration award.',
+			techbinder: '/2023techbinder.pdf',
+			videos: [
+				{ name: 'Season Recap', id: 'HeokAZa2hfo' },
+				{ name: 'WPI winning match', id: 'DxJ9BWuwGyI' },
+				{ name: 'NEDCMP Wilson winning match', id: 'DczqfwSpFsQ' },
+				{ name: 'NEDCMP grand finals winning match', id: '0g_Gj0Xq1gw' }
+			]
+		},
+		{
 			name: 'Skadi',
 			year: '2022',
 			image: '/img/robots/2022rapidreact.png',

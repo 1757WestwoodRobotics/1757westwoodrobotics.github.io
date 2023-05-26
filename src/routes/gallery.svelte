@@ -12,6 +12,35 @@
 	});
 
 	let urls = {
+		'2023': [
+			'/img/gallery/2023/332A9610.webp',
+			'/img/gallery/2023/DCMP1.webp',
+			'/img/gallery/2023/DCMP2.webp',
+			'/img/gallery/2023/DCMP3.webp',
+			'/img/gallery/2023/DCMP4.webp',
+			'/img/gallery/2023/IMG_4058.webp',
+			'/img/gallery/2023/IMG_4152.webp',
+			'/img/gallery/2023/NI8A5748.webp',
+			'/img/gallery/2023/NI8A5752.webp',
+			'/img/gallery/2023/NI8A5755.webp',
+			'/img/gallery/2023/NI8A5761.webp',
+			'/img/gallery/2023/NI8A5775.webp',
+			'/img/gallery/2023/NI8A5851.webp',
+			'/img/gallery/2023/NI8A5962.webp',
+			'/img/gallery/2023/NI8A6028.webp',
+			'/img/gallery/2023/NI8A6095.webp',
+			'/img/gallery/2023/NI8A6122.webp',
+			'/img/gallery/2023/NI8A6152.webp',
+			'/img/gallery/2023/NI8A6206.webp',
+			'/img/gallery/2023/NI8A6215.webp',
+			'/img/gallery/2023/NI8A6230.webp',
+			'/img/gallery/2023/WPI1.webp',
+			'/img/gallery/2023/WPI2.webp',
+			'/img/gallery/2023/WPI3.webp',
+			'/img/gallery/2023/WPI4.webp',
+			'/img/gallery/2023/WPI5.webp',
+			'/img/gallery/2023/WPI6.webp'
+		],
 		'2022': [
 			'/img/dcmp_team.jpg',
 			'/img/gallery/2022/_36A0001.webp',
@@ -312,6 +341,25 @@
 
 <div class="w-full min-h-screen bg-slate-900 text-white">
 	<br />
+	<h3 class="w-full text-center text-5xl">2023: Charged Up</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2023'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
 	<h3 class="w-full text-center text-5xl">2022: Rapid React</h3>
 	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
 		<svelte:component
