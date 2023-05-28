@@ -99,6 +99,46 @@
 			allowfullscreen
 		/>
 		<br />
+		<h1 class="text-3xl m-3">CHECK US OUT IN THE NEWS!</h1>
+		<div class="p-8 bg-emerald-900 m-4 shadow-black drop-shadow-md rounded-xl">
+			<div>
+				<a
+					class="text-sky-400 hover:text-blue-600"
+					href="https://westwoodminute.town.news/g/westwood-ma/n/153573/westwood-robotics-team-shines-award-studded-competition-season"
+					>Westwood Robotics Team Celebrates Three Competition Wins, Heads to World Championships |
+					Westwood Minute</a
+				>
+				<hr class="p-2 m-2" />
+			</div>
+			<img
+				src="https://westwoodminute.town.news/sites/default/files/styles/extra_large/public/8418/2023-04/screenshot_2023-04-11_at_10.29.41_pm.png.jpg?itok=hIpQWfCa"
+				width="1200"
+				height="900"
+				alt="Westwood Robotics Team Celebrates Three Competition Wins, Heads to World Championships"
+			/>
+		</div>
+		<div class="p-8 bg-emerald-900 m-4 shadow-black drop-shadow-md rounded-xl">
+			<div>
+				<a
+					class="text-sky-400 hover:text-blue-600"
+					href="https://whdh.com/news/westwood-hs-robotics-team-goes-global-competes-internationally/"
+					>Westwood HS robotics team goes global, competes internationally | 7 News WHDH</a
+				>
+
+				<hr class="p-2 m-2" />
+			</div>
+			<a
+				href="https://whdh.com/news/westwood-hs-robotics-team-goes-global-competes-internationally/"
+			>
+				<img
+					src="https://cf-images.us-east-1.prod.boltdns.net/v1/static/4744899807001/49863e3d-3174-4bd4-b54b-9076317d179e/d96b0e3b-945a-45fe-b37a-b0667a29bd68/1280x720/match/image.jpg"
+					width="1280"
+					height="730"
+					alt="Team 1757's 2022 robot in action"
+				/>
+			</a>
+		</div>
+
 		<hr class="p-8" />
 		<a class="text-3xl m-3 text-sky-500 hover:underline mb-9" href="/robots"
 			>CHECK OUT OUR ROBOTS!</a
@@ -132,18 +172,6 @@
 				<div>
 					<img src="/img/robots/2017steamworks_compressed.png" alt="2017 robot" />
 					<h1>2017 Steamworks</h1>
-				</div>
-				<div>
-					<img src="/img/robots/2016stronghold_compressed.png" alt="2016 robot" />
-					<h1>2016 Stronghold</h1>
-				</div>
-				<div>
-					<img src="/img/robots/2015tshirtcannon_compressed.png" alt="2015 T Shirt Cannon" />
-					<h1>2015 T Shirt Cannon</h1>
-				</div>
-				<div>
-					<img src="/img/robots/2015recyclerush_compressed.png" alt="2015 robot" />
-					<h1>2015 Recycle Rush</h1>
 				</div>
 			</svelte:component>
 		</div>
