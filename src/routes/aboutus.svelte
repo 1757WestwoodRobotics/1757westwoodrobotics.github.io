@@ -102,29 +102,29 @@
 					src="/img/team/charley.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
 				/>
-				<b>Charley Marsland</b>
-				Captain
+				<b>Landon Bayer</b>
+				Team Captain<br/> Technical Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img src="/img/team/luke.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
-				<b>Luke Maxwell</b>
-				Vice Captain<br />Technical Lead
+				<b>Claire Peng</b>
+				Business Captain<br />
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/landon.webp"
 					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[270deg] ring-green-800"
 				/>
-				<b>Landon Bayer</b>
-				Business Lead
+				<b>Anya Jiang</b>
+				Technical Vice Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/sean.webp"
 					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[30deg] ring-orange-400"
 				/>
-				<b>Sean Tao</b>
-				Secretary
+				<b>Elizabeth Lowney</b>
+				Business Vice Captain
 			</div>
 		</div>
 		<br />
@@ -137,16 +137,8 @@
 					src="/img/team/dwight.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-emerald-600 mb-5"
 				/>
-				<b>Dwight Meglan</b>
-				Lead Mentor
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
-					src="/img/team/chris.webp"
-					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
-				/>
 				<b>Chris Aloisio</b>
-				Programming Mentor<br />Cad Mentor
+				Lead Mentor<br/> 
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
@@ -155,6 +147,14 @@
 				/>
 				<b>Steven Harrington</b>
 				Mechanical Mentor<br />Business Mentor
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/chris.webp"
+					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
+				/>
+				<b>Dwight Meglan</b>
+				the lebron of robotics
 			</div>
 		</div>
 		<br />
@@ -175,16 +175,32 @@
 					src="/img/team/jeff.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-5"
 				/>
-				<b>Jeffery Pan</b>
-				Treasurer
+				<b>Jacob Kaplan</b>
+				Design Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/rachel.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
 				/>
-				<b>Rachel Qu</b>
-				Media Manager
+				<b>Alex Theofilou</b>
+				Outreach Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/rachel.webp"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+				/>
+				<b>Celina Yau</b>
+				Media Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/rachel.webp"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+				/>
+				<b>somebody</b>
+				Finance Lead
 			</div>
 		</div>
 	</span>

@@ -51,5 +51,5 @@
 	</div>
 </div>
 <div class="w-full text-white bg-stone-600 text-center p-7">
-	Created and © 2022 by Westwood Robotics. All Rights Reserved.
+	Created and © 2024 by Westwood Robotics. All Rights Reserved.
 </div>

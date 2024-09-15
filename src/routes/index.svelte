@@ -79,6 +79,15 @@
 					<span>2023 New England District Championship</span>
 				</div>
 			</div>
+			<div class="banner">
+				<img src="https://thebluealliance.com/images/first_icon.svg" />
+				<div class="award-name">
+					<span>Winner</span>
+				</div>
+				<div class="award-event-long">
+					<span>2024 WPI FIRST Impact Award</span>
+				</div>
+			</div>
 		</div>
 		<br />
 		<h3 class="text-4xl">OUR MISSION</h3>
@@ -145,6 +154,10 @@
 		>
 		<div class="bg-slate-800 rounded-xl drop-shadow-md mt-9">
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
+				<div>
+					<img src="/img/robots/2024crescendo.png" alt="Crescendo"/>
+					<h1>2024 Crescendo - "PROTEUS"</h1>
+				</div>
 				<div>
 					<img src="/img/robots/2023chargedup.png" alt="Charged Up" />
 					<h1>2023 Charged Up - "LUXO"</h1>

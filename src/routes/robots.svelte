@@ -5,6 +5,16 @@
 
 	let robots = [
 		{
+			name: 'Proteus',
+			year: '2024',
+			image: '/img/robots/2024crescendo.png',
+			desc: 'Insert description',
+			techbinder: '/2024techbinder.pdf',
+			videos: [
+				{name: 'Season Recap', id: ''}
+			]
+		},	
+		{
 			name: 'Luxo',
 			year: '2023',
 			image: '/img/robots/2023chargedup.png',
