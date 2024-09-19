@@ -103,12 +103,12 @@
 					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
 				/>
 				<b>Landon Bayer</b>
-				Team Captain<br/> Technical Captain
+				Technical Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img src="/img/team/luke.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
 				<b>Claire Peng</b>
-				Business Captain<br />
+				Business Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
@@ -154,7 +154,7 @@
 					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
 				/>
 				<b>Dwight Meglan</b>
-				the lebron of robotics
+				Mentor
 			</div>
 		</div>
 		<br />
@@ -199,8 +199,16 @@
 					src="/img/team/rachel.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
 				/>
-				<b>somebody</b>
-				Finance Lead
+				<b>Constantina Flevarakis</b>
+				Finance Co-Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/rachel.webp"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+				/>
+				<b>Julian Saroufim</b>
+				Finance Co-Lead
 			</div>
 		</div>
 	</span>

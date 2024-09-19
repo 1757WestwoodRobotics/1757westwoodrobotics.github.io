@@ -12,6 +12,7 @@
 	});
 
 	let urls = {
+		'2024': [],
 		'2023': [
 			'/img/gallery/2023/332A9610.webp',
 			'/img/gallery/2023/DCMP1.webp',
@@ -341,6 +342,25 @@
 
 <div class="w-full min-h-screen bg-slate-900 text-white">
 	<br />
+	<h3 class="w-full text-center text-5xl">2024: Crescendo</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2024'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
 	<h3 class="w-full text-center text-5xl">2023: Charged Up</h3>
 	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
 		<svelte:component
