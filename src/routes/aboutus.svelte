@@ -99,29 +99,29 @@
 		>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/charley.webp"
+					src="/img/team/landon.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
 				/>
 				<b>Landon Bayer</b>
 				Technical Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
-				<img src="/img/team/luke.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
-				<b>Claire Peng</b>
-				Business Captain
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/landon.webp"
-					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[270deg] ring-green-800"
+					src="/img/team/claire.webp"
+					class="rounded-full aspect-square ring-4 w-32 mb-5 ring-green-800"
 				/>
 				<b>Anya Jiang</b>
 				Technical Vice Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
+				<img src="/img/team/claire.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
+				<b>Claire Peng</b>
+				Business Captain
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/sean.webp"
-					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-[30deg] ring-orange-400"
+					src="/img/team/elizabeth.webp"
+					class="rounded-full aspect-square ring-4 w-32 mb-5 ring-orange-400"
 				/>
 				<b>Elizabeth Lowney</b>
 				Business Vice Captain
@@ -134,7 +134,7 @@
 		>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/dwight.webp"
+					src="/img/team/chris.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-emerald-600 mb-5"
 				/>
 				<b>Chris Aloisio</b>
@@ -150,7 +150,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/chris.webp"
+					src="/img/team/dwight.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-cyan-600 mb-5"
 				/>
 				<b>Dwight Meglan</b>
@@ -194,10 +194,19 @@
 				<b>Celina Yau</b>
 				Media Lead
 			</div>
+
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/rachel.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
+				/>
+				<b>Julian Saroufim</b>
+				Finance Co-Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/constantina.webp"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
 				/>
 				<b>Constantina Flevarakis</b>
 				Finance Co-Lead
@@ -205,10 +214,10 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/rachel.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
 				/>
-				<b>Julian Saroufim</b>
-				Finance Co-Lead
+				<b>Yuhan Chen</b>
+				Open Alliance Lead
 			</div>
 		</div>
 	</span>
