@@ -181,15 +181,15 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/rachel.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-orange-800 mb-5"
 				/>
 				<b>Alex Theofilou</b>
 				Outreach Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/rachel.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-5"
+					src="/img/team/celina.webp"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-blue-800 mb-5"
 				/>
 				<b>Celina Yau</b>
 				Media Lead
@@ -198,7 +198,7 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/rachel.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-green-800 mb-7"
 				/>
 				<b>Julian Saroufim</b>
 				Finance Co-Lead
@@ -206,7 +206,7 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/constantina.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
+					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-7"
 				/>
 				<b>Constantina Flevarakis</b>
 				Finance Co-Lead
