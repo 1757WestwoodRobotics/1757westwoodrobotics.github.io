@@ -107,7 +107,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/claire.webp"
+					src="/img/team/anya.webp"
 					class="rounded-full aspect-square ring-4 w-32 mb-5 ring-green-800"
 				/>
 				<b>Anya Jiang</b>
@@ -172,7 +172,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/jeff.webp"
+					src="/img/team/jacob.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-5"
 				/>
 				<b>Jacob Kaplan</b>
@@ -180,7 +180,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/rachel.webp"
+					src="/img/team/alex.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-orange-800 mb-5"
 				/>
 				<b>Alex Theofilou</b>
@@ -197,7 +197,7 @@
 
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/rachel.webp"
+					src="/img/team/blank.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-green-800 mb-7"
 				/>
 				<b>Julian Saroufim</b>
@@ -213,7 +213,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/rachel.webp"
+					src="/img/team/yuhan.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
 				/>
 				<b>Yuhan Chen</b>
