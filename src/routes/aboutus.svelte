@@ -197,7 +197,7 @@
 
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/blank.webp"
+					src="/img/team/julian.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-green-800 mb-7"
 				/>
 				<b>Julian Saroufim</b>
