@@ -121,10 +121,10 @@
 			            <p class="p-3">Amp</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseAmp}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseAmp}>MORE</p>
 			                <input type="hidden" name="entry.1926752669" value="{ampAuto}"/>
 			                <p>{ampAuto}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseAmp}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseAmp}>LESS</p>
 			            </div>
 			        </div>
 
@@ -132,10 +132,10 @@
 			            <p class="p-3">Speaker</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseSpeaker}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseSpeaker}>MORE</p>
 			                <input type="hidden" name="entry.1553663479" value="{speakerAuto}"/>
 			                <p>{speakerAuto}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseSpeaker}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseSpeaker}>LESS</p>
 			            </div>
 			        </div>
 			    </div>
@@ -147,94 +147,76 @@
 
 		    <h1><b>TELEOP</b></h1>
 		    <div class="grid grid-cols-3 grid-rows-3 text-center">
-			        <div class="border-solid border-2 rounded border-zinc-500">
-			            <p class="p-3">Alliance Wing Pickup</p>
+			        <div class="border-solid border-2 rounded border-zinc-500 row-span-3 flex align-center items-center bg-zinc-800">
+                  <div class="flex-1">
+                      <p class="p-3">Pickup</p>
 
-			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseWing}>MORE</p>
-			                <input type="hidden" name="entry.1373737509" value="{wingPickup}"/>
-			                <p>{wingPickup}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseWing}>LESS</p>
-			            </div>
+                      <div class="bg-zinc-800 mx-4">
+                          <p class="text-xl py-3 bg-blue-500" on:click={increaseWing}>MORE</p>
+                          <input type="hidden" name="entry.1373737509" value="{wingPickup}"/>
+                          <p>{wingPickup}</p>
+                          <p class="text-xl py-3 bg-red-500" on:click={decreaseWing}>LESS</p>
+                      </div>
+                  </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Unamped Speaker</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseUSpeaker}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseUSpeaker}>MORE</p>
 			                <input type="hidden" name="entry.106049709" value="{unampSpeaker}"/>
 			                <p>{unampSpeaker}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseUSpeaker}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseUSpeaker}>LESS</p>
 			            </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Amplified Speaker</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseASpeaker}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseASpeaker}>MORE</p>
 			                <input type="hidden" name="entry.1330822060" value="{ampSpeaker}"/>
 			                <p>{ampSpeaker}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseASpeaker}>LESS</p>
-			            </div>
-			        </div>
-			        <div class="border-solid border-2 rounded border-zinc-500">
-			            <p class="p-3">Center field pickup</p>
-
-			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseCenter}>MORE</p>
-			                <input type="hidden" name="entry.752972962" value="{centerPickup}"/>
-			                <p>{centerPickup}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseCenter}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseASpeaker}>LESS</p>
 			            </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Amp</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseAmpTele}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseAmpTele}>MORE</p>
 			                <input type="hidden" name="entry.424932978" value="{ampScore}"/>
 			                <p>{ampScore}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseAmpTele}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseAmpTele}>LESS</p>
 			            </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Trap</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseTrap}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseTrap}>MORE</p>
 			                <input type="hidden" name="entry.1674092010" value="{trapScore}"/>
 			                <p>{trapScore}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseTrap}>LESS</p>
-			            </div>
-			        </div>
-			        <div class="border-solid border-2 rounded border-zinc-500">
-			            <p class="p-3">Far wing pickup</p>
-
-			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseFar}>MORE</p>
-			                <input type="hidden" name="entry.935324328" value="{farPickup}"/>
-			                <p>{farPickup}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseFar}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseTrap}>LESS</p>
 			            </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Passed</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increasePass}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increasePass}>MORE</p>
 			                <input type="hidden" name="entry.1615626336" value="{passed}"/>
 			                <p>{passed}</p>
-			                <p class="text-sm bg-red-500" on:click={decreasePass}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreasePass}>LESS</p>
 			            </div>
 			        </div>
 			        <div class="border-solid border-2 rounded border-zinc-500 my-3">
 			            <p class="p-3">Missed</p>
 
 			            <div class="bg-zinc-800 mx-4">
-			                <p class="text-sm bg-blue-500" on:click={increaseMiss}>MORE</p>
+			                <p class="text-xl py-3 bg-blue-500" on:click={increaseMiss}>MORE</p>
 			                <input type="hidden" name="entry.856036666" value="{miss}"/>
 			                <p>{miss}</p>
-			                <p class="text-sm bg-red-500" on:click={decreaseMiss}>LESS</p>
+			                <p class="text-xl py-3 bg-red-500" on:click={decreaseMiss}>LESS</p>
 			            </div>
 			        </div>
 		    </div>
@@ -251,8 +233,8 @@
 		        </select>
 		        <p>Was the robot spotlit?</p>
 		        <select name="entry.588469689" class="bg-zinc-700">
-		            <option value="y">Yes</option>
 		            <option value="n">No</option>
+		            <option value="y">Yes</option>
 		        </select>
 		        <p>Other bots in harmony:</p>
 		        <select name="entry.1599211559" class="bg-zinc-700">
