@@ -229,7 +229,7 @@
 		<hr class="p-8" />
 		<div class="p-9 bg-gray-100 rounded-xl drop-shadow-md text-black">
 			<h1 class="text-3xl mb-9">SPONSORS</h1>
-			<div class="p-8 bg-yellow-300 rounded-xl drop-shadow-md m-2">
+			<div class="p-8 bg-amber-400 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Gold Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
 					<a
@@ -254,23 +254,16 @@
 					<a class="w-32" href="https://www.medtronic.com/us-en/index.html" target="_blank">
 						<img src="/img/sponsors/medtronic.png" />
 					</a>
-					<a class="w-32" href="http://actfastenersinc.com/" target="_blank">
-						<img src="/img/sponsors/actfasteners.png" />
+					<a class="w-32" href="https://www.te.com/en/home.html" target="_blank">
+						<img src="/img/sponsors/te connectivity.svg" />
 					</a>
-					<a class="w-32" href="https://www.intuitive-foundation.org/" target="_blank">
-						<img src="/img/sponsors/intuitivefoundation.webp" />
+
+					<a class="w-32" href="https://www.alltown.com/" target="_blank">
+						<img src="/img/sponsors/alltown.svg" />
 					</a>
-					<a class="w-32" href="https://www.iracars.com/" target="_blank">
-						<img src="/img/sponsors/iramotorgroup.png" />
-					</a>
-					<a class="w-32" href="https://techliere.com/" target="_blank">
-						<img src="/img/sponsors/techliere.webp" />
-					</a>
-					<h3 class="w-32">Gelsomini Family</h3>
-					<h3 class="w-32">Gopal Family</h3>
 				</div>
 			</div>
-			<div class="p-8 bg-yellow-800 rounded-xl drop-shadow-md m-2">
+			<div class="p-8 bg-orange-300 rounded-xl drop-shadow-md m-2" color="#ce8946">
 				<p class="mb-4"><b>Bronze Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
 					<a class="w-24" href="https://www.needhambank.com/" target="_blank">
@@ -278,6 +271,9 @@
 					</a>
 					<a class="w-24" href="https://www.se.com/us/en/" target="_blank">
 						<img src="/img/sponsors/schneiderelectric.png" />
+					</a>
+					<a class="w-24" href="https://www.fabworks.com/" target="_blank">
+						<img src="/img/sponsors/fabworks.svg" />
 					</a>
 					<a class="w-24" href="https://www.dedhamsavings.com/" target="_blank">
 						<img src="/img/sponsors/dedhamsavings.svg" />
@@ -291,8 +287,10 @@
 					<a class="w-24" href="https://www.comellasrestaurants.com/" target="_blank">
 						<img src="/img/sponsors/comellas.png" />
 					</a>
+					<a class="w-24" href="https://polymaker.com/" target="_blank">
+						<img src="/img/sponsors/polymaker.webp" />
+					</a>
 					<h3 class="w-24">Peng Family</h3>
-					<h3 class="w-24">McWeeney Family</h3>
 				</div>
 			</div>
 		</div>
