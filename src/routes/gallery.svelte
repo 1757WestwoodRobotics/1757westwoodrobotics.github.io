@@ -12,7 +12,19 @@
 	});
 
 	let urls = {
-		'2024': [],
+		'2024': [
+			'/img/gallery/2024/DSC00069.webp',
+			'/img/gallery/2024/DSC00075.webp',
+			'/img/gallery/2024/DSC00114.webp',
+			'/img/gallery/2024/DSC00124.webp',
+			'/img/gallery/2024/DSC00371.webp',
+			'/img/gallery/2024/IMG_0184.webp',
+			'/img/gallery/2024/NI8A7853.webp',
+			'/img/gallery/2024/NI8A7859.webp',
+			'/img/gallery/2024/NI8A7963.webp',
+			'/img/gallery/2024/NI8A7982_1.webp',
+			'/img/gallery/2024/NI8A8039.webp'
+		],
 		'2023': [
 			'/img/gallery/2023/332A9610.webp',
 			'/img/gallery/2023/DCMP1.webp',

@@ -239,13 +239,6 @@
 					>
 						<img src="/img/sponsors/whs.png" />
 					</a>
-					<a
-						class="w-48 aspect-square bg-white flex items-center rounded-xl"
-						href="https://www.cardathea.com/"
-						target="_blank"
-					>
-						<img src="/img/sponsors/cardathea.png" />
-					</a>
 				</div>
 			</div>
 			<div class="p-8 bg-stone-400 rounded-xl drop-shadow-md m-2">
@@ -258,8 +251,8 @@
 						<img src="/img/sponsors/te connectivity.svg" />
 					</a>
 
-					<a class="w-32" href="https://www.alltown.com/" target="_blank">
-						<img src="/img/sponsors/alltown.svg" />
+					<a class="w-32" href="https://www.globalp.com/" target="_blank">
+						<img src="/img/sponsors/global partners.webp" />
 					</a>
 				</div>
 			</div>
