@@ -250,9 +250,11 @@
 					<a class="w-32" href="https://www.te.com/en/home.html" target="_blank">
 						<img src="/img/sponsors/te connectivity.svg" />
 					</a>
-
 					<a class="w-32" href="https://www.globalp.com/" target="_blank">
 						<img src="/img/sponsors/global partners.webp" />
+					</a>
+					<a class="w-32" href="http://actfastenersinc.com/" target="_blank">
+						<img src="/img/sponsors/actfasteners.png" />
 					</a>
 				</div>
 			</div>
