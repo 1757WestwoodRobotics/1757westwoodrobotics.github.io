@@ -14,7 +14,7 @@
       selectedReef = level;
       for(let i=0; i<12;i++){
         document.getElementById("auto-"+(i+1)).checked = autoReef[selectedReef][i]
-        document.getElementById("teleop-"+(i+1)).checked = autoReef[selectedReef][i]
+        document.getElementById("teleop-"+(i+1)).checked = teleopReef[selectedReef][i]
       }
       let autoHold = document.getElementById("reef-auto-holder")
       autoHold.classList.toggle("bg-t-"+(old+2))
@@ -322,10 +322,10 @@
 						<p class="p-3">L1</p>
 
 						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={l1auto}>MORE</p>
+							<p class="text-xl py-3 bg-blue-500" on:click={increateL1auto}>MORE</p>
 							<input type="hidden" name="entry.802870340" value={l1auto} />
 							<p>{l1auto}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={l1auto}>LESS</p>
+							<p class="text-xl py-3 bg-red-500" on:click={decreaseL1auto}>LESS</p>
 						</div>
 					</div>
 
