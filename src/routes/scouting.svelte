@@ -28,6 +28,12 @@
     }
   }
 
+  let rotateReef = (angle) => {
+    return () => {
+    document.getElementById("auto-reef-input").style.transform = 'rotate('+angle+'deg)'
+    }
+  }
+
   let updateReefAuto = (number) => {
     return () => {
     autoReef[selectedReef][number-1] = !autoReef[selectedReef][number-1]
@@ -190,9 +196,20 @@
 			<hr />
 			<br />
 
+
+      <center>
+        <div on:click={rotateReef(0)}   class="bg-zinc-500 p-2 rounded inline">Rotate Reef 0</div>
+        <div on:click={rotateReef(90)}  class="bg-zinc-500 p-2 rounded inline">Rotate Reef 90</div>
+        <div on:click={rotateReef(180)} class="bg-zinc-500 p-2 rounded inline">Rotate Reef 180</div>
+        <div on:click={rotateReef(270)} class="bg-zinc-500 p-2 rounded inline">Rotate Reef 270</div>
+      </center>
+
+			<br />
+			<hr />
+			<br />
 			<h1><b>AUTO</b></h1>
-			<div class="grid grid-cols-4 gap-x-2"> 
-				<div class="col-span-3 bg-repeat bg-t-4" style="background-size: 20%" id="reef-auto-holder">
+			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"> 
+				<div class="col-span-4 bg-repeat bg-t-4" style="background-size: 20%" id="reef-auto-holder">
 					<p>Attempted collection</p>
           <div class="grid grid-cols-3 w-full">
             <span id="auto-sel-2" class="text-center inactive p-10" on:click={changeSelectedReef(0)}>L2</span>
@@ -200,8 +217,9 @@
             <span id="auto-sel-4" class="text-center active p-10" on:click={changeSelectedReef(2)}>L4</span>
           </div>
 					<br />
+          <center>
 					<div
-						class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 w-full relative"
+						class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 aspect-square relative" id="auto-reef-input"
 					>
           <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[45deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefAuto(1)} id="auto-1"/></span>
             <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[75deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefAuto(2)} id="auto-2"/></span>
@@ -216,9 +234,11 @@
             <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[345deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(11)} id="auto-11"/></span>
             <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[375deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(12)} id="auto-12"/></span>
 					</div>
+          </center>
 				</div>
-				<div class="grid grid-rows-2 text-center">
-					<div class="border-solid border-2 rounded border-zinc-500 my-3">
+
+				<div class="grid grid-cols-4 text-center w-full col-span-4">
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
 						<p class="p-3">L1</p>
 
 						<div class="bg-zinc-800 mx-4">
@@ -229,8 +249,30 @@
 						</div>
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 my-3">
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
 						<p class="p-3">Dropped coral</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={increaseSpeaker}>MORE</p>
+							<input type="hidden" name="entry.1553663479" value={speakerAuto} />
+							<p>{speakerAuto}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={decreaseSpeaker}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">Algae grabbed</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={increaseAmp}>MORE</p>
+							<input type="hidden" name="entry.1926752669" value={ampAuto} />
+							<p>{ampAuto}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={decreaseAmp}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">Algae scored</p>
 
 						<div class="bg-zinc-800 mx-4">
 							<p class="text-xl py-3 bg-blue-500" on:click={increaseSpeaker}>MORE</p>
