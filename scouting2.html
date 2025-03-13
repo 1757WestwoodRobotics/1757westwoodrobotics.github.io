@@ -25,7 +25,7 @@
 	<link rel="modulepreload" href="/_app/immutable/chunks/index-d7c05558.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-4c397a37.js">
 	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-c9382863.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/scouting.svelte-7319a013.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scouting2.svelte-b1493649.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/footer-22c2de0a.js">
 	</head>
 	<body>
@@ -68,6 +68,18 @@
 				<input type="number" name="entry.2123081628" class="bg-zinc-700" placeholder="00"></div>
 
 			<br>
+			<hr>
+			<br>
+
+
+      <center><div class="bg-zinc-500 p-2 rounded inline">Rotate Reef 0</div>
+        <div class="bg-zinc-500 p-2 rounded inline">Rotate Reef 90</div>
+        <div class="bg-zinc-500 p-2 rounded inline">Rotate Reef 180</div>
+        <div class="bg-zinc-500 p-2 rounded inline">Rotate Reef 270</div></center>
+
+			<br>
+			<hr>
+			<br>
 			<h1><b>AUTO</b></h1>
 			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"><div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1459339326" value="auto leave"> auto leave
 				</div>
@@ -75,30 +87,28 @@
 				</div>
 				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1459339326" value="no show"> no show
 				</div>
+				<div class="col-span-4 bg-repeat bg-t-4" style="background-size: 20%" id="reef-auto-holder"><div class="grid grid-cols-3 w-full"><span id="auto-sel-2" class="text-center inactive p-10">L2</span>
+            <span id="auto-sel-3" class="text-center inactive p-10">L3</span>
+            <span id="auto-sel-4" class="text-center active p-10">L4</span></div>
+					<br>
+          <center><div class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 aspect-square relative" id="auto-reef-input"><span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[45deg]"><input class="scale-[2]" type="checkbox" id="auto-1"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[75deg]"><input class="scale-[2]" type="checkbox" id="auto-2"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[105deg]"><input class="scale-[2]" type="checkbox" id="auto-3"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[135deg]"><input class="scale-[2]" type="checkbox" id="auto-4"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[165deg]"><input class="scale-[2]" type="checkbox" id="auto-5"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[195deg]"><input class="scale-[2]" type="checkbox" id="auto-6"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[225deg]"><input class="scale-[2]" type="checkbox" id="auto-7"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[255deg]"><input class="scale-[2]" type="checkbox" id="auto-8"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[285deg]"><input class="scale-[2]" type="checkbox" id="auto-9"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[315deg]"><input class="scale-[2]" type="checkbox" id="auto-10"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[345deg]"><input class="scale-[2]" type="checkbox" id="auto-11"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[375deg]"><input class="scale-[2]" type="checkbox" id="auto-12"></span></div></center></div>
 
         <span id="autoL1"></span>
         <span id="autoL2"></span>
         <span id="autoL3"></span>
 
-				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L4</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-              <p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L3</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-              <p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L2</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-          <hr class="col-span-3">
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
+				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
 
 						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
 							<input type="hidden" name="entry.802870340" value="0">
@@ -138,30 +148,28 @@
 
 
 			<h1><b>TELEOP</b></h1>
-			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"><span id="teleopL2"></span>
+			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"><div class="bg-zinc-800 p-3 hover:font-bold"></div>
+				<div class="col-span-4 bg-repeat bg-t-4" style="background-size: 20%" id="reef-teleop-holder"><div class="grid grid-cols-3 w-full"><span id="teleop-sel-2" class="text-center inactive p-10">L2</span>
+            <span id="teleop-sel-3" class="text-center inactive p-10">L3</span>
+            <span id="teleop-sel-4" class="text-center active p-10">L4</span></div>
+					<br>
+          <center><div class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 aspect-square relative" id="teleop-reef-input"><span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[45deg]"><input class="scale-[2]" type="checkbox" id="teleop-1"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[75deg]"><input class="scale-[2]" type="checkbox" id="teleop-2"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[105deg]"><input class="scale-[2]" type="checkbox" id="teleop-3"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[135deg]"><input class="scale-[2]" type="checkbox" id="teleop-4"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[165deg]"><input class="scale-[2]" type="checkbox" id="teleop-5"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[195deg]"><input class="scale-[2]" type="checkbox" id="teleop-6"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[225deg]"><input class="scale-[2]" type="checkbox" id="teleop-7"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[255deg]"><input class="scale-[2]" type="checkbox" id="teleop-8"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[285deg]"><input class="scale-[2]" type="checkbox" id="teleop-9"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[315deg]"><input class="scale-[2]" type="checkbox" id="teleop-10"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[345deg]"><input class="scale-[2]" type="checkbox" id="teleop-11"></span>
+            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[375deg]"><input class="scale-[2]" type="checkbox" id="teleop-12"></span></div></center></div>
+        <span id="teleopL2"></span>
         <span id="teleopL3"></span>
         <span id="teleopL4"></span>
 
-				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L4</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-              <p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L3</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-              <p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L2</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-          <hr class="col-span-3">
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
+				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
 
 						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
 							<input type="hidden" name="entry.1509540302" value="0">
@@ -253,10 +261,10 @@
 </div>
 
 
-		<script type="module" data-sveltekit-hydrate="ghuvye">
+		<script type="module" data-sveltekit-hydrate="w1b0l5">
 		import { start } from "/_app/immutable/start-74ff1014.js";
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="ghuvye"]').parentNode,
+			target: document.querySelector('[data-sveltekit-hydrate="w1b0l5"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,
@@ -265,9 +273,9 @@
 			hydrate: {
 				status: 200,
 				error: null,
-				nodes: [0, 6],
+				nodes: [0, 7],
 				params: {},
-				routeId: "scouting"
+				routeId: "scouting2"
 			}
 		});
 	</script></div>
