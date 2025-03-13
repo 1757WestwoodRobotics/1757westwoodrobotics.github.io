@@ -36,16 +36,17 @@
     }
   }
 
-  let rotateReef = (angle) => {
-    return () => {
-    document.getElementById("auto-reef-input").style.transform = 'rotate('+angle+'deg)'
-    document.getElementById("teleop-reef-input").style.transform = 'rotate('+angle+'deg)'
-    }
-  }
 
-  let updateReefAuto = (number) => {
+  let updateReefAuto = (level, change) => {
     return () => {
-    autoReef[selectedReef][number-1] = !autoReef[selectedReef][number-1]
+      let lastLevel = autoReef[level].reduce((a,b,i) => {return b?i:a}, -1)
+      console.log(lastLevel, change, level)
+      if (change == 1 && lastLevel != 11){
+        autoReef[level][lastLevel + 1] = true // last true value +1 is set to true
+      }else if(change == -1 && lastLevel != -1){
+        autoReef[level][lastLevel] = false // last false value 
+      }
+
       let entryNumber = "entry.1165839798"
       let inner = ""
       for(let i=0; i<12;i++){
@@ -74,9 +75,15 @@
       document.getElementById("autoL3").innerHTML = inner
     }
   }
-  let updateReefTeleop = (number) => {
+  let updateReefTeleop = (level, change) => {
     return () => {
-    teleopReef[selectedReef][number-1] = !teleopReef[selectedReef][number-1]
+      let lastLevel = teleopReef[level].reduce((a,b,i) => {return b?i:a}, -1)
+      console.log(lastLevel, change, level)
+      if (change == 1 && lastLevel != 11){
+        teleopReef[level][lastLevel + 1] = true // last true value +1 is set to true
+      }else if(change == -1 && lastLevel != -1){
+        teleopReef[level][lastLevel] = false // last false value 
+      }
 
       let entryNumber = "entry.359297210"
       let inner = ""
@@ -260,20 +267,6 @@
 			</div>
 
 			<br />
-			<hr />
-			<br />
-
-
-      <center>
-        <div on:click={rotateReef(0)}   class="bg-zinc-500 p-2 rounded inline">Rotate Reef 0</div>
-        <div on:click={rotateReef(90)}  class="bg-zinc-500 p-2 rounded inline">Rotate Reef 90</div>
-        <div on:click={rotateReef(180)} class="bg-zinc-500 p-2 rounded inline">Rotate Reef 180</div>
-        <div on:click={rotateReef(270)} class="bg-zinc-500 p-2 rounded inline">Rotate Reef 270</div>
-      </center>
-
-			<br />
-			<hr />
-			<br />
 			<h1><b>AUTO</b></h1>
 			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"> 
 
@@ -286,38 +279,42 @@
 				<div class="bg-zinc-800 p-3 hover:font-bold">
 					<input type="checkbox" name="entry.1459339326" value="no show" /> no show
 				</div>
-				<div class="col-span-4 bg-repeat bg-t-4" style="background-size: 20%" id="reef-auto-holder">
-          <div class="grid grid-cols-3 w-full">
-            <span id="auto-sel-2" class="text-center inactive p-10" on:click={changeSelectedReef(0)}>L2</span>
-            <span id="auto-sel-3" class="text-center inactive p-10" on:click={changeSelectedReef(1)}>L3</span>
-            <span id="auto-sel-4" class="text-center active p-10" on:click={changeSelectedReef(2)}>L4</span>
-          </div>
-					<br />
-          <center>
-					<div
-						class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 aspect-square relative" id="auto-reef-input"
-					>
-          <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[45deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefAuto(1)} id="auto-1"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[75deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefAuto(2)} id="auto-2"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[105deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(3)} id="auto-3"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[135deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(4)} id="auto-4"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[165deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(5)} id="auto-5"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[195deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(6)} id="auto-6"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[225deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(7)} id="auto-7"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[255deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(8)} id="auto-8"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[285deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(9)} id="auto-9"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[315deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(10)} id="auto-10"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[345deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(11)} id="auto-11"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[375deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefAuto(12)} id="auto-12"/></span>
-					</div>
-          </center>
-				</div>
 
         <span id="autoL1"></span>
         <span id="autoL2"></span>
         <span id="autoL3"></span>
 
 				<div class="grid grid-cols-3 text-center w-full col-span-4">
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L4</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(2, 1)}>MORE</p>
+              <p>{autoReef[2].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(2,-1)}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L3</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(1,1)}>MORE</p>
+							<p>{autoReef[1].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+              <p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(1,-1)}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L2</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(0,1)}>MORE</p>
+							<p>{autoReef[0].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(0,-1)}>LESS</p>
+						</div>
+					</div>
+          <hr class="col-span-3"/>
 					<div class="border-solid border-2 rounded border-zinc-500 m-3">
 						<p class="p-3">L1</p>
 
@@ -382,39 +379,43 @@
 			<h1><b>TELEOP</b></h1>
 			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"> 
 
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-				</div>
-				<div class="col-span-4 bg-repeat bg-t-4" style="background-size: 20%" id="reef-teleop-holder">
-          <div class="grid grid-cols-3 w-full">
-            <span id="teleop-sel-2" class="text-center inactive p-10" on:click={changeSelectedReef(0)}>L2</span>
-            <span id="teleop-sel-3" class="text-center inactive p-10" on:click={changeSelectedReef(1)}>L3</span>
-            <span id="teleop-sel-4" class="text-center active p-10" on:click={changeSelectedReef(2)}>L4</span>
-          </div>
-					<br />
-          <center>
-					<div
-						class="flex flex-center justify-center items-center gap-4 gap-y-16 text-center bg-[url('/img/scouting/reef.png')] bg-center bg-cover h-96 aspect-square relative" id="teleop-reef-input"
-					>
-          <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[45deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(1)} id="teleop-1"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[75deg]"> <input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(2)} id="teleop-2"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[105deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(3)} id="teleop-3"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[135deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(4)} id="teleop-4"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[165deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(5)} id="teleop-5"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[195deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(6)} id="teleop-6"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[225deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(7)} id="teleop-7"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[255deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(8)} id="teleop-8"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[285deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(9)} id="teleop-9"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[315deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(10)} id="teleop-10"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[345deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(11)} id="teleop-11"/></span>
-            <span class="top-[6.3rem] left-[11.3rem] h-32 origin-bottom absolute rotate-[375deg]"><input class="scale-[2]" type="checkbox" on:click={updateReefTeleop(12)} id="teleop-12"/></span>
-					</div>
-          </center>
-				</div>
+
         <span id="teleopL2"></span>
         <span id="teleopL3"></span>
         <span id="teleopL4"></span>
 
 				<div class="grid grid-cols-3 text-center w-full col-span-4">
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L4</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(2, 1)}>MORE</p>
+              <p>{teleopReef[2].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(2,-1)}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L3</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(1,1)}>MORE</p>
+							<p>{teleopReef[1].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+              <p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(1,-1)}>LESS</p>
+						</div>
+					</div>
+
+					<div class="border-solid border-2 rounded border-zinc-500 m-3">
+						<p class="p-3">L2</p>
+
+						<div class="bg-zinc-800 mx-4">
+							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(0,1)}>MORE</p>
+							<p>{teleopReef[0].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
+							<p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(0,-1)}>LESS</p>
+						</div>
+					</div>
+          <hr class="col-span-3"/>
+
 					<div class="border-solid border-2 rounded border-zinc-500 m-3">
 						<p class="p-3">L1</p>
 
