@@ -5,6 +5,17 @@
 
 	let robots = [
 		{
+			name: 'Perceus',
+			year: '2025',
+			image: '/img/robots/2025reefscape.png',
+			desc: 'Learning from the previous year\'s design mistakes, we set out to build a more robust and higher performing robot. Named after the Greek hero who slew Medusa, this bot is designed to be a versatile and reliable performer on the field. With a focus on durability and ease of maintenance, Perceus is built to withstand the rigors of competition while delivering consistent performance.',
+			techbinder: '/2025techbinder.pdf',
+			videos: [
+				{name: 'Robot Reveal', id: '8KiZ2uVPwyY'},
+				{name: 'WPI Recap', id: '9QMI3LTphhM'}
+			]
+		},
+		{
 			name: 'Proteus',
 			year: '2024',
 			image: '/img/robots/2024crescendo.png',
@@ -13,7 +24,7 @@
 			videos: [
 				{name: 'Season Recap', id: ''}
 			]
-		},	
+		},
 		{
 			name: 'Luxo',
 			year: '2023',
@@ -118,7 +129,7 @@
 </svelte:head>
 
 <Navbar />
-<div>
+<div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 	{#each robots as { name, year, image, desc, videos, techbinder }}
 		<RobotPage {name} {year} {image} {desc} {videos} {techbinder} />
 	{/each}
