@@ -12,12 +12,6 @@
 		Carousel = module.default;
 	});
 
-	let showPopup = browser && localStorage.showPopup === undefined ? true : false;
-
-	let hidePopup = () => {
-		showPopup = false;
-		localStorage.showPopup = false;
-	};
 </script>
 
 <svelte:head>
@@ -290,17 +284,6 @@
 			</div>
 		</div>
 	</div>
-	{#if showPopup}
-		<div class="fixed bottom-5 rounded-xl bg-green-600 p-5 drop-shadow-md mx-5">
-			Like the new look? We updated our website!
-			<br />
-			<b
-				><button type="button" class="text-red-600 text-sm" on:click={hidePopup}
-					>Click here to dismiss</button
-				></b
-			>
-		</div>
-	{/if}
 	<Footer />
 </div>
 
