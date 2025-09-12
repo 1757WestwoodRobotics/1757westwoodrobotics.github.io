@@ -1,6 +1,6 @@
 {
   ".svelte-kit/runtime/client/start.js": {
-    "file": "immutable/start-74ff1014.js",
+    "file": "immutable/start-bf4e86dd.js",
     "src": ".svelte-kit/runtime/client/start.js",
     "isEntry": true,
     "imports": [
@@ -27,7 +27,7 @@
       "_index-d7c05558.js"
     ],
     "css": [
-      "immutable/assets/__layout-05b8f410.css"
+      "immutable/assets/__layout-53ce9b45.css"
     ]
   },
   ".svelte-kit/runtime/components/error.svelte": {
@@ -64,7 +64,7 @@
     ]
   },
   "src/routes/index.svelte": {
-    "file": "immutable/pages/index.svelte-48b4c0f8.js",
+    "file": "immutable/pages/index.svelte-b9e96ee4.js",
     "src": "src/routes/index.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -81,7 +81,7 @@
     ]
   },
   "src/routes/robots.svelte": {
-    "file": "immutable/pages/robots.svelte-1058976d.js",
+    "file": "immutable/pages/robots.svelte-3442d689.js",
     "src": "src/routes/robots.svelte",
     "isEntry": true,
     "isDynamicEntry": true,
@@ -139,14 +139,6 @@
       "immutable/assets/main-7d0fc666.css"
     ]
   },
-  "src/routes/robots.css": {
-    "file": "immutable/assets/robots-144d1137.css",
-    "src": "src/routes/robots.css"
-  },
-  "node_modules/svelte-carousel/src/main.css": {
-    "file": "immutable/assets/main-7d0fc666.css",
-    "src": "node_modules/svelte-carousel/src/main.css"
-  },
   "footer.css": {
     "file": "immutable/assets/footer-32503cb2.css",
     "src": "footer.css"
@@ -155,8 +147,16 @@
     "file": "immutable/assets/index-60a310f3.css",
     "src": "src/routes/index.css"
   },
+  "src/routes/robots.css": {
+    "file": "immutable/assets/robots-144d1137.css",
+    "src": "src/routes/robots.css"
+  },
+  "node_modules/svelte-carousel/src/main.css": {
+    "file": "immutable/assets/main-7d0fc666.css",
+    "src": "node_modules/svelte-carousel/src/main.css"
+  },
   "src/routes/__layout.css": {
-    "file": "immutable/assets/__layout-05b8f410.css",
+    "file": "immutable/assets/__layout-53ce9b45.css",
     "src": "src/routes/__layout.css"
   }
 }
