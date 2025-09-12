@@ -9,35 +9,40 @@
 	let showVideos = false;
 </script>
 
-<div class="bg-slate-900 flex flex-wrap overflow-auto p-5 h-full m-4 rounded-lg items-center">
-	<span class="grow flex-col md:basis-5/12 flex justify-center items-center shrink basis-full">
-		<img src={image} class="bg-[url('{image}')] aspect-auto" />
-	</span>
-	<div class="text-center w-full p-4 text-white flex-auto basis-7/12">
-		<h2 class="text-3xl">{year}{name !== '' ? ' - ' : ''}{name}</h2>
-		<p>{desc}</p>
-		{#if techbinder != ''}
-			<a href={techbinder} class="m-4 text-blue-500 underline">View the technical binder</a>
-		{/if}
-		<br />
-		{#if videos != ''}
-			<div
-				class="bottom-0 inset-x-0 text-blue-400 underline hover:cursor-pointer text-xl"
-				on:click={() => {
-					showVideos = !showVideos;
-				}}
-			>
-				Videos
-			</div>
-			<div class="flex w-full justify-around items-center flex-wrap">
-				{#if showVideos}
-					{#each videos as { name, id }}
-						<a class="text-blue-500 hover:underline" target="_blank" href="https://youtu.be/{id}"
-							>{name}</a
-						>
-					{/each}
-				{/if}
-			</div>
-		{/if}
+<div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full">
+	<div style="background-image: url({image})" class="w-full h-96 bg-contain bg-center bg-no-repeat"></div>
+	<div class="p-6">
+		<h2 class="text-2xl font-bold text-white mb-2">{year}{name !== '' ? ' - ' : ''}{name}</h2>
+		<p class="text-gray-400 mb-4">{desc}</p>
+		<div class="flex justify-between items-center">
+			{#if techbinder != ''}
+				<a href={techbinder} class="text-blue-500 hover:underline">Technical Binder</a>
+			{/if}
+			{#if videos.length > 0}
+				<button
+					on:click={() => (showVideos = !showVideos)}
+					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+				>
+					{showVideos ? 'Hide' : 'Show'} Videos
+				</button>
+			{/if}
+		</div>
 	</div>
+	{#if showVideos && videos.length > 0}
+		<div class="px-6 pb-4">
+			<h3 class="text-xl font-bold text-white mb-2">Videos</h3>
+			<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				{#each videos as { name, id }}
+					<a
+						href="https://youtu.be/{id}"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="text-blue-400 hover:underline"
+					>
+						{name}
+					</a>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </div>
