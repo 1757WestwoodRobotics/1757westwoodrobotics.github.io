@@ -19,11 +19,9 @@
 			name: 'Proteus',
 			year: '2024',
 			image: '/img/robots/2024crescendo.png',
-			desc: 'Insert description',
+			desc: 'Desiring and stretching to move further, team 1757 designed and built its most ambitious robot to date. Named after the Greek sea god who could change his shape at will, this bot is designed to be a versatile and adaptable performer on the field. Tragically this robot was never able to compete at its highest level due to time and resource constraints.',
 			techbinder: '/2024techbinder.pdf',
-			videos: [
-				{name: 'Season Recap', id: ''}
-			]
+			videos: []
 		},
 		{
 			name: 'Luxo',
