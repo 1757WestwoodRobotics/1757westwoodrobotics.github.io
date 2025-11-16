@@ -99,32 +99,26 @@
 		>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/landon.webp"
+					src="/img/team/anya.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-red-800 mb-5"
 				/>
-				<b>Landon Bayer</b>
-				Technical Captain
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
-					src="/img/team/anya.webp"
-					class="rounded-full aspect-square ring-4 w-32 mb-5 ring-green-800"
-				/>
 				<b>Anya Jiang</b>
-				Technical Vice Captain
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img src="/img/team/claire.webp" class="rounded-full aspect-square ring-4 w-32 mb-5" />
-				<b>Claire Peng</b>
-				Business Captain
+				Team Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/elizabeth.webp"
-					class="rounded-full aspect-square ring-4 w-32 mb-5 ring-orange-400"
+					src="/img/team/luke_s.webp"
+					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-6 ring-green-800"
 				/>
-				<b>Elizabeth Lowney</b>
-				Business Vice Captain
+				<b>Luke Szigety</b>
+				Technical Lead
+			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img 
+					src="/img/team/isabel.webp" 
+					class="rounded-full aspect-square ring-4 w-32 mb-5 -rotate-3 ring-purple-800" />
+				<b>Isabel Wu</b>
+				Business Lead
 			</div>
 		</div>
 		<br />
@@ -164,60 +158,43 @@
 		>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/ivan.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-fuchsia-800 mb-5"
+					src="/img/team/constantina.webp"
+					class="rounded-full aspect-square ring-4 w-32 ring-fuchsia-800 mb-5 -rotate-2"
 				/>
-				<b>Ivan Cai</b>
-				Programming Lead
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
-					src="/img/team/jacob.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-5"
-				/>
-				<b>Jacob Kaplan</b>
+				<b>Constantina Flevarakis</b>
 				Design Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/alex.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-orange-800 mb-5"
+					src="/img/team/hamsini.webp"
+					class="rounded-full aspect-square ring-4 w-32 -rotate-12 ring-yellow-800 mb-5"
 				/>
-				<b>Alex Theofilou</b>
-				Outreach Lead
+				<b>Hamsini Siddi</b>
+				Outreach Co-Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/celina.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-blue-800 mb-5"
+					src="/img/team/duanmu.webp"
+					class="rounded-full aspect-square ring-4 w-32 ring-green-800 mb-5"
 				/>
-				<b>Celina Yau</b>
-				Media Lead
-			</div>
-
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
-					src="/img/team/julian.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-green-800 mb-7"
-				/>
-				<b>Julian Saroufim</b>
-				Finance Co-Lead
+				<b>Duanmu Jiang</b>
+				Outreach Co-Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/constantina.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-cyan-800 mb-7"
+					src="/img/team/henry.webp"
+					class="rounded-full aspect-square ring-4 w-32 ring-cyan-800 mb-7"
 				/>
-				<b>Constantina Flevarakis</b>
-				Finance Co-Lead
+				<b>Henry Marsland</b>
+				Open Alliance Co-Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
 					src="/img/team/yuhan.webp"
-					class="rounded-full aspect-square ring-4 w-32 rotate-6 ring-pink-800 mb-7"
+					class="rounded-full aspect-square ring-4 w-32 rotate-3 ring-pink-800 mb-7"
 				/>
 				<b>Yuhan Chen</b>
-				Open Alliance Lead
+				Open Alliance Co-Lead
 			</div>
 		</div>
 	</span>

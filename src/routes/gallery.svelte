@@ -12,6 +12,21 @@
 	});
 
 	let urls = {
+		'2025': [
+			'/img/gallery/2025/NERD picture.webp',
+			'/img/gallery/2025/Nerdscoring.webp',
+			'/img/gallery/2025/WWdayplay.webp',
+			'/img/gallery/2025/openhouseimg.webp',
+			'/img/gallery/2025/battlecrydark.webp',
+			'/img/gallery/2025/MAstatesrobot.webp',
+			'/img/gallery/2025/DCMPpits.webp',
+			'/img/gallery/2025/WPI1757crowd.webp',
+			'/img/gallery/2025/WPIfield.webp',
+			'/img/gallery/2025/WPIscoring1.webp',
+			'/img/gallery/2025/WPIcrowd2.webp',
+			'/img/gallery/2025/695840_55c94ea4eb624020b8d0af97f87f297d~mv2.webp',
+			'/img/gallery/2025/climb2.webp'
+		],
 		'2024': [
 			'/img/gallery/2024/DSC00069.webp',
 			'/img/gallery/2024/DSC00075.webp',
@@ -354,6 +369,25 @@
 
 <div class="w-full min-h-screen bg-slate-900 text-white">
 	<br />
+	<h3 class="w-full text-center text-5xl">2025: Reefscape</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2025'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
 	<h3 class="w-full text-center text-5xl">2024: Crescendo</h3>
 	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
 		<svelte:component
