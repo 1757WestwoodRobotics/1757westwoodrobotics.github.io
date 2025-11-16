@@ -18,14 +18,21 @@
 			'/img/gallery/2025/WWdayplay.webp',
 			'/img/gallery/2025/openhouseimg.webp',
 			'/img/gallery/2025/battlecrydark.webp',
-			'/img/gallery/2025/MAstatesrobot.webp',
+			'/img/gallery/2025/MAstatesrobot1.webp',
 			'/img/gallery/2025/DCMPpits.webp',
 			'/img/gallery/2025/WPI1757crowd.webp',
 			'/img/gallery/2025/WPIfield.webp',
 			'/img/gallery/2025/WPIscoring1.webp',
 			'/img/gallery/2025/WPIcrowd2.webp',
 			'/img/gallery/2025/695840_55c94ea4eb624020b8d0af97f87f297d~mv2.webp',
-			'/img/gallery/2025/climb2.webp'
+			'/img/gallery/2025/climb2.webp',
+			'/img/gallery/2025/pits2image.webp',
+			'/img/gallery/2025/NEDCMPscoring2.webp',
+			'/img/gallery/2025/DCMPfield1.webp',
+			'/img/gallery/2025/URIclimb2.webp',
+			'/img/gallery/2025/DCMPcrowdcheer1.webp',
+			'/img/gallery/2025/DCMPcrowdcheer2.webp',
+			'/img/gallery/2025/DCMPscoring2.webp'
 		],
 		'2024': [
 			'/img/gallery/2024/DSC00069.webp',

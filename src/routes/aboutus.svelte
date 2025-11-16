@@ -116,7 +116,7 @@
 			<div class="flex justify-center align-center items-center flex-col">
 				<img 
 					src="/img/team/isabel.webp" 
-					class="rounded-full aspect-square ring-4 w-32 mb-5 -rotate-3 ring-purple-800" />
+					class="rounded-full aspect-square ring-4 w-32 mb-5 -rotate-1 ring-purple-800" />
 				<b>Isabel Wu</b>
 				Business Lead
 			</div>
