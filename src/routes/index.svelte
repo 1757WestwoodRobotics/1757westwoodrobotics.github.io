@@ -161,7 +161,7 @@
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
 				<div>
 					<img src="/img/robots/2025reefscape.png" alt="Reefscape"/>
-					<h1>2025 Reefscape - "PERCEUS"</h1>
+					<h1>2025 Reefscape - "PERSEUS"</h1>
 				</div>
 				<div>
 					<img src="/img/robots/2024crescendo.png" alt="Crescendo"/>

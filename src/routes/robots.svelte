@@ -5,10 +5,10 @@
 
 	let robots = [
 		{
-			name: 'Perceus',
+			name: 'Perseus',
 			year: '2025',
 			image: '/img/robots/2025reefscape.png',
-			desc: 'Learning from the previous year\'s design mistakes, we set out to build a more robust and higher performing robot. Named after the Greek hero who slew Medusa, this bot is designed to be a versatile and reliable performer on the field. With a focus on durability and ease of maintenance, Perceus is built to withstand the rigors of competition while delivering consistent performance.',
+			desc: 'Learning from the previous year\'s design mistakes, we set out to build a more robust and higher performing robot. Named after the Greek hero who slew Medusa, this bot is designed to be a versatile and reliable performer on the field. With a focus on durability and ease of maintenance, Perseus is built to withstand the rigors of competition while delivering consistent performance.',
 			techbinder: '/2025techbinder.pdf',
 			videos: [
 				{name: 'Robot Reveal', id: '8KiZ2uVPwyY'},
