@@ -1,546 +1,393 @@
 <script>
 	import Navbar from '../components/navbar.svelte';
 	import Footer from '../components/footer.svelte';
+	import { onMount } from 'svelte';
 
-  let selectedReef = 2;
+	// Counters
+	let autoFuel = 0;
+	let teleopFuel = 0;
+	let teleopFuelFed = 0;
 
+	// Skills (Ranges)
+	let scoringEff = 3;
+	let feedingSkill = 3;
+	let defSkill = 0;
 
-  let autoReef = [Array(12).fill(false), Array(12).fill(false), Array(12).fill(false)]
-  let teleopReef = [Array(12).fill(false), Array(12).fill(false), Array(12).fill(false)]
+	// Match Timer & Timeline
+	let matchStarted = false;
+	let matchTime = 0;
+	let timerInterval;
+	let timeline = [];
+	let activeActions = new Set();
 
-  let changeSelectedReef = (level) => {
-    return () => {
-      let old = selectedReef;
-      selectedReef = level;
-      for(let i=0; i<12;i++){
-        document.getElementById("auto-"+(i+1)).checked = autoReef[selectedReef][i]
-        document.getElementById("teleop-"+(i+1)).checked = teleopReef[selectedReef][i]
-      }
-      let autoHold = document.getElementById("reef-auto-holder")
-      autoHold.classList.toggle("bg-t-"+(old+2))
-      autoHold.classList.toggle("bg-t-"+(level+2))
-
-      let teleopHold = document.getElementById("reef-teleop-holder")
-      teleopHold.classList.toggle("bg-t-"+(old+2))
-      teleopHold.classList.toggle("bg-t-"+(level+2))
-
-      document.getElementById("auto-sel-"+(old+2)).classList.toggle("inactive")
-      document.getElementById("auto-sel-"+(old+2)).classList.toggle("active")
-      document.getElementById("auto-sel-"+(level+2)).classList.toggle("inactive")
-      document.getElementById("auto-sel-"+(level+2)).classList.toggle("active")
-
-      document.getElementById("teleop-sel-"+(old+2)).classList.toggle("inactive")
-      document.getElementById("teleop-sel-"+(old+2)).classList.toggle("active")
-      document.getElementById("teleop-sel-"+(level+2)).classList.toggle("inactive")
-      document.getElementById("teleop-sel-"+(level+2)).classList.toggle("active")
-    }
-  }
-
-
-  let updateReefAuto = (level, change) => {
-    return () => {
-      let lastLevel = autoReef[level].reduce((a,b,i) => {return b?i:a}, -1)
-      console.log(lastLevel, change, level)
-      if (change == 1 && lastLevel != 11){
-        autoReef[level][lastLevel + 1] = true // last true value +1 is set to true
-      }else if(change == -1 && lastLevel != -1){
-        autoReef[level][lastLevel] = false // last false value 
-      }
-
-      let entryNumber = "entry.1165839798"
-      let inner = ""
-      for(let i=0; i<12;i++){
-        if(autoReef[0][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("autoL1").innerHTML = inner
-
-      entryNumber = "entry.1533027981"
-      inner = ""
-      for(let i=0; i<12;i++){
-        if(autoReef[1][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("autoL2").innerHTML = inner
-
-      entryNumber = "entry.302690072"
-      inner = ""
-      for(let i=0; i<12;i++){
-        if(autoReef[2][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("autoL3").innerHTML = inner
-    }
-  }
-  let updateReefTeleop = (level, change) => {
-    return () => {
-      let lastLevel = teleopReef[level].reduce((a,b,i) => {return b?i:a}, -1)
-      console.log(lastLevel, change, level)
-      if (change == 1 && lastLevel != 11){
-        teleopReef[level][lastLevel + 1] = true // last true value +1 is set to true
-      }else if(change == -1 && lastLevel != -1){
-        teleopReef[level][lastLevel] = false // last false value 
-      }
-
-      let entryNumber = "entry.359297210"
-      let inner = ""
-      for(let i=0; i<12;i++){
-        if(teleopReef[0][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("teleopL2").innerHTML = inner
-
-      entryNumber = "entry.1548842258"
-      inner = ""
-      for(let i=0; i<12;i++){
-        if(teleopReef[1][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("teleopL3").innerHTML = inner
-
-      entryNumber = "entry.773785512"
-      inner = ""
-      for(let i=0; i<12;i++){
-        if(teleopReef[2][i]){
-          inner += "<input type='hidden' name='"+entryNumber+"' value='"+String.fromCharCode(65+i)+"''/>"
-        }
-      }
-      document.getElementById("teleopL4").innerHTML = inner
-      console.log(teleopReef)
-    }
-  }
-
-	let l1auto = 0;
-	const increateL1auto = () => {
-		l1auto++;
-	};
-	const decreaseL1auto = () => {
-		l1auto--;
+	const toggleTimer = () => {
+		if (matchStarted) {
+			clearInterval(timerInterval);
+			matchStarted = false;
+		} else {
+			matchStarted = true;
+			const startTime = Date.now() - matchTime * 1000;
+			timerInterval = setInterval(() => {
+				matchTime = Math.floor((Date.now() - startTime) / 1000);
+			}, 1000);
+		}
 	};
 
-	let droppedcoralauto = 0;
-
-	const increasedroppedauto = () => {
-		droppedcoralauto++;
-	};
-	const decreasedroppedauto = () => {
-		droppedcoralauto--;
-	};
-
-	let autoAlgaeGrab = 0;
-
-	const increaseAutoAlgaeGrab = () => {
-		autoAlgaeGrab++;
-	};
-	const decreateAutoAlgaeGrab = () => {
-		autoAlgaeGrab--;
+	const resetMatch = () => {
+		if (confirm('Reset match data and timer?')) {
+			clearInterval(timerInterval);
+			matchStarted = false;
+			matchTime = 0;
+			timeline = [];
+			activeActions.clear();
+			activeActions = activeActions;
+			autoFuel = 0;
+			teleopFuel = 0;
+			teleopFuelFed = 0;
+		}
 	};
 
-	let autoAlgaeBarge = 0;
-
-	const increaseAutoAlgaeBarge = () => {
-		autoAlgaeBarge++;
-	};
-	const decreaseAutoAlgaeBarge = () => {
-		autoAlgaeBarge--;
+	const recordPointAction = (code) => {
+		if (!matchStarted) toggleTimer();
+		timeline = [...timeline, { code, time: matchTime, type: 'point' }];
 	};
 
-	let autoProcessor = 0;
-
-	const increaseAutoProcessor = () => {
-		autoProcessor++;
-	};
-	const decreaseAutoProcessor = () => {
-		autoProcessor--;
-	};
-
-	let l1teleop = 0;
-
-	const increaseL1Teleop = () => {
-		l1teleop++;
-	};
-	const decreaseL1Teleop = () => {
-		l1teleop--;
+	const startAction = (code) => {
+		if (!matchStarted) toggleTimer();
+		if (!activeActions.has(code)) {
+			activeActions.add(code);
+			activeActions = activeActions;
+			timeline = [...timeline, { code, time: matchTime, type: 'start' }];
+		}
 	};
 
-	let teleopcoraldrop = 0;
-
-	const increaseTDrop = () => {
-		teleopcoraldrop++;
-	};
-	const decreaseTDrop = () => {
-		teleopcoraldrop--;
-	};
-
-	let teleopAlgaeGrab = 0;
-
-	const increaseteleopAlgaeGrab = () => {
-		teleopAlgaeGrab++;
-	};
-	const decreaseTeleopAlgaeGrab = () => {
-		teleopAlgaeGrab--;
+	const stopAction = (code) => {
+		if (activeActions.has(code)) {
+			activeActions.delete(code);
+			activeActions = activeActions;
+			timeline = [...timeline, { code, time: matchTime, type: 'stop' }];
+		}
 	};
 
-	let teleopBarge = 0;
+	// Serialization for form submission
+	$: serializedTimeline = timeline.map(e => `${e.code}:${e.type}@${e.time}`).join(';');
 
-	const increaseTeleopBarge = () => {
-		teleopBarge++;
+	// Counter functions with timeline integration
+	const changeAutoFuel = (val) => {
+		if (val > 0) recordPointAction('auto_fuel');
+		autoFuel = Math.max(0, autoFuel + val);
 	};
-	const decreaseTeleopBarge = () => {
-		teleopBarge--;
+	const changeTeleopFuel = (val) => {
+		if (val > 0) recordPointAction('tele_fuel');
+		teleopFuel = Math.max(0, teleopFuel + val);
 	};
-
-	let teleopProcessor = 0;
-
-	const increaseTeleopProcessor = () => {
-		teleopProcessor++;
-	};
-	const decreaseTeleopProcessor = () => {
-		teleopProcessor--;
-	};
-
-	let miss = 0;
-
-	const increaseMiss = () => {
-		miss++;
-	};
-	const decreaseMiss = () => {
-		miss--;
+	const changeTeleopFuelFed = (val) => {
+		if (val > 0) recordPointAction('tele_fed');
+		teleopFuelFed = Math.max(0, teleopFuelFed + val);
 	};
 </script>
 
 <svelte:head>
-	<title>Scouting Form</title>
-	<meta name="description" content="Scouting submission for 1757" />
-	<meta name="keywords" content="FRC, FIRST, Robotics" />
-	<meta name="author" content="Westwood Robotics" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta property="og:title" content="Scouting submission for 1757" />
-	<meta property="og:description" content="scouting data submission base for team 1757" />
-<style>
-  .active {
-    background-color: #1a1aee;
-  }
-  .inactive {
-    background-color: #2a2a3a;
-  }
-  .bg-t-2 {
-    background-image: url("/img/scouting/2.png");
-  }
-  .bg-t-3 {
-    background-image: url("/img/scouting/3.png");
-  }
-  .bg-t-4 {
-    background-image: url("/img/scouting/4.png");
-  }
-</style>
+	<title>Scouting Form - REBUILT 2026</title>
+	<meta name="description" content="Scouting submission for 1757 - REBUILT 2026" />
 </svelte:head>
 
 <Navbar />
 
 <div class="bg-zinc-800">
-	<div class="container mx-auto p-4 max-w-prose text-white bg-zinc-900">
+	<div class="container mx-auto p-4 max-w-prose text-white bg-zinc-900 min-h-screen">
+		<!-- Match Controller Sticky Header -->
+		<div class="sticky top-0 z-50 bg-zinc-900 border-b border-zinc-700 p-4 mb-6 shadow-xl -mx-4">
+			<div class="flex items-center justify-between gap-4">
+				<div class="flex flex-col">
+					<span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Match Timer</span>
+					<span class="text-4xl font-mono font-black {matchStarted ? 'text-green-500' : 'text-zinc-400'}">
+						{Math.floor(matchTime / 60)}:{String(matchTime % 60).padStart(2, '0')}
+					</span>
+				</div>
+				<div class="flex gap-2">
+					<button type="button" on:click={toggleTimer} class="px-6 py-2 rounded-lg font-bold transition {matchStarted ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}">
+						{matchStarted ? 'STOP' : 'START'}
+					</button>
+					<button type="button" on:click={resetMatch} class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-bold text-xs">
+						RESET
+					</button>
+				</div>
+			</div>
+			{#if timeline.length > 0}
+				<div class="mt-2 text-[10px] text-zinc-500 truncate font-mono">
+					Last: {timeline[timeline.length-1].code} @ {timeline[timeline.length-1].time}s
+				</div>
+			{/if}
+		</div>
+
 		<form
-			class="w-full max-w-lg"
+			class="w-full"
 			action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfmPqseLSWrN8bCP5Op0Yi7rGYw0gT17kpEED8cQgUkUwja7A/formResponse"
 			method="POST"
 		>
-			<h1><b>BASE INFO</b></h1>
-			<div>
-				<span>Your name: &nbsp;</span>
-				<input type="input" name="entry.1381339308" class="bg-zinc-700" placeholder="ENTER NAME" />
-			</div>
-			<br />
-			<div>
-				<span>Team number being scouted: &nbsp;</span>
-				<input type="number" name="entry.1172542334" class="bg-zinc-700" placeholder="254" />
-			</div>
-			<br />
-			<div>
-				<span>Match number: &nbsp;</span>
-				<input type="number" name="entry.2123081628" class="bg-zinc-700" placeholder="00" />
-			</div>
+			<input type="hidden" name="entry.teleopActions" value={serializedTimeline} />
 
-			<br />
-			<h1><b>AUTO</b></h1>
-			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"> 
-
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.1459339326" value="auto leave" /> auto leave
+			<!-- PREMATCH -->
+			<div class="mb-8">
+				<h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-blue-400">PRE-MATCH</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Scouter Initials</label>
+						<input type="text" name="entry.1381339308" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ABC" required />
+					</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Match Number</label>
+						<input type="number" name="entry.2123081628" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required />
+					</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Team Number</label>
+						<input type="number" name="entry.1172542334" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1757" required />
+					</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Starting Position</label>
+						<select name="entry.startPos" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+							<option value="OT">Outpost Trench</option>
+							<option value="OBFT">Outpost Bump Favoring Trench</option>
+							<option value="OBFH">Outpost Bump Favoring Hub</option>
+							<option value="H">Hub</option>
+							<option value="DBFH">Depot Bump Favoring Hub</option>
+							<option value="DBFT">Depot Bump Favoring Trench</option>
+							<option value="DT">Depot Trench</option>
+							<option value="NS">No position / no show</option>
+						</select>
+					</div>
 				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold col-span-2">
-					<input type="checkbox" name="entry.1459339326" value="preloaded with coral" /> preloaded with coral
+				<label class="flex items-center space-x-3 bg-zinc-800 p-3 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+					<input type="checkbox" name="entry.1459339326" value="no show" class="w-5 h-5 rounded" />
+					<span class="font-medium">No Show</span>
+				</label>
+			</div>
+
+			<!-- AUTONOMOUS -->
+			<div class="mb-8">
+				<h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-green-400">AUTONOMOUS (HOLD ACTIONS)</h2>
+				
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+					{#each [
+						['auto_score', 'SCORING', 'bg-green-600'],
+						['auto_outpost', 'OUTPOST COLL', 'bg-blue-600'],
+						['auto_pass', 'PASSING', 'bg-orange-600'],
+						['auto_depot', 'DEPOT COLL', 'bg-blue-600'],
+						['auto_ground', 'GROUND COLL', 'bg-blue-600'],
+						['auto_climb', 'CLIMBING', 'bg-purple-600'],
+						['auto_trench', 'TRENCH', 'bg-zinc-700'],
+						['auto_faff', 'FAFFING', 'bg-red-600']
+					] as [code, label, color]}
+						<button type="button" 
+							class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight {activeActions.has(code) ? `${color} text-white` : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}"
+							on:mousedown={() => startAction(code)} on:mouseup={() => stopAction(code)}
+							on:touchstart|preventDefault={() => startAction(code)} on:touchend|preventDefault={() => stopAction(code)}>
+							{label}
+						</button>
+					{/each}
 				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.1459339326" value="no show" /> no show
-				</div>
 
-        <span id="autoL1"></span>
-        <span id="autoL2"></span>
-        <span id="autoL3"></span>
-
-				<div class="grid grid-cols-3 text-center w-full col-span-4">
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L4</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(2, 1)}>MORE</p>
-              <p>{autoReef[2].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(2,-1)}>LESS</p>
-						</div>
-					</div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L3</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(1,1)}>MORE</p>
-							<p>{autoReef[1].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-              <p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(1,-1)}>LESS</p>
-						</div>
-					</div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L2</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefAuto(0,1)}>MORE</p>
-							<p>{autoReef[0].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={updateReefAuto(0,-1)}>LESS</p>
-						</div>
-					</div>
-          <hr class="col-span-3"/>
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L1</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increateL1auto}>MORE</p>
-							<input type="hidden" name="entry.802870340" value={l1auto} />
-							<p>{l1auto}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseL1auto}>LESS</p>
-						</div>
-					</div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Dropped coral</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increasedroppedauto}>MORE</p>
-							<input type="hidden" name="entry.1260908892" value={droppedcoralauto} />
-							<p>{droppedcoralauto}</p>
-              <p class="text-xl py-3 bg-red-500" on:click={decreasedroppedauto}>LESS</p>
-						</div>
-					</div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae grabbed</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseAutoAlgaeGrab}>MORE</p>
-							<input type="hidden" name="entry.448746192" value={autoAlgaeGrab} />
-							<p>{autoAlgaeGrab}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreateAutoAlgaeGrab}>LESS</p>
-						</div>
-					</div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae barge</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseAutoAlgaeBarge}>MORE</p>
-							<input type="hidden" name="entry.839277872" value={autoAlgaeBarge} />
-							<p>{autoAlgaeBarge}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseAutoAlgaeBarge}>LESS</p>
-						</div>
-					</div>
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae processor</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseAutoProcessor}>MORE</p>
-							<input type="hidden" name="entry.630511118" value={autoProcessor} />
-							<p>{autoProcessor}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseAutoProcessor}>LESS</p>
-						</div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Auto Climb Result</label>
+						<select name="entry.autoClimbed" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+							<option value="No">No Climb</option>
+							<option value="Out">Output Side</option>
+							<option value="Mid">Middle</option>
+							<option value="Dep">Depot Side</option>
+							<option value="F">Failed Climb</option>
+						</select>
 					</div>
 				</div>
 			</div>
 
-			<br />
-			<hr />
-			<br />
+			<!-- TELEOP -->
+			<div class="mb-8">
+				<h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-yellow-400">TELEOP (HOLD ACTIONS)</h2>
+				
+				<div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6">
+					{#each [
+						['tele_score', 'SCORING', 'bg-green-600'],
+						['tele_coll', 'COLLECTING', 'bg-blue-600'],
+						['tele_pass', 'PASSING', 'bg-orange-600'],
+						['tele_climb', 'CLIMBING', 'bg-purple-600'],
+						['tele_alliance', 'ALLIANCE ZONE', 'bg-blue-500'],
+						['tele_neutral', 'NEUTRAL ZONE', 'bg-zinc-500'],
+						['tele_faff', 'FAFFING', 'bg-red-600'],
+						['tele_opponent', 'OPPONENT ZONE', 'bg-red-900'],
+						['tele_def', 'DEFENSE', 'bg-blue-900']
+					] as [code, label, color]}
+						<button type="button" 
+							class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight {activeActions.has(code) ? `${color} text-white` : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}"
+							on:mousedown={() => startAction(code)} on:mouseup={() => stopAction(code)}
+							on:touchstart|preventDefault={() => startAction(code)} on:touchend|preventDefault={() => stopAction(code)}>
+							{label}
+						</button>
+					{/each}
+				</div>
 
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+					<label class="flex items-center space-x-3 bg-zinc-800 p-4 rounded border-2 border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+						<input type="checkbox" name="entry.allianceWonAuto" value="true" class="w-6 h-6 rounded" />
+						<span class="font-bold">Alliance won auto?</span>
+					</label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-4 rounded border-2 border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+						<input type="checkbox" name="entry.robotDefended" value="true" class="w-6 h-6 rounded" />
+						<span class="font-bold">Defended by opponent?</span>
+					</label>
+				</div>
+			</div>
 
-			<h1><b>TELEOP</b></h1>
-			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"> 
+			<!-- ENDGAME -->
+			<div class="mb-8">
+				<h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-purple-400">ENDGAME</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Climb Level</label>
+						<select name="entry.climbed" class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none">
+							<option value="No">No Climb</option>
+							<option value="L1">Level 1</option>
+							<option value="L2">Level 2</option>
+							<option value="L3">Level 3</option>
+							<option value="F">Failed Climb</option>
+						</select>
+					</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Climb Position</label>
+						<select name="entry.climbPos" class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none">
+							<option value="No">No Climb</option>
+							<option value="Out">Output Side</option>
+							<option value="Mid">Middle</option>
+							<option value="Dep">Depot Side</option>
+						</select>
+					</div>
+				</div>
 
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+					<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+						<input type="checkbox" name="entry.mechIssue" value="true" class="w-4 h-4 rounded" />
+						<span class="text-sm">Mech Issue</span>
+					</label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+						<input type="checkbox" name="entry.died" value="true" class="w-4 h-4 rounded" />
+						<span class="text-sm">Died</span>
+					</label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+						<input type="checkbox" name="entry.tipped" value="true" class="w-4 h-4 rounded" />
+						<span class="text-sm">Tipped</span>
+					</label>
+				</div>
+			</div>
 
-        <span id="teleopL2"></span>
-        <span id="teleopL3"></span>
-        <span id="teleopL4"></span>
+			<!-- POSTMATCH -->
+			<div class="mb-8">
+				<h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-zinc-400">POST-MATCH</h2>
+				
+				<div class="space-y-6">
+					<div class="flex flex-col">
+						<div class="flex justify-between mb-1">
+							<label class="text-xs font-semibold uppercase text-zinc-400">Scoring Effectiveness</label>
+							<span class="text-xs font-bold text-blue-400">{scoringEff}/5</span>
+						</div>
+						<input type="range" name="entry.scoringEff" min="0" max="5" bind:value={scoringEff} class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer" />
+					</div>
 
-				<div class="grid grid-cols-3 text-center w-full col-span-4">
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L4</p>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Scored How?</label>
+						<select name="entry.scoredHow" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none">
+							<option value="blank">(blank)</option>
+							<option value="driving">While driving</option>
+							<option value="stationary">While stationary</option>
+							<option value="both">Both</option>
+							<option value="none">No scoring</option>
+						</select>
+					</div>
 
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(2, 1)}>MORE</p>
-              <p>{teleopReef[2].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(2,-1)}>LESS</p>
+					<div class="mb-6">
+						<p class="text-xs font-semibold uppercase text-zinc-400 mb-2 tracking-wide">Scoring Locations</p>
+						<div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+							{#each [['Outpost Trench', '1'], ['Outpost', '2'], ['Hub', '3'], ['Ladder', '4'], ['Depot', '5'], ['Depot Trench', '6']] as [label, val]}
+								<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition">
+									<input type="checkbox" name="entry.teleScoreLoc" value={val} class="w-4 h-4 rounded" />
+									<span class="text-xs">{label}</span>
+								</label>
+							{/each}
 						</div>
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L3</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(1,1)}>MORE</p>
-							<p>{teleopReef[1].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-              <p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(1,-1)}>LESS</p>
+					<div class="flex flex-col">
+						<div class="flex justify-between mb-1">
+							<label class="text-xs font-semibold uppercase text-zinc-400">Feeding Skill</label>
+							<span class="text-xs font-bold text-orange-400">{feedingSkill}/5</span>
 						</div>
+						<input type="range" name="entry.feedingSkill" min="0" max="5" bind:value={feedingSkill} class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer" />
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L2</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={updateReefTeleop(0,1)}>MORE</p>
-							<p>{teleopReef[0].reduce((acc,v) => {return acc + (v ? 1:0)}, 0)}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={updateReefTeleop(0,-1)}>LESS</p>
-						</div>
-					</div>
-          <hr class="col-span-3"/>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">L1</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseL1Teleop}>MORE</p>
-							<input type="hidden" name="entry.1509540302" value={l1teleop} />
-							<p>{l1teleop}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseL1Teleop}>LESS</p>
-						</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Passed How?</label>
+						<select name="entry.passedHow" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none">
+							<option value="blank">(blank)</option>
+							<option value="driving">While driving</option>
+							<option value="stationary">While stationary</option>
+							<option value="both">Both</option>
+							<option value="none">No Passing</option>
+						</select>
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Dropped coral</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseTDrop}>MORE</p>
-							<input type="hidden" name="entry.2121724609" value={teleopcoraldrop} />
-							<p>{teleopcoraldrop}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseTDrop}>LESS</p>
+					<div class="flex flex-col">
+						<div class="flex justify-between mb-1">
+							<label class="text-xs font-semibold uppercase text-zinc-400">Defense Skill</label>
+							<span class="text-xs font-bold text-red-400">{defSkill}/5</span>
 						</div>
+						<input type="range" name="entry.defSkill" min="0" max="5" bind:value={defSkill} class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer" />
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae grabbed</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseteleopAlgaeGrab}>MORE</p>
-							<input type="hidden" name="entry.328219189" value={teleopAlgaeGrab} />
-							<p>{teleopAlgaeGrab}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseTeleopAlgaeGrab}>LESS</p>
-						</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Card</label>
+						<select name="entry.yc" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none">
+							<option value="No Card">No Card</option>
+							<option value="Yellow">Yellow Card</option>
+							<option value="Red">Red Card</option>
+						</select>
 					</div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae barge</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseTeleopBarge}>MORE</p>
-							<input type="hidden" name="entry.631533806" value={teleopBarge} />
-							<p>{teleopBarge}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseTeleopBarge}>LESS</p>
-						</div>
-					</div>
-					<div class="border-solid border-2 rounded border-zinc-500 m-3">
-						<p class="p-3">Algae processor</p>
-
-						<div class="bg-zinc-800 mx-4">
-							<p class="text-xl py-3 bg-blue-500" on:click={increaseTeleopProcessor}>MORE</p>
-							<input type="hidden" name="entry.839947357" value={teleopProcessor} />
-							<p>{teleopProcessor}</p>
-							<p class="text-xl py-3 bg-red-500" on:click={decreaseTeleopProcessor}>LESS</p>
-						</div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1 tracking-wide">Comments</label>
+            <p class="text-s">Please fill this section out, while not explicitly required, we do reach and and every comment when making decisions about a given team. This is the best way you have to describe any qualitative nuances found within any robot</p>
+						<textarea
+							rows="4"
+							name="entry.co"
+							class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+							placeholder="General observations..."
+						/>
 					</div>
 				</div>
 			</div>
-			<br />
-			<hr />
-			<br />
-			<h1><b>ENDING</b></h1>
-			<div>
-				<p>The robot was at the end</p>
-				<select name="entry.193584090" class="bg-zinc-700">
-					<option value="neither">Neither</option>
-					<option value="parked">Parked</option>
-					<option value="fshallow">Failed shallow</option>
-					<option value="sshallow">Success shallow</option>
-					<option value="fdeep">Failed deep</option>
-					<option value="sdeep">Success deep</option>
-				</select>
-				<p>Role in the match</p>
-				<select name="entry.1612925064" class="bg-zinc-700">
-					<option value="offense">Offense</option>
-					<option value="defense">Defense</option>
-					<option value="feeder">Feeder</option>
-					<option value="immobile">Immobile</option>
-				</select>
-				<br />
-				<br />
-				<p>How did the team handle gamepieces?</p>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.218969793" value="coral floor" /> picked
-					up coral from floor
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.218969793" value="coral station" /> fed
-					at coral station like a baby bird
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.218969793" value="algae floor" /> picked up algae from ground
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.218969793" value="algae reef" /> picked up algae from the reef
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.218969793" value="algae knock" /> knocked algae
-				</div>
 
-				<p>During the match, the bot...</p>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.1171427482" value="gamepiece stuck" /> gamepiece stuck
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.1171427482" value="went under shallow cage" /> went under a shallow cage
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold">
-					<input type="checkbox" name="entry.1171427482" value="broke or was disabled" /> robot
-					broke or was disabled
-				</div>
-
-				<br />
-				<h2><b class="text-large">MATCH NOTES</b></h2>
-				<textarea
-					rows="10"
-					cols="30"
-					name="entry.73579906"
-					class="bg-zinc-700"
-					placeholder="What happened? Auto fail? If the bot played defense how did it do? Was it under a lot of defense?"
-				/>
-			</div>
-			<br />
-			<hr />
-			<br />
-			<input type="submit" value="Submit" class="bg-zinc-300 text-black p-5" />
+			<button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transition transform active:scale-95 mb-12">
+				SUBMIT DATA
+			</button>
 		</form>
 	</div>
 </div>
 
 <Footer />
+
+<style>
+	input[type='range']::-webkit-slider-thumb {
+		appearance: none;
+		width: 20px;
+		height: 20px;
+		background: #3b82f6;
+		border-radius: 50%;
+		cursor: pointer;
+	}
+	input[type='range']::-moz-range-thumb {
+		width: 20px;
+		height: 20px;
+		background: #3b82f6;
+		border-radius: 50%;
+		cursor: pointer;
+	}
+</style>
