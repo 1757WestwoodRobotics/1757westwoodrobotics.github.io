@@ -44,6 +44,7 @@
 			autoFuel = 0;
 			teleopFuel = 0;
 			teleopFuelFed = 0;
+      document.getElementById('scoutingForm').reset();
 		}
 	};
 
@@ -155,6 +156,7 @@ const parseCSV = (csvText) => {
 			class="w-full"
 			action="https://docs.google.com/forms/u/0/d/e/1FAIpQLScTQ5gSQ9cnMgUszwJ2k651a1uiHPpv1g6uj_C7A1XAHUHb5Q/formResponse"
 			method="POST"
+      id="scoutingForm"
 		>
 			<input type="hidden" name="entry.2000596765" value={serializedTimeline} />
 
