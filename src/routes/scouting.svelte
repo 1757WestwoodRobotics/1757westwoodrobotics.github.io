@@ -232,8 +232,8 @@ const parseCSV = (csvText) => {
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
 					{#each [
 						['auto_score', 'SCORING', 'bg-green-600'],
-						['auto_outpost', 'OUTPOST COLL', 'bg-blue-600'],
 						['auto_pass', 'PASSING', 'bg-orange-600'],
+						['auto_outpost', 'OUTPOST COLL', 'bg-blue-600'],
 						['auto_depot', 'DEPOT COLL', 'bg-blue-600'],
 						['auto_ground', 'GROUND COLL', 'bg-blue-600'],
 						['auto_climb', 'CLIMBING', 'bg-purple-600'],
@@ -272,12 +272,12 @@ const parseCSV = (csvText) => {
 						['tele_score', 'SCORING', 'bg-green-600'],
 						['tele_coll', 'COLLECTING', 'bg-blue-600'],
 						['tele_pass', 'PASSING', 'bg-orange-600'],
+						['tele_faff', 'FAFFING', 'bg-red-600'],
+						['tele_def', 'DEFENSE', 'bg-blue-900'],
 						['tele_climb', 'CLIMBING', 'bg-purple-600'],
 						['tele_alliance', 'ALLIANCE ZONE', 'bg-blue-500'],
 						['tele_neutral', 'NEUTRAL ZONE', 'bg-zinc-500'],
-						['tele_faff', 'FAFFING', 'bg-red-600'],
-						['tele_opponent', 'OPPONENT ZONE', 'bg-red-900'],
-						['tele_def', 'DEFENSE', 'bg-blue-900']
+						['tele_opponent', 'OPPONENT ZONE', 'bg-red-900']
 					] as [code, label, color]}
 						<button type="button" 
 							class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight {activeActions.has(code) ? `${color} text-white` : 'bg-zinc-800 text-zinc-400 border border-zinc-700'}"
