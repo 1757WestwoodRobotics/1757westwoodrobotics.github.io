@@ -4,29 +4,16 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="./favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta http-equiv="content-security-policy" content=""><title>Scouting Form</title><meta name="description" content="Scouting submission for 1757" data-svelte="svelte-16dmma5"><meta name="keywords" content="FRC, FIRST, Robotics" data-svelte="svelte-16dmma5"><meta name="author" content="Westwood Robotics" data-svelte="svelte-16dmma5"><meta name="viewport" content="width=device-width, initial-scale=1.0" data-svelte="svelte-16dmma5"><meta property="og:title" content="Scouting submission for 1757" data-svelte="svelte-16dmma5"><meta property="og:description" content="scouting data submission base for team 1757" data-svelte="svelte-16dmma5"><style data-svelte="svelte-16dmma5">.active {
-    background-color: #1a1aee;
-  }
-  .inactive {
-    background-color: #2a2a3a;
-  }
-  .bg-t-2 {
-    background-image: url("/img/scouting/2.png");
-  }
-  .bg-t-3 {
-    background-image: url("/img/scouting/3.png");
-  }
-  .bg-t-4 {
-    background-image: url("/img/scouting/4.png");
-  }</style>
-	<link rel="stylesheet" href="/_app/immutable/assets/__layout-e0566efb.css">
+		<meta http-equiv="content-security-policy" content=""><title>Scouting Form - REBUILT 2026</title><meta name="description" content="Scouting submission for 1757 - REBUILT 2026" data-svelte="svelte-1idc3fo">
+	<link rel="stylesheet" href="/_app/immutable/assets/__layout-3be94717.css">
+	<link rel="stylesheet" href="/_app/immutable/assets/scouting-6e73d605.css">
 	<link rel="stylesheet" href="/_app/immutable/assets/footer-32503cb2.css">
-	<link rel="modulepreload" href="/_app/immutable/start-0911538a.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/index-d7c05558.js">
+	<link rel="modulepreload" href="/_app/immutable/start-8633e71b.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/index-179c8e08.js">
 	<link rel="modulepreload" href="/_app/immutable/chunks/preload-helper-4c397a37.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-c9382863.js">
-	<link rel="modulepreload" href="/_app/immutable/pages/scouting.svelte-7319a013.js">
-	<link rel="modulepreload" href="/_app/immutable/chunks/footer-22c2de0a.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/__layout.svelte-a3d6e8a6.js">
+	<link rel="modulepreload" href="/_app/immutable/pages/scouting.svelte-ce56100f.js">
+	<link rel="modulepreload" href="/_app/immutable/chunks/footer-99c29d41.js">
 	</head>
 	<body>
 		<div>
@@ -57,183 +44,125 @@
 	
 	</nav>
 
-<div class="bg-zinc-800"><div class="container mx-auto p-4 max-w-prose text-white bg-zinc-900"><form class="w-full max-w-lg" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLSfmPqseLSWrN8bCP5Op0Yi7rGYw0gT17kpEED8cQgUkUwja7A/formResponse" method="POST"><h1><b>BASE INFO</b></h1>
-			<div><span>Your name:  </span>
-				<input type="input" name="entry.1381339308" class="bg-zinc-700" placeholder="ENTER NAME"></div>
-			<br>
-			<div><span>Team number being scouted:  </span>
-				<input type="number" name="entry.1172542334" class="bg-zinc-700" placeholder="254"></div>
-			<br>
-			<div><span>Match number:  </span>
-				<input type="number" name="entry.2123081628" class="bg-zinc-700" placeholder="00"></div>
+<div class="bg-zinc-800"><div class="container mx-auto p-4 max-w-prose text-white bg-zinc-900 min-h-screen">
+		<div class="sticky top-0 z-50 bg-zinc-900 border-b border-zinc-700 p-4 mb-6 shadow-xl -mx-4"><div class="flex items-center justify-between gap-4"><div class="flex flex-col"><span class="text-[10px] font-bold text-zinc-500 uppercase tracking-tighter">Match Timer</span>
+					<span class="text-4xl font-mono font-black text-zinc-400">0:00</span></div>
+				<div class="flex gap-2"><button type="button" class="px-6 py-2 rounded-lg font-bold transition bg-green-600 hover:bg-green-700">START</button>
+					<button type="button" class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-bold text-xs">RESET
+					</button></div></div>
+			</div>
 
-			<br>
-			<h1><b>AUTO</b></h1>
-			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"><div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1459339326" value="auto leave"> auto leave
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold col-span-2"><input type="checkbox" name="entry.1459339326" value="preloaded with coral"> preloaded with coral
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1459339326" value="no show"> no show
-				</div>
+		<form class="w-full" action="https://docs.google.com/forms/u/0/d/e/1FAIpQLScTQ5gSQ9cnMgUszwJ2k651a1uiHPpv1g6uj_C7A1XAHUHb5Q/formResponse" method="POST"><input type="hidden" name="entry.2000596765" value="">
 
-        <span id="autoL1"></span>
-        <span id="autoL2"></span>
-        <span id="autoL3"></span>
+			
+			<div class="mb-8"><h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-blue-400">PRE-MATCH</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Scouter Initials</label>
+						<input type="text" name="entry.55361842" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="ABC" required></div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Match Number</label>
+            <input type="number" name="entry.528540297" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required></div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Team Number</label>
+            <input type="number" name="entry.1130076361" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1757" required value="0">
+            </div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Starting Position</label>
+						<select name="entry.236449401" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"><option value="OT">Outpost Trench</option><option value="OBFT">Outpost Bump Favoring Trench</option><option value="OBFH">Outpost Bump Favoring Hub</option><option value="H">Hub</option><option value="DBFH">Depot Bump Favoring Hub</option><option value="DBFT">Depot Bump Favoring Trench</option><option value="DT">Depot Trench</option><option value="NS">No position / no show</option></select></div></div>
+				<label class="flex items-center space-x-3 bg-zinc-800 p-3 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.65205079" value="no show" class="w-5 h-5 rounded">
+					<span class="font-medium">No Show</span></label>
+        
 
-				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L4</p>
+			
+			<div class="mb-8"><h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-green-400">AUTONOMOUS (HOLD ACTIONS)</h2>
+				
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6"><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">SCORING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">OUTPOST COLL
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">PASSING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">DEPOT COLL
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">GROUND COLL
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">CLIMBING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">TRENCH
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">FAFFING
+						</button></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-              <p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"><div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Auto Climb Result</label>
+						<select name="entry.287801541" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none"><option value="No">No Climb</option><option value="Out">Output Side</option><option value="Mid">Middle</option><option value="Dep">Depot Side</option><option value="F">Failed Climb</option></select></div></div></div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L3</p>
+			
+			<div class="mb-8"><h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-yellow-400">TELEOP (HOLD ACTIONS)</h2>
+				
+				<div class="grid grid-cols-2 md:grid-cols-3 gap-2 mb-6"><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">SCORING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">COLLECTING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">PASSING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">CLIMBING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">ALLIANCE ZONE
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">NEUTRAL ZONE
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">FAFFING
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">OPPONENT ZONE
+						</button><button type="button" class="p-4 rounded-lg font-bold text-[10px] shadow-lg active:scale-95 transition leading-tight bg-zinc-800 text-zinc-400 border border-zinc-700">DEFENSE
+						</button></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-              <p class="text-xl py-3 bg-red-500">LESS</p></div></div>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"><label class="flex items-center space-x-3 bg-zinc-800 p-4 rounded border-2 border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.901735072" value="true" class="w-6 h-6 rounded">
+						<span class="font-bold">Alliance won auto?</span></label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-4 rounded border-2 border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.942649623" value="true" class="w-6 h-6 rounded">
+						<span class="font-bold">Defended by opponent?</span></label></div></div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L2</p>
+			
+			<div class="mb-8"><h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-purple-400">ENDGAME</h2>
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Climb Level</label>
+						<select name="entry.477247024" class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none"><option value="No">No Climb</option><option value="L1">Level 1</option><option value="L2">Level 2</option><option value="L3">Level 3</option><option value="F">Failed Climb</option></select></div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Climb Position</label>
+						<select name="entry.1268059521" class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none"><option value="No">No Climb</option><option value="Out">Output Side</option><option value="Mid">Middle</option><option value="Dep">Depot Side</option></select></div></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-          <hr class="col-span-3">
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
+				<div class="grid grid-cols-1 sm:grid-cols-3 gap-2"><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.676569017" value="true" class="w-4 h-4 rounded">
+						<span class="text-sm">Mech Issue</span></label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.1940984634" value="true" class="w-4 h-4 rounded">
+						<span class="text-sm">Died</span></label>
+					<label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.1961795439" value="true" class="w-4 h-4 rounded">
+						<span class="text-sm">Tipped</span></label></div></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.802870340" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
+			
+			<div class="mb-8"><h2 class="text-xl font-bold border-b border-zinc-700 pb-2 mb-4 text-zinc-400">POST-MATCH</h2>
+				
+				<div class="space-y-6"><div class="flex flex-col"><div class="flex justify-between mb-1"><label class="text-xs font-semibold uppercase text-zinc-400">Scoring Effectiveness</label>
+							<span class="text-xs font-bold text-blue-400">3/5</span></div>
+						<input type="range" name="entry.975098497" min="0" max="5" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer svelte-15tkqcj" value="3"></div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Dropped coral</p>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Scored How?</label>
+						<select name="entry.1864643366" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none"><option value="blank">(blank)</option><option value="driving">While driving</option><option value="stationary">While stationary</option><option value="both">Both</option><option value="none">No scoring</option></select></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.1260908892" value="0">
-							<p>0</p>
-              <p class="text-xl py-3 bg-red-500">LESS</p></div></div>
+					<div class="mb-6"><p class="text-xs font-semibold uppercase text-zinc-400 mb-2 tracking-wide">Scoring Locations</p>
+						<div class="grid grid-cols-2 sm:grid-cols-3 gap-2"><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="1" class="w-4 h-4 rounded">
+									<span class="text-xs">Outpost Trench</span>
+								</label><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="2" class="w-4 h-4 rounded">
+									<span class="text-xs">Outpost</span>
+								</label><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="3" class="w-4 h-4 rounded">
+									<span class="text-xs">Hub</span>
+								</label><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="4" class="w-4 h-4 rounded">
+									<span class="text-xs">Ladder</span>
+								</label><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="5" class="w-4 h-4 rounded">
+									<span class="text-xs">Depot</span>
+								</label><label class="flex items-center space-x-3 bg-zinc-800 p-2 rounded border border-zinc-700 cursor-pointer hover:bg-zinc-700 transition"><input type="checkbox" name="entry.728375142" value="6" class="w-4 h-4 rounded">
+									<span class="text-xs">Depot Trench</span>
+								</label></div></div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae grabbed</p>
+					<div class="flex flex-col"><div class="flex justify-between mb-1"><label class="text-xs font-semibold uppercase text-zinc-400">Feeding Skill</label>
+							<span class="text-xs font-bold text-orange-400">3/5</span></div>
+						<input type="range" name="entry.2132357592" min="0" max="5" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer svelte-15tkqcj" value="3"></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.448746192" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Passed How?</label>
+						<select name="entry.788387708" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none"><option value="blank">(blank)</option><option value="driving">While driving</option><option value="stationary">While stationary</option><option value="both">Both</option><option value="none">No Passing</option></select></div>
 
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae barge</p>
+					<div class="flex flex-col"><div class="flex justify-between mb-1"><label class="text-xs font-semibold uppercase text-zinc-400">Defense Skill</label>
+							<span class="text-xs font-bold text-red-400">0/5</span></div>
+						<input type="range" name="entry.1384370540" min="0" max="5" class="w-full h-2 bg-zinc-700 rounded-lg appearance-none cursor-pointer svelte-15tkqcj" value="0"></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.839277872" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae processor</p>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Card</label>
+						<select name="entry.1816355809" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none"><option value="No Card">No Card</option><option value="Yellow">Yellow Card</option><option value="Red">Red Card</option></select></div>
 
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.630511118" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div></div></div>
+					<div class="flex flex-col"><label class="text-xs font-semibold uppercase text-zinc-400 mb-1 tracking-wide">Comments</label>
+            <p class="text-s">Please fill this section out, while not explicitly required, we do read every comment when making decisions about a given team. This is the best way you have to describe any qualitative nuances found within any robot</p>
+						<textarea rows="4" name="entry.568874806" class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="General observations..."></textarea></div></div></div>
 
-			<br>
-			<hr>
-			<br>
-
-
-			<h1><b>TELEOP</b></h1>
-			<div class="grid grid-cols-4 gap-x-2 bg-zinc-800"><span id="teleopL2"></span>
-        <span id="teleopL3"></span>
-        <span id="teleopL4"></span>
-
-				<div class="grid grid-cols-3 text-center w-full col-span-4"><div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L4</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-              <p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L3</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-              <p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L2</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-          <hr class="col-span-3">
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">L1</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.1509540302" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Dropped coral</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.2121724609" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae grabbed</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.328219189" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae barge</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.631533806" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div>
-					<div class="border-solid border-2 rounded border-zinc-500 m-3"><p class="p-3">Algae processor</p>
-
-						<div class="bg-zinc-800 mx-4"><p class="text-xl py-3 bg-blue-500">MORE</p>
-							<input type="hidden" name="entry.839947357" value="0">
-							<p>0</p>
-							<p class="text-xl py-3 bg-red-500">LESS</p></div></div></div></div>
-			<br>
-			<hr>
-			<br>
-			<h1><b>ENDING</b></h1>
-			<div><p>The robot was at the end</p>
-				<select name="entry.193584090" class="bg-zinc-700"><option value="neither">Neither</option><option value="parked">Parked</option><option value="fshallow">Failed shallow</option><option value="sshallow">Success shallow</option><option value="fdeep">Failed deep</option><option value="sdeep">Success deep</option></select>
-				<p>Role in the match</p>
-				<select name="entry.1612925064" class="bg-zinc-700"><option value="offense">Offense</option><option value="defense">Defense</option><option value="feeder">Feeder</option><option value="immobile">Immobile</option></select>
-				<br>
-				<br>
-				<p>How did the team handle gamepieces?</p>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.218969793" value="coral floor"> picked
-					up coral from floor
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.218969793" value="coral station"> fed
-					at coral station like a baby bird
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.218969793" value="algae floor"> picked up algae from ground
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.218969793" value="algae reef"> picked up algae from the reef
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.218969793" value="algae knock"> knocked algae
-				</div>
-
-				<p>During the match, the bot...</p>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1171427482" value="gamepiece stuck"> gamepiece stuck
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1171427482" value="went under shallow cage"> went under a shallow cage
-				</div>
-				<div class="bg-zinc-800 p-3 hover:font-bold"><input type="checkbox" name="entry.1171427482" value="broke or was disabled"> robot
-					broke or was disabled
-				</div>
-
-				<br>
-				<h2><b class="text-large">MATCH NOTES</b></h2>
-				<textarea rows="10" cols="30" name="entry.73579906" class="bg-zinc-700" placeholder="What happened? Auto fail? If the bot played defense how did it do? Was it under a lot of defense?"></textarea></div>
-			<br>
-			<hr>
-			<br>
-			<input type="submit" value="Submit" class="bg-zinc-300 text-black p-5"></form></div></div>
+			<button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-lg shadow-lg transition transform active:scale-95 mb-12">SUBMIT DATA
+			</button></div></form></div></div>
 
 <div class="w-full flex text-white bg-green-600 flex-wrap"><div class="text-center p-5 grow shrink basis-1/2 md:basis-1/3"><h2 class="text-xl"><b>CONTACT</b></h2>
 		<br>
@@ -253,10 +182,10 @@
 </div>
 
 
-		<script type="module" data-sveltekit-hydrate="ghuvye">
-		import { start } from "/_app/immutable/start-0911538a.js";
+		<script type="module" data-sveltekit-hydrate="1leslcp">
+		import { start } from "/_app/immutable/start-8633e71b.js";
 		start({
-			target: document.querySelector('[data-sveltekit-hydrate="ghuvye"]').parentNode,
+			target: document.querySelector('[data-sveltekit-hydrate="1leslcp"]').parentNode,
 			paths: {"base":"","assets":""},
 			session: {},
 			route: true,
