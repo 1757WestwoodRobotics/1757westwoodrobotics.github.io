@@ -173,9 +173,9 @@ const parseCSV = (csvText) => {
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Team Number</label>
             <input type="number" name="entry.1130076361" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1757" required bind:value={selectedTeam}/>
-            {#if selectedMatchData && [selectedMatchData["R1"], selectedMatchData["R2"], selectedMatchData["R3"], selectedMatchData["B1"], selectedMatchData["B2"], selectedMatchData["B3"]].includes(selectedTeam.toString())}
+            {#if selectedMatchData && [selectedMatchData["R1"], selectedMatchData["R2"], selectedMatchData["R3"], selectedMatchData["B1"], selectedMatchData["B2"], selectedMatchData["B3"]].includes(selectedTeam !== null ? selectedTeam.toString() : "null")}
               <p class="text-xs text-green-400 mt-1">Team is in this match!</p>
-              <p class="text-xs text-zinc-500 mt-1">You are scouting the {["R1", "R2", "R3"].find(pos => selectedMatchData[pos] == selectedTeam.toString()) ? 'Red' : 'Blue'} Alliance</p>
+              <p class="text-xs text-zinc-500 mt-1">You are scouting the {["R1", "R2", "R3"].find(pos => selectedMatchData[pos] == selectedTeam !== null ? selectedTeam.toString() : "null") ? 'Red' : 'Blue'} Alliance</p>
             {:else if selectedMatchData}
               <p class="text-xs text-red-400 mt-1">Team is NOT in this match.</p>
               <p>Valid teams are: {[selectedMatchData["R1"], selectedMatchData["R2"], selectedMatchData["R3"], selectedMatchData["B1"], selectedMatchData["B2"], selectedMatchData["B3"]].join(', ')}</p>
