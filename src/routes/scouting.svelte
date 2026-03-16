@@ -84,7 +84,37 @@
 	const changeTeleopFuelFed = (val) => {
 		if (val > 0) recordPointAction('tele_fed');
 		teleopFuelFed = Math.max(0, teleopFuelFed + val);
-	};
+  };
+
+const parseCSV = (csvText) => {
+  const lines = csvText.trim().split('\n');
+  const headers = lines[0].split(',');
+  const result = [];
+
+  for (let i = 1; i < lines.length; i++) {
+    const obj = {};
+    const currentline = lines[i].split(',');
+
+    for (let j = 0; j < headers.length; j++) {
+      obj[headers[j].trim()] = currentline[j].trim();
+    }
+    result.push(obj);
+  }
+  return result;
+}
+  let selectedMatchData = null;
+
+  const getGamblescout = async () => {
+    selectedMatchData = null;
+    let res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRUxqLukIXm32NQACEavD7l8jzLbR8y5VJK_c5p3mfKkx4D-tlii9SiPpsVgaElgTjUgWyUfym_T4jo/pub?gid=1678037315&single=true&output=csv");
+    let text = await res.text();
+    let data = parseCSV(text);
+    console.log(data);
+      const matchNum = document.querySelector('input[name="entry.2123081628"]').value;
+    selectedMatchData = data.find(row => row["Match"]== `Qual ${matchNum}`);
+      console.log(selectedMatchData);
+  }
+  let selectedTeam = 0;
 </script>
 
 <svelte:head>
@@ -138,11 +168,18 @@
 					</div>
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Match Number</label>
-						<input type="number" name="entry.2123081628" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required />
+            <input type="number" name="entry.2123081628" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required on:input={getGamblescout}/>
 					</div>
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Team Number</label>
-						<input type="number" name="entry.1172542334" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1757" required />
+            <input type="number" name="entry.1172542334" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1757" required bind:value={selectedTeam}/>
+            {#if selectedMatchData && [selectedMatchData["R1"], selectedMatchData["R2"], selectedMatchData["R3"], selectedMatchData["B1"], selectedMatchData["B2"], selectedMatchData["B3"]].includes(selectedTeam.toString())}
+              <p class="text-xs text-green-400 mt-1">Team is in this match!</p>
+              <p class="text-xs text-zinc-500 mt-1">You are scouting the {["R1", "R2", "R3"].find(pos => selectedMatchData[pos] == selectedTeam.toString()) ? 'Red' : 'Blue'} Alliance</p>
+            {:else if selectedMatchData}
+              <p class="text-xs text-red-400 mt-1">Team is NOT in this match.</p>
+              <p>Valid teams are: {[selectedMatchData["R1"], selectedMatchData["R2"], selectedMatchData["R3"], selectedMatchData["B1"], selectedMatchData["B2"], selectedMatchData["B3"]].join(', ')}</p>
+            {/if}
 					</div>
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Starting Position</label>
@@ -162,7 +199,31 @@
 					<input type="checkbox" name="entry.1459339326" value="no show" class="w-5 h-5 rounded" />
 					<span class="font-medium">No Show</span>
 				</label>
+        {#if selectedMatchData}
+        <div class="mt-4 p-3 bg-zinc-700 rounded text-sm text-zinc-300">
+          <p><strong>GambleScout:</strong> You can only <span class="font-semibold uppercase">win</span> points for GambleScout. Please predict the team you are going to win, the current odds for this match are:</p>
+          <p class="uppercase font-semibold bg-zinc-800 p-2">Blue {selectedMatchData["Blue win %"]} | Red {selectedMatchData["Red win %"]} </p>
+          Your point potential is:
+          <div class="grid grid-cols-3 bg-zinc-700 p-2 rounded mt-2 text-center font-mono text-xs">
+            <label></label>
+            <label>Bet on Blue</label>
+            <label>Bet on Red</label>
+            <label>Blue Wins</label>
+            <label>{selectedMatchData["Points if guessed blue correctly"]}</label>
+            <label>{selectedMatchData["Points if incorrectly guessed"]}</label>
+            <label>Red Wins</label>
+            <label>{selectedMatchData["Points if incorrectly guessed"]}</label>
+            <label>{selectedMatchData["Points if guessed red correctly"]}</label>
+        </div>
+					<div class="flex flex-col">
+						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">GambleScout prediction</label>
+						<select name="entry.gc" class="bg-zinc-800 border border-zinc-700 rounded p-2 outline-none">
+							<option value="b">Blue Alliance</option>
+							<option value="r">Red Alliance</option>
+						</select>
+					</div>
 			</div>
+        {/if}
 
 			<!-- AUTONOMOUS -->
 			<div class="mb-8">
@@ -354,7 +415,7 @@
 
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1 tracking-wide">Comments</label>
-            <p class="text-s">Please fill this section out, while not explicitly required, we do reach and and every comment when making decisions about a given team. This is the best way you have to describe any qualitative nuances found within any robot</p>
+            <p class="text-s">Please fill this section out, while not explicitly required, we do read every comment when making decisions about a given team. This is the best way you have to describe any qualitative nuances found within any robot</p>
 						<textarea
 							rows="4"
 							name="entry.co"
