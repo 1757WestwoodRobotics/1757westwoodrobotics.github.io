@@ -369,7 +369,7 @@
 					const data = await statRes.json();
 					teamStatsMap.set(teamNum, {
 						epa: data?.epa?.total_points?.mean || 0,
-						unitless: data?.epa?.unitless || 0,
+						rank: data?.epa?.ranks?.total?.rank || 0,
 						norm: data?.epa?.norm || 0
 					});
 					teamStatsMap = teamStatsMap; 
@@ -417,7 +417,7 @@
 
 			teamStats = {
 				epa: global.epa || 0,
-				rank: global.unitless || 'N/A',
+				rank: global.rank || 'N/A',
 				opr: opr,
 				nickname: tbaData?.nickname || `Team ${teamNumber}`,
 				city: tbaData?.city || '',
@@ -714,11 +714,50 @@
 	}
 
 	let hoveredMatch = null;
+	let selectedMatchPopup = null;
 
 	$: simAggregates = {
 		red: { score: simRedTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0) },
 		blue: { score: simBlueTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0) }
 	};
+
+	function getMatchScoutingData(matchNumber) {
+		const scoutedTeams = scoutingData.filter(r => getVal(r, 'Match #') == matchNumber);
+		const breakdown = schedule.find(m => m.match_number === matchNumber);
+		if (!breakdown) return { red: [], blue: [] };
+
+		const red = breakdown.alliances.red.team_keys.map(key => {
+			const team = key.replace('frc', '');
+			const scout = scoutedTeams.find(r => getVal(r, 'Team #') === team);
+			return { team, scout };
+		});
+		const blue = breakdown.alliances.blue.team_keys.map(key => {
+			const team = key.replace('frc', '');
+			const scout = scoutedTeams.find(r => getVal(r, 'Team #') === team);
+			return { team, scout };
+		});
+		return { red, blue };
+	}
+
+	function getMatchesWithIssues(teamNum) {
+		const matches = scoutingData
+			.filter(r => getVal(r, 'Team #') === teamNum)
+			.filter(r => {
+				const hasMechanical = getVal(r, 'mech issue') === 'TRUE' || getVal(r, 'mechanical issue') === 'Yes';
+				const hasTipped = getVal(r, 'tipped') === 'TRUE' || getVal(r, 'tipped') === 'Yes';
+				const hasDied = getVal(r, 'died') === 'TRUE' || getVal(r, 'died') === 'Yes';
+				const hasCard = getVal(r, 'card') !== 'No Card' && getVal(r, 'card') !== 'N/A' && getVal(r, 'card') !== '';
+				return hasMechanical || hasTipped || hasDied || hasCard;
+			})
+			.map(r => ({
+				matchNum: getVal(r, 'Match #'),
+				hasMechanical: getVal(r, 'mech issue') === 'TRUE' || getVal(r, 'mechanical issue') === 'Yes',
+				hasTipped: getVal(r, 'tipped') === 'TRUE' || getVal(r, 'tipped') === 'Yes',
+				hasDied: getVal(r, 'died') === 'TRUE' || getVal(r, 'died') === 'Yes',
+				hasCard: getVal(r, 'card') !== 'No Card' && getVal(r, 'card') !== 'N/A' && getVal(r, 'card') !== ''
+			}));
+		return matches;
+	}
 </script>
 
 <Navbar />
@@ -873,14 +912,12 @@
 			<div class="flex flex-wrap gap-1.5">
 				{#each schedule as match}
 					{@const count = getScouterCount(match.match_number)}
-					<div class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-help relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}" 
-						role="button"
-						tabindex="0"
+					<button class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-pointer hover:scale-110 relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60' : 'bg-zinc-900 border-zinc-800 text-zinc-700 hover:border-zinc-700'}" 
 						on:mouseenter={() => hoveredMatch = match} 
 						on:mouseleave={() => hoveredMatch = null}
 						on:focus={() => hoveredMatch = match}
 						on:blur={() => hoveredMatch = null}
-						on:keydown={(e) => e.key === 'Enter' && (hoveredMatch = hoveredMatch === match ? null : match)}>
+						on:click={() => selectedMatchPopup = match}>
 						{match.match_number}
 						{#if hoveredMatch === match}
 							<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
@@ -912,7 +949,7 @@
 								<div class="w-2 h-2 bg-zinc-900 border-r-2 border-b-2 border-zinc-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2"></div>
 							</div>
 						{/if}
-					</div>
+					</button>
 				{/each}
 			</div>
 		</section>
@@ -1115,11 +1152,13 @@
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Avg Eff.')}>Avg Eff. {sortKey === 'Avg Eff.' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Climb Rate')}>Climb Rate {sortKey === 'Climb Rate' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Samples')}>Samples {sortKey === 'Samples' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
+								<th class="p-8 border-b-2 border-zinc-800 text-center">Matches w/ Issues</th>
 								<th class="p-8 border-b-2 border-zinc-800">Intelligence</th>
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-zinc-800">
 							{#each sortedLeaderboard as m}
+								{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
 								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
 									<td class="p-2 md:p-8 font-black text-white text-xl md:text-4xl group-hover:pl-4 md:group-hover:pl-12 transition-all">{m.teamNum}</td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{m.epa.toFixed(1)}</span></td>
@@ -1127,6 +1166,25 @@
 									<td class="p-8 text-center"><span class="text-3xl font-black text-orange-400">{m.avgEff.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-2xl font-black {m.climbRate > 0.7 ? 'text-purple-400' : 'text-zinc-600'}">{(m.climbRate * 100).toFixed(0)}%</span></td>
 									<td class="p-8 text-center"><span class="text-xs font-black text-zinc-500 uppercase tracking-widest">{m.entryCount} matches</span></td>
+									<td class="p-8 text-center">
+										{#if issuesMatches.length > 0}
+											<div class="flex flex-wrap gap-1.5 justify-center">
+												{#each issuesMatches as issue}
+													<div class="flex items-center gap-1 bg-red-950/40 border border-red-500/30 px-2 py-1 rounded-lg group/issue hover:bg-red-950/60 transition-all" title="M{issue.matchNum}: {issue.hasMechanical ? 'Mech ' : ''}{issue.hasTipped ? 'Tipped ' : ''}{issue.hasDied ? 'Dead ' : ''}{issue.hasCard ? issue.hasCard : ''}">
+														<span class="text-[10px] font-black text-red-300">M{issue.matchNum}</span>
+														<div class="flex gap-0.5">
+															{#if issue.hasMechanical}<span class="text-xs" title="Mechanical Issue">⚙️</span>{/if}
+															{#if issue.hasTipped}<span class="text-xs" title="Tipped">⚠️</span>{/if}
+															{#if issue.hasDied}<span class="text-xs" title="Dead">💀</span>{/if}
+															{#if issue.hasCard}<span class="text-xs" title="Card">🟡</span>{/if}
+														</div>
+													</div>
+												{/each}
+											</div>
+										{:else}
+											<span class="text-xs font-black text-zinc-600 uppercase">—</span>
+										{/if}
+									</td>
 									<td class="p-8">
 										<button class="bg-zinc-800 hover:bg-blue-600 text-white text-[10px] font-black px-4 py-2 rounded-xl transition uppercase tracking-widest">View Intel</button>
 									</td>
@@ -1139,6 +1197,7 @@
 				<!-- Mobile Cards -->
 				<div class="md:hidden space-y-3">
 					{#each sortedLeaderboard as m}
+						{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
 						<div class="bg-zinc-900/40 border-2 border-orange-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-orange-500/40 transition-all" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
 							<div class="flex justify-between items-start gap-3 mb-3">
 								<div class="flex-1">
@@ -1165,6 +1224,16 @@
 								<p class="text-[7px] font-black text-orange-400 uppercase mb-1">Scoring Eff</p>
 								<p class="text-base font-black text-orange-400">{m.avgEff.toFixed(1)}/5</p>
 							</div>
+							{#if issuesMatches.length > 0}
+								<div class="mt-2 p-2 bg-red-950/40 rounded-lg border border-red-500/30">
+									<p class="text-[7px] font-black text-red-400 uppercase mb-1">Issues</p>
+									<div class="flex flex-wrap gap-1">
+										{#each issuesMatches as issue}
+											<span class="text-[10px] font-black bg-red-900/60 text-red-200 px-1.5 py-0.5 rounded" title="M{issue.matchNum}">M{issue.matchNum}</span>
+										{/each}
+									</div>
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -1582,6 +1651,94 @@
 						</div>
 					</section>
 				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Match Scouting Data Popup -->
+{#if selectedMatchPopup}
+	{@const matchData = getMatchScoutingData(selectedMatchPopup.match_number)}
+	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
+		role="dialog"
+		aria-modal="true"
+		on:click|self={() => selectedMatchPopup = null}
+		on:keydown={(e) => e.key === 'Escape' && (selectedMatchPopup = null)}>
+		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-t-[2rem] md:rounded-[3rem] w-full md:max-w-6xl max-h-[90vh] overflow-y-auto shadow-[0_0_150px_rgba(0,0,0,1)]">
+			<!-- Header -->
+			<div class="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md p-3 md:p-10 border-b-2 border-zinc-800 flex md:justify-between md:items-center gap-3 z-10">
+				<div class="flex-1 min-w-0">
+					<h2 class="text-2xl md:text-5xl font-black uppercase tracking-tighter mb-2 text-zinc-200">Match {selectedMatchPopup.match_number}</h2>
+					<p class="text-[10px] md:text-xs text-zinc-600 uppercase font-black tracking-[0.2em]">Complete Scouting Overview</p>
+				</div>
+				<button on:click={() => selectedMatchPopup = null} class="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-lg md:rounded-[1.5rem] transition text-zinc-400 hover:text-white shadow-2xl group flex-shrink-0"><span class="text-xl md:text-3xl group-hover:rotate-90 transition-transform duration-300">✕</span></button>
+			</div>
+
+			<!-- Content -->
+			<div class="p-3 md:p-10 space-y-8 md:space-y-12">
+				<!-- Red Alliance -->
+				<section>
+					<h3 class="text-lg md:text-2xl font-black text-red-500 uppercase tracking-wider mb-6 flex items-center gap-3">
+						<div class="w-4 h-4 rounded-lg bg-red-600"></div>
+						Red Alliance
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+						{#each matchData.red as { team, scout }}
+							{@const colors = teamColorsMap.get(team) || { primary: '#ef4444', secondary: '#991b1b' }}
+							<div class="bg-red-950/20 border-2 border-red-500/30 rounded-2xl p-4 md:p-6 cursor-pointer hover:border-red-500/60 transition-all group" 
+								role="button"
+								on:click={() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); }}
+								on:keydown={(e) => e.key === 'Enter' && (() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); })()}>
+								<div class="flex items-start justify-between gap-3 mb-4">
+									<div>
+										<p class="text-2xl md:text-4xl font-black text-white">{team}</p>
+										<p class="text-[10px] text-zinc-500 font-black uppercase tracking-wider mt-1">{scout ? 'Scouted' : 'Not Scouted'}</p>
+									</div>
+									<div class="w-3 h-3 rounded-full {scout ? 'bg-green-500' : 'bg-red-900'}"></div>
+								</div>
+								{#if scout}
+									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Scout:</span><span class="font-black text-white">{getVal(scout, 'Scouter initials')}</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Climb:</span><span class="font-black text-purple-400">{getVal(scout, 'climb level')}</span></div>
+									</div>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				</section>
+
+				<!-- Blue Alliance -->
+				<section>
+					<h3 class="text-lg md:text-2xl font-black text-blue-500 uppercase tracking-wider mb-6 flex items-center gap-3">
+						<div class="w-4 h-4 rounded-lg bg-blue-600"></div>
+						Blue Alliance
+					</h3>
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+						{#each matchData.blue as { team, scout }}
+							{@const colors = teamColorsMap.get(team) || { primary: '#3b82f6', secondary: '#1e40af' }}
+							<div class="bg-blue-950/20 border-2 border-blue-500/30 rounded-2xl p-4 md:p-6 cursor-pointer hover:border-blue-500/60 transition-all group" 
+								role="button"
+								on:click={() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); }}
+								on:keydown={(e) => e.key === 'Enter' && (() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); })()}>
+								<div class="flex items-start justify-between gap-3 mb-4">
+									<div>
+										<p class="text-2xl md:text-4xl font-black text-white">{team}</p>
+										<p class="text-[10px] text-zinc-500 font-black uppercase tracking-wider mt-1">{scout ? 'Scouted' : 'Not Scouted'}</p>
+									</div>
+									<div class="w-3 h-3 rounded-full {scout ? 'bg-green-500' : 'bg-red-900'}"></div>
+								</div>
+								{#if scout}
+									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Scout:</span><span class="font-black text-white">{getVal(scout, 'Scouter initials')}</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Climb:</span><span class="font-black text-purple-400">{getVal(scout, 'climb level')}</span></div>
+									</div>
+								{/if}
+							</div>
+						{/each}
+					</div>
+				</section>
 			</div>
 		</div>
 	</div>
