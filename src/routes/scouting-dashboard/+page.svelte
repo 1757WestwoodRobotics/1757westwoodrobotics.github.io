@@ -35,6 +35,7 @@
 	let teamStatsMap = new Map(); 
 	let teamColorsMap = new Map();
 	let teamDetailsMap = new Map();
+	let matchResultsMap = new Map();
 	let eventOprs = {}; 
 	let teamStats = null; 
 	let statsLoading = false;
@@ -630,6 +631,10 @@
 		selectedRow = matchRow;
 	}
 
+	$: if (selectedMatchPopup) {
+		fetchMatchResult(selectedMatchPopup.match_number);
+	}
+
 	function parseActions(actionStr) {
 		if (!actionStr || actionStr === 'N/A') return [];
 		return actionStr.split(';').map(act => {
@@ -757,6 +762,126 @@
 				hasCard: getVal(r, 'card') !== 'No Card' && getVal(r, 'card') !== 'N/A' && getVal(r, 'card') !== ''
 			}));
 		return matches;
+	}
+
+	function getTeamMatchData(teamNum, matchNum) {
+		return scoutingData.find(r => getVal(r, 'Team #') === teamNum && getVal(r, 'Match #') == matchNum);
+	}
+
+	function getTeamMatchIssues(teamNum, matchNum) {
+		const match = getTeamMatchData(teamNum, matchNum);
+		if (!match) return null;
+		const hasMechanical = getVal(match, 'mech issue') === 'TRUE' || getVal(match, 'mechanical issue') === 'Yes';
+		const hasTipped = getVal(match, 'tipped') === 'TRUE' || getVal(match, 'tipped') === 'Yes';
+		const hasDied = getVal(match, 'died') === 'TRUE' || getVal(match, 'died') === 'Yes';
+		const hasCard = getVal(match, 'card') !== 'No Card' && getVal(match, 'card') !== 'N/A' && getVal(match, 'card') !== '';
+		return { hasMechanical, hasTipped, hasDied, hasCard };
+	}
+
+	function getMatchResult(matchNumber) {
+		// Check cache first
+		if (matchResultsMap.has(matchNumber)) {
+			return matchResultsMap.get(matchNumber);
+		}
+
+		const match = schedule.find(m => m.match_number === matchNumber);
+		if (!match) return null;
+		
+		// Check if match has score data from TBA
+		if (match.alliances && match.alliances.red && match.alliances.blue) {
+			const red = match.alliances.red.score || 0;
+			const blue = match.alliances.blue.score || 0;
+			if (red > 0 || blue > 0) {
+				const result = { 
+					red, 
+					blue, 
+					winner: red > blue ? 'red' : (blue > red ? 'blue' : 'tie'),
+					source: 'official'
+				};
+				matchResultsMap.set(matchNumber, result);
+				return result;
+			}
+		}
+		
+		// Match likely hasn't been played yet
+		return null;
+	}
+
+	async function fetchMatchResult(matchNumber) {
+		// Check cache first
+		if (matchResultsMap.has(matchNumber)) {
+			return matchResultsMap.get(matchNumber);
+		}
+
+		try {
+			const eventKey = EVENT_KEY;
+			const res = await fetch(`https://api.statbotics.io/v3/match/${eventKey}_qm${matchNumber}`);
+			if (res.ok) {
+				const data = await res.json();
+				if (data && data.result) {
+					const result = {
+						red: data.result.red_score || 0,
+						blue: data.result.blue_score || 0,
+						winner: data.result.winner === 'R' ? 'red' : data.result.winner === 'B' ? 'blue' : 'tie',
+						source: 'statbotics'
+					};
+					matchResultsMap.set(matchNumber, result);
+					return result;
+				}
+			}
+		} catch (e) {
+			console.error(`Error fetching match result for match ${matchNumber}:`, e);
+		}
+
+		// Fall back to TBA data
+		return getMatchResult(matchNumber);
+	}
+
+	function getMatchPrediction(matchNumber) {
+		const match = schedule.find(m => m.match_number === matchNumber);
+		if (!match) return null;
+		const redTeams = match.alliances.red.team_keys.map(k => k.replace('frc', ''));
+		const blueTeams = match.alliances.blue.team_keys.map(k => k.replace('frc', ''));
+		const redScore = redTeams.reduce((sum, team) => sum + (teamStatsMap.get(team)?.epa || 0), 0);
+		const blueScore = blueTeams.reduce((sum, team) => sum + (teamStatsMap.get(team)?.epa || 0), 0);
+		return {
+			red: redScore,
+			blue: blueScore,
+			winner: redScore > blueScore ? 'red' : blueScore > redScore ? 'blue' : 'tie'
+		};
+	}
+
+	function hasMatchScoutedData(matchNumber) {
+		return scoutingData.some(r => getVal(r, 'Match #') == matchNumber);
+	}
+
+	function getMatchScoutedBreakdown(matchNumber) {
+		const scoutedTeams = scoutingData.filter(r => getVal(r, 'Match #') == matchNumber);
+		if (scoutedTeams.length === 0) return null;
+
+		const breakdown = schedule.find(m => m.match_number === matchNumber);
+		if (!breakdown) return null;
+
+		const redTeams = breakdown.alliances.red.team_keys.map(k => k.replace('frc', ''));
+		const blueTeams = breakdown.alliances.blue.team_keys.map(k => k.replace('frc', ''));
+
+		const calculateTeamScore = (teamNum) => {
+			const scout = scoutedTeams.find(r => getVal(r, 'Team #') === teamNum);
+			if (!scout) return 0;
+			const scoring = parseFloat(getVal(scout, 'Scoring effectiveness?')) || 0;
+			const feeding = parseFloat(getVal(scout, 'feeding score?')) || 0;
+			return (scoring + feeding) / 2;
+		};
+
+		const redScore = redTeams.reduce((sum, team) => sum + calculateTeamScore(team), 0);
+		const blueScore = blueTeams.reduce((sum, team) => sum + calculateTeamScore(team), 0);
+
+		return {
+			red: redScore,
+			blue: blueScore,
+			winner: redScore > blueScore ? 'red' : blueScore > redScore ? 'blue' : 'tie',
+			scoutedCount: scoutedTeams.length
+		};
 	}
 </script>
 
@@ -1676,6 +1801,54 @@
 
 			<!-- Content -->
 			<div class="p-3 md:p-10 space-y-8 md:space-y-12">
+				<!-- Match Result/Prediction -->
+				{#if selectedMatchPopup}
+					{@const hasScouted = hasMatchScoutedData(selectedMatchPopup.match_number)}
+					{@const result = getMatchResult(selectedMatchPopup.match_number)}
+					{@const scoutedBreakdown = hasScouted ? getMatchScoutedBreakdown(selectedMatchPopup.match_number) : null}
+					{@const prediction = !hasScouted ? getMatchPrediction(selectedMatchPopup.match_number) : null}
+					{#if result || scoutedBreakdown || prediction}
+						<section class="bg-zinc-900/60 border-2 border-zinc-800 rounded-2xl p-4 md:p-8">
+							<h3 class="text-sm md:text-base font-black text-zinc-400 uppercase tracking-widest mb-1">Match Outcome</h3>
+							{#if result}
+								<p class="text-[8px] md:text-[9px] font-black text-blue-500 uppercase tracking-widest mb-4">Official Match Result</p>
+								<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+									<div class="bg-red-950/40 border border-red-500/30 rounded-lg p-3 md:p-4 text-center">
+										<p class="text-[10px] md:text-xs font-black text-red-400 uppercase tracking-widest mb-1">Red</p>
+										<p class="text-2xl md:text-4xl font-black text-white">{result.red}</p>
+									</div>
+									<div class="bg-blue-950/40 border border-blue-500/30 rounded-lg p-3 md:p-4 text-center">
+										<p class="text-[10px] md:text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Blue</p>
+										<p class="text-2xl md:text-4xl font-black text-white">{result.blue}</p>
+									</div>
+									<div class="bg-yellow-950/40 border border-yellow-500/30 rounded-lg p-3 md:p-4 text-center md:col-span-1">
+										<p class="text-[10px] md:text-xs font-black text-yellow-400 uppercase tracking-widest mb-1">Winner</p>
+										<p class="text-lg md:text-2xl font-black {result.winner === 'red' ? 'text-red-400' : result.winner === 'blue' ? 'text-blue-400' : 'text-zinc-400'}">{result.winner === 'red' ? '🔴 RED' : result.winner === 'blue' ? '🔵 BLUE' : 'TIE'}</p>
+									</div>
+								</div>
+							{:else if prediction}
+								<p class="text-[8px] md:text-[9px] font-black text-orange-500 uppercase tracking-widest mb-4">Predicted Outcome (No Scout Data)</p>
+								<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+									<div class="bg-red-950/40 border border-red-500/30 rounded-lg p-3 md:p-4 text-center">
+										<p class="text-[10px] md:text-xs font-black text-red-400 uppercase tracking-widest mb-1">Red Predicted</p>
+										<p class="text-2xl md:text-4xl font-black text-red-300">{prediction.red.toFixed(1)}</p>
+										<p class="text-[8px] md:text-[9px] font-black text-red-600 uppercase tracking-widest mt-1">EPA</p>
+									</div>
+									<div class="bg-blue-950/40 border border-blue-500/30 rounded-lg p-3 md:p-4 text-center">
+										<p class="text-[10px] md:text-xs font-black text-blue-400 uppercase tracking-widest mb-1">Blue Predicted</p>
+										<p class="text-2xl md:text-4xl font-black text-blue-300">{prediction.blue.toFixed(1)}</p>
+										<p class="text-[8px] md:text-[9px] font-black text-blue-600 uppercase tracking-widest mt-1">EPA</p>
+									</div>
+									<div class="bg-yellow-950/40 border border-yellow-500/30 rounded-lg p-3 md:p-4 text-center md:col-span-1">
+										<p class="text-[10px] md:text-xs font-black text-yellow-400 uppercase tracking-widest mb-1">Predicted</p>
+										<p class="text-lg md:text-2xl font-black {prediction.winner === 'red' ? 'text-red-400' : prediction.winner === 'blue' ? 'text-blue-400' : 'text-zinc-400'}">{prediction.winner === 'red' ? '🔴 RED' : prediction.winner === 'blue' ? '🔵 BLUE' : 'TIE'}</p>
+									</div>
+								</div>
+							{/if}
+						</section>
+					{/if}
+				{/if}
+
 				<!-- Red Alliance -->
 				<section>
 					<h3 class="text-lg md:text-2xl font-black text-red-500 uppercase tracking-wider mb-6 flex items-center gap-3">
@@ -1685,6 +1858,9 @@
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
 						{#each matchData.red as { team, scout }}
 							{@const colors = teamColorsMap.get(team) || { primary: '#ef4444', secondary: '#991b1b' }}
+							{@const issues = getTeamMatchIssues(team, selectedMatchPopup.match_number)}
+							{@const scoring = scout ? parseFloat(getVal(scout, 'Scoring effectiveness?')) || 0 : null}
+							{@const feeding = scout ? parseFloat(getVal(scout, 'feeding score?')) || 0 : null}
 							<div class="bg-red-950/20 border-2 border-red-500/30 rounded-2xl p-4 md:p-6 cursor-pointer hover:border-red-500/60 transition-all group" 
 								role="button"
 								on:click={() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); }}
@@ -1696,11 +1872,30 @@
 									</div>
 									<div class="w-3 h-3 rounded-full {scout ? 'bg-green-500' : 'bg-red-900'}"></div>
 								</div>
+								
 								{#if scout}
+									{#if issues && (issues.hasMechanical || issues.hasTipped || issues.hasDied || issues.hasCard)}
+										<div class="mb-3 p-2 md:p-3 bg-red-900/60 border border-red-500/50 rounded-lg">
+											<p class="text-[8px] md:text-[9px] font-black text-red-300 uppercase tracking-widest mb-2">Issues Detected</p>
+											<div class="flex flex-wrap gap-1.5">
+												{#if issues.hasMechanical}<span class="bg-red-800/80 text-red-200 px-2 py-0.5 rounded text-[8px] font-black">⚙️ Mechanical</span>{/if}
+												{#if issues.hasTipped}<span class="bg-orange-800/80 text-orange-200 px-2 py-0.5 rounded text-[8px] font-black">⚠️ Tipped</span>{/if}
+												{#if issues.hasDied}<span class="bg-red-950/80 text-red-200 px-2 py-0.5 rounded text-[8px] font-black">💀 Dead</span>{/if}
+												{#if issues.hasCard}<span class="bg-yellow-800/80 text-yellow-200 px-2 py-0.5 rounded text-[8px] font-black">🟡 Card</span>{/if}
+											</div>
+										</div>
+									{/if}
 									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">Scoring Eff.:</span><span class="font-black text-orange-400">{scoring.toFixed(1)}/5</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Feeding Skill:</span><span class="font-black text-green-400">{feeding.toFixed(1)}/5</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">Scout:</span><span class="font-black text-white">{getVal(scout, 'Scouter initials')}</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">Climb:</span><span class="font-black text-purple-400">{getVal(scout, 'climb level')}</span></div>
+									</div>
+								{:else}
+									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">Predicted EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
+										<p class="text-[8px] text-zinc-500 italic">Scouting data not available for this match</p>
 									</div>
 								{/if}
 							</div>
@@ -1717,6 +1912,9 @@
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
 						{#each matchData.blue as { team, scout }}
 							{@const colors = teamColorsMap.get(team) || { primary: '#3b82f6', secondary: '#1e40af' }}
+							{@const issues = getTeamMatchIssues(team, selectedMatchPopup.match_number)}
+							{@const scoring = scout ? parseFloat(getVal(scout, 'Scoring effectiveness?')) || 0 : null}
+							{@const feeding = scout ? parseFloat(getVal(scout, 'feeding score?')) || 0 : null}
 							<div class="bg-blue-950/20 border-2 border-blue-500/30 rounded-2xl p-4 md:p-6 cursor-pointer hover:border-blue-500/60 transition-all group" 
 								role="button"
 								on:click={() => { const matchNum = selectedMatchPopup.match_number; selectedMatchPopup = null; handleRowClick(scout || { 'Team #': team, 'Match #': matchNum }); }}
@@ -1728,11 +1926,30 @@
 									</div>
 									<div class="w-3 h-3 rounded-full {scout ? 'bg-green-500' : 'bg-red-900'}"></div>
 								</div>
+								
 								{#if scout}
+									{#if issues && (issues.hasMechanical || issues.hasTipped || issues.hasDied || issues.hasCard)}
+										<div class="mb-3 p-2 md:p-3 bg-red-900/60 border border-red-500/50 rounded-lg">
+											<p class="text-[8px] md:text-[9px] font-black text-red-300 uppercase tracking-widest mb-2">Issues Detected</p>
+											<div class="flex flex-wrap gap-1.5">
+												{#if issues.hasMechanical}<span class="bg-red-800/80 text-red-200 px-2 py-0.5 rounded text-[8px] font-black">⚙️ Mechanical</span>{/if}
+												{#if issues.hasTipped}<span class="bg-orange-800/80 text-orange-200 px-2 py-0.5 rounded text-[8px] font-black">⚠️ Tipped</span>{/if}
+												{#if issues.hasDied}<span class="bg-red-950/80 text-red-200 px-2 py-0.5 rounded text-[8px] font-black">💀 Dead</span>{/if}
+												{#if issues.hasCard}<span class="bg-yellow-800/80 text-yellow-200 px-2 py-0.5 rounded text-[8px] font-black">🟡 Card</span>{/if}
+											</div>
+										</div>
+									{/if}
 									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">Scoring Eff.:</span><span class="font-black text-orange-400">{scoring.toFixed(1)}/5</span></div>
+										<div class="flex justify-between"><span class="text-zinc-600">Feeding Skill:</span><span class="font-black text-green-400">{feeding.toFixed(1)}/5</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">Scout:</span><span class="font-black text-white">{getVal(scout, 'Scouter initials')}</span></div>
 										<div class="flex justify-between"><span class="text-zinc-600">Climb:</span><span class="font-black text-purple-400">{getVal(scout, 'climb level')}</span></div>
+									</div>
+								{:else}
+									<div class="space-y-2 md:space-y-3 text-[9px] md:text-sm">
+										<div class="flex justify-between"><span class="text-zinc-600">Predicted EPA:</span><span class="font-black text-white">{(teamMetrics.find(m => m.teamNum === team)?.epa || 0).toFixed(1)}</span></div>
+										<p class="text-[8px] text-zinc-500 italic">Scouting data not available for this match</p>
 									</div>
 								{/if}
 							</div>
