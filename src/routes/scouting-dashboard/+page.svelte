@@ -46,6 +46,15 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 
+	// Video sync
+	let videoCurrentTime = 0;
+	let videoElement = null;
+	let videosCollapsed = false;
+
+	// Context menu for simulator
+	let contextMenu = null;
+	let contextMenuMatch = null;
+
 	// Image viewer
 	let viewerImageSrc = null;
 	let viewerScale = 1;
@@ -710,6 +719,15 @@
 		return teams.size;
 	}
 
+	function teamIsInMatch(teamNum, match) {
+		if (!match || !match.alliances) return false;
+		const allTeams = [
+			...match.alliances.red.team_keys.map(k => k.replace('frc', '')),
+			...match.alliances.blue.team_keys.map(k => k.replace('frc', ''))
+		];
+		return allTeams.includes(String(teamNum));
+	}
+
 	function getMatchBreakdown(match) {
 		const scoutedTeams = new Set(scoutingData.filter(r => getVal(r, 'Match #') == match.match_number).map(r => getVal(r, 'Team #')));
 		return {
@@ -718,12 +736,29 @@
 		};
 	}
 
+	function loadMatchIntoSimulator(match) {
+		if (!match || !match.alliances) return;
+		const redTeams = match.alliances.red.team_keys.map(k => k.replace('frc', ''));
+		const blueTeams = match.alliances.blue.team_keys.map(k => k.replace('frc', ''));
+		simRedTeams = redTeams;
+		simBlueTeams = blueTeams;
+		simulatorMode = true;
+		contextMenu = null;
+		contextMenuMatch = null;
+	}
+
 	let hoveredMatch = null;
 	let selectedMatchPopup = null;
 
 	$: simAggregates = {
-		red: { score: simRedTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0) },
-		blue: { score: simBlueTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0) }
+		red: { 
+			epa: simRedTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0),
+			opr: simRedTeams.map(t => parseInt(t) || 0).reduce((acc, t) => acc + (eventOprs[`frc${t}`] || 0), 0)
+		},
+		blue: { 
+			epa: simBlueTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0),
+			opr: simBlueTeams.map(t => parseInt(t) || 0).reduce((acc, t) => acc + (eventOprs[`frc${t}`] || 0), 0)
+		}
 	};
 
 	function getMatchScoutingData(matchNumber) {
@@ -922,6 +957,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Scouting Dashboard - REBUILT 2026</title>
+	<meta name="description" content="Scouting view for 1757 - REBUILT 2026" />
+</svelte:head>
+
 <Navbar />
 
 <!-- Loading Overlay -->
@@ -1074,13 +1114,20 @@
 			<div class="flex flex-wrap gap-1.5">
 				{#each schedule as match}
 					{@const count = getScouterCount(match.match_number)}
-					<button class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-pointer hover:scale-110 relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60' : 'bg-zinc-900 border-zinc-800 text-zinc-700 hover:border-zinc-700'}" 
-						on:mouseenter={() => hoveredMatch = match} 
-						on:mouseleave={() => hoveredMatch = null}
-						on:focus={() => hoveredMatch = match}
-						on:blur={() => hoveredMatch = null}
-						on:click={() => selectedMatchPopup = match}>
-						{match.match_number}
+					{@const searchTeamNum = searchTerm.trim() ? parseInt(searchTerm.trim()) : null}
+					{@const teamInMatch = searchTeamNum && teamIsInMatch(searchTeamNum, match)}
+					<button class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-pointer hover:scale-110 relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60' : 'bg-zinc-900 border-zinc-800 text-zinc-700 hover:border-zinc-700'} {teamInMatch ? 'shadow-[0_0_12px_rgba(34,197,94,0.6),0_0_24px_rgba(34,197,94,0.3)] ring-2 ring-green-500/50' : ''}" 
+					on:mouseenter={() => hoveredMatch = match} 
+					on:mouseleave={() => hoveredMatch = null}
+					on:focus={() => hoveredMatch = match}
+					on:blur={() => hoveredMatch = null}
+					on:click={() => selectedMatchPopup = match}
+					on:contextmenu={(e) => {
+						e.preventDefault();
+						contextMenu = { x: e.clientX, y: e.clientY };
+						contextMenuMatch = match;
+					}}>
+					{match.match_number}
 						{#if hoveredMatch === match}
 							<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
 								<div class="bg-zinc-900 border-2 border-zinc-800 p-4 rounded-2xl shadow-2xl min-w-[200px]">
@@ -1183,7 +1230,10 @@
 				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
 					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
 						<h2 class="text-2xl md:text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
-						<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-2xl md:text-5xl font-black text-white">{simAggregates.red.score.toFixed(1)}</p></div>
+						<div class="flex gap-4 md:gap-6">
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.red.epa.toFixed(1)}</p></div>
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.red.opr.toFixed(1)}</p></div>
+						</div>
 					</div>
 					<div class="space-y-4 md:space-y-6">
 						{#each simRedTeams as team, i}
@@ -1243,7 +1293,10 @@
 				<div class="bg-blue-950/10 border-2 border-blue-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
 					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
 						<h2 class="text-2xl md:text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
-						<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-2xl md:text-5xl font-black text-white">{simAggregates.blue.score.toFixed(1)}</p></div>
+						<div class="flex gap-4 md:gap-6">
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.blue.epa.toFixed(1)}</p></div>
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.blue.opr.toFixed(1)}</p></div>
+						</div>
 					</div>
 					<div class="space-y-4 md:space-y-6">
 						{#each simBlueTeams as team, i}
@@ -1840,16 +1893,25 @@
 			<div class="p-3 md:p-10 space-y-8 md:space-y-12">
 				<!-- Match Videos -->
 				{#if matchData.videos && matchData.videos.length > 0}
-					<section class="flex flex-col items-center">
-						<h3 class="text-lg md:text-2xl font-black text-purple-500 uppercase tracking-wider mb-6 flex items-center gap-3">
-							<div class="w-4 h-4 rounded-lg bg-purple-600"></div>
-							Match Videos
-						</h3>
-						<div class="w-full flex justify-center">
-							<div class="w-full flex gap-4 md:gap-6 max-w-4xl items-center justify-center">
+					<section class="flex flex-col w-full">
+						<div class="flex items-center justify-between mb-4 md:mb-6">
+							<h3 class="text-lg md:text-2xl font-black text-purple-500 uppercase tracking-wider flex items-center gap-3">
+								<div class="w-4 h-4 rounded-lg bg-purple-600"></div>
+								Match Videos
+							</h3>
+							<button 
+								on:click={() => videosCollapsed = !videosCollapsed}
+								class="flex items-center justify-center w-8 h-8 md:w-10 md:h-10 rounded-lg bg-purple-900/40 hover:bg-purple-900/60 border border-purple-500/30 hover:border-purple-500/60 transition-all text-purple-300 hover:text-purple-200"
+								title={videosCollapsed ? 'Expand videos' : 'Collapse videos'}>
+								<span class="text-lg md:text-xl transition-transform {videosCollapsed ? 'rotate-0' : 'rotate-180'}">⌄</span>
+							</button>
+						</div>
+						
+						{#if !videosCollapsed}
+							<div class="w-full flex flex-col gap-4 md:gap-6">
 								{#each matchData.videos as video}
 									<div class="bg-purple-950/20 border-2 border-purple-500/30 rounded-2xl overflow-hidden hover:border-purple-500/60 transition-all group">
-										<div class="relative w-full aspect-video bg-black flex items-center justify-center">
+										<div class="relative w-full bg-black flex items-center justify-center" style="aspect-ratio: 16 / 9; min-height: 350px;">
 											<iframe
 												width="100%"
 												height="100%"
@@ -1863,12 +1925,14 @@
 										</div>
 										<div class="p-3 md:p-4">
 											<p class="text-[9px] md:text-xs font-black text-purple-400 uppercase tracking-widest">YouTube Video</p>
-											<a href={`https://www.youtube.com/watch?v=${video.key}`} target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-sm font-black text-purple-300 hover:text-purple-200 transition truncate block mt-1">Watch on YouTube →</a>
+											<a href={`https://www.youtube.com/watch?v=${video.key}`} target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-sm font-black text-purple-300 hover:text-purple-200 transition block mt-1">Watch on YouTube →</a>
 										</div>
 									</div>
 								{/each}
 							</div>
-						</div>
+						{:else}
+							<div class="text-center py-4 text-zinc-500 text-sm italic">Videos collapsed • Click expand to view</div>
+						{/if}
 					</section>
 				{/if}
 
@@ -1880,6 +1944,36 @@
 							Match Timeline
 						</h3>
 						<div class="bg-zinc-900/40 border-2 border-cyan-500/20 rounded-2xl p-4 md:p-6 overflow-x-auto">
+							<!-- Video Progress Indicator (if videos exist) -->
+							{#if matchData.videos && matchData.videos.length > 0}
+								<div class="mb-4 pb-4 border-b border-cyan-500/20">
+									<div class="flex items-center gap-2 mb-2">
+										<span class="text-[8px] md:text-[9px] font-black text-cyan-400 uppercase tracking-widest">Video Sync</span>
+										<span class="text-[8px] text-cyan-500 font-bold">{Math.round(videoCurrentTime)}s / 150s</span>
+									</div>
+									<div class="relative w-full h-6 md:h-8 bg-zinc-950/50 rounded border border-cyan-500/30 overflow-hidden cursor-pointer group" on:click={(e) => {
+										const rect = e.currentTarget.getBoundingClientRect();
+										const percent = (e.clientX - rect.left) / rect.width;
+										videoCurrentTime = Math.max(0, Math.min(150, percent * 150));
+									}} on:keydown={(e) => {
+										if (e.key === 'ArrowLeft') videoCurrentTime = Math.max(0, videoCurrentTime - 1);
+										if (e.key === 'ArrowRight') videoCurrentTime = Math.min(150, videoCurrentTime + 1);
+									}} role="slider" tabindex="0" aria-label="Video timeline sync">
+										<!-- Time markers -->
+										<div class="absolute inset-0 flex text-[7px] text-cyan-700 pointer-events-none z-0">
+											{#each [0, 30, 60, 90, 120, 150] as time}
+												<div class="flex-1 border-r border-cyan-900/30 px-1">{time}</div>
+											{/each}
+										</div>
+										<!-- Progress bar -->
+										<div class="absolute top-0 bottom-0 bg-gradient-to-r from-cyan-600 to-cyan-500 z-10 group-hover:from-cyan-500 group-hover:to-cyan-400 transition-all" style="width: {(videoCurrentTime / 150) * 100}%;"></div>
+										<!-- Current time indicator -->
+										<div class="absolute top-0 bottom-0 w-0.5 bg-white z-20 shadow-lg" style="left: {(videoCurrentTime / 150) * 100}%;"></div>
+									</div>
+									<p class="text-[7px] md:text-[8px] text-zinc-500 mt-1 italic">Click or drag to sync timeline • Arrow keys to adjust</p>
+								</div>
+							{/if}
+							
 							<div class="min-w-full space-y-4">
 								{#each [...matchData.red, ...matchData.blue] as { team, scout }}
 									{@const isRed = matchData.red.some(r => r.team === team)}
@@ -1903,13 +1997,19 @@
 													{@const startPercent = (event.start / 150) * 100}
 													{@const widthPercent = Math.max(((event.end - event.start) / 150) * 100, 2)}
 													{@const eventColor = getActionColor(event.code)}
+													{@const isActive = videoCurrentTime >= event.start && videoCurrentTime <= event.end}
 													<div
-														class="absolute top-1 md:top-2 bottom-1 md:bottom-2 rounded text-[7px] md:text-[9px] font-black text-white px-1 md:px-1.5 flex items-center justify-center truncate {eventColor}"
+														class="absolute top-1 md:top-2 bottom-1 md:bottom-2 rounded text-[7px] md:text-[9px] font-black text-white px-1 md:px-1.5 flex items-center justify-center truncate {eventColor} {isActive ? 'ring-2 ring-white shadow-[0_0_8px_rgba(255,255,255,0.5)]' : ''} transition-all"
 														style="left: {startPercent}%; width: {widthPercent}%;"
 														title="{event.code}: {event.start}s - {event.end}s ({event.end - event.start}s)">
 														<span class="truncate">{event.code}</span>
 													</div>
 												{/each}
+												
+												<!-- Current time indicator -->
+												{#if matchData.videos && matchData.videos.length > 0}
+													<div class="absolute top-0 bottom-0 w-0.5 bg-white z-30 pointer-events-none shadow-lg" style="left: {(videoCurrentTime / 150) * 100}%;"></div>
+												{/if}
 											</div>
 										</div>
 									{/if}
@@ -2146,6 +2246,35 @@
 				class="max-w-full max-h-full object-contain select-none transition-transform duration-100"
 				style="transform: scale({viewerScale}) translate({viewerTranslateX / viewerScale}px, {viewerTranslateY / viewerScale}px); transform-origin: center;"
 				draggable="false" />
+		</div>
+	</div>
+{/if}
+
+<!-- Simulator Load Context Menu -->
+{#if contextMenu && contextMenuMatch}
+	<div 
+		class="fixed inset-0 z-[150]"
+		on:click={() => contextMenu = null}
+		on:contextmenu={(e) => e.preventDefault()}>
+		<div 
+			class="fixed bg-zinc-900 border-2 border-zinc-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+			style="left: {contextMenu.x}px; top: {contextMenu.y}px;"
+			on:click|stopPropagation>
+			<div class="min-w-[200px]">
+				<p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-3 py-2 border-b border-zinc-800">Match {contextMenuMatch.match_number}</p>
+				<button 
+					on:click={() => loadMatchIntoSimulator(contextMenuMatch)}
+					class="w-full text-left px-3 py-2 text-[11px] font-black text-white hover:bg-blue-600 hover:text-white transition flex items-center gap-2">
+					<span>🎮</span>
+					<span>Load in Simulator</span>
+				</button>
+				<button 
+					on:click={() => contextMenu = null}
+					class="w-full text-left px-3 py-2 text-[11px] font-black text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition flex items-center gap-2">
+					<span>✕</span>
+					<span>Close</span>
+				</button>
+			</div>
 		</div>
 	</div>
 {/if}
