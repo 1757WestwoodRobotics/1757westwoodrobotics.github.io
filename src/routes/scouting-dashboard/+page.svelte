@@ -37,6 +37,75 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 
+	// Image viewer
+	let viewerImageSrc = null;
+	let viewerScale = 1;
+	let viewerTranslateX = 0;
+	let viewerTranslateY = 0;
+	let isDragging = false;
+	let dragStartX = 0;
+	let dragStartY = 0;
+
+	function openImageViewer(imageSrc) {
+		viewerImageSrc = imageSrc;
+		viewerScale = 1;
+		viewerTranslateX = 0;
+		viewerTranslateY = 0;
+	}
+
+	function closeImageViewer() {
+		viewerImageSrc = null;
+		viewerScale = 1;
+		viewerTranslateX = 0;
+		viewerTranslateY = 0;
+		isDragging = false;
+	}
+
+	function handleViewerWheel(e) {
+		e.preventDefault();
+		const delta = e.deltaY > 0 ? -0.1 : 0.1;
+		viewerScale = Math.max(0.5, Math.min(5, viewerScale + delta));
+	}
+
+	function handleViewerMouseDown(e) {
+		if (viewerScale > 1) {
+			isDragging = true;
+			dragStartX = e.clientX - viewerTranslateX;
+			dragStartY = e.clientY - viewerTranslateY;
+		}
+	}
+
+	function handleViewerMouseMove(e) {
+		if (isDragging) {
+			viewerTranslateX = e.clientX - dragStartX;
+			viewerTranslateY = e.clientY - dragStartY;
+		}
+	}
+
+	function handleViewerMouseUp() {
+		isDragging = false;
+	}
+
+	function handleViewerTouchStart(e) {
+		if (e.touches.length === 1 && viewerScale > 1) {
+			isDragging = true;
+			dragStartX = e.touches[0].clientX - viewerTranslateX;
+			dragStartY = e.touches[0].clientY - viewerTranslateY;
+		}
+	}
+
+	function handleViewerTouchMove(e) {
+		if (isDragging && e.touches.length === 1) {
+			e.preventDefault();
+			viewerTranslateX = e.touches[0].clientX - dragStartX;
+			viewerTranslateY = e.touches[0].clientY - dragStartY;
+		}
+	}
+
+	function handleViewerTouchEnd() {
+		isDragging = false;
+	}
+
 	// Sorting
 	let sortKey = 'EPA';
 	let sortOrder = -1; // Default to descending for leaderboard
@@ -609,7 +678,14 @@
 			<div class="flex flex-wrap gap-1.5">
 				{#each schedule as match}
 					{@const count = getScouterCount(match.match_number)}
-					<div class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-help relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}" on:mouseenter={() => hoveredMatch = match} on:mouseleave={() => hoveredMatch = null}>
+					<div class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-help relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300' : 'bg-zinc-900 border-zinc-800 text-zinc-700'}" 
+						role="button"
+						tabindex="0"
+						on:mouseenter={() => hoveredMatch = match} 
+						on:mouseleave={() => hoveredMatch = null}
+						on:focus={() => hoveredMatch = match}
+						on:blur={() => hoveredMatch = null}
+						on:keydown={(e) => e.key === 'Enter' && (hoveredMatch = hoveredMatch === match ? null : match)}>
 						{match.match_number}
 						{#if hoveredMatch === match}
 							<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
@@ -653,7 +729,10 @@
 						{@const colors = teamColorsMap.get(getVal(pit, 'Team number')) || { primary: '#3b82f6', secondary: '#1e40af' }}
 						<div class="bg-zinc-900/40 border-2 border-zinc-800 rounded-[2.5rem] p-6 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative shadow-2xl" 
 							style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-							on:click={() => handleRowClick({ 'Team #': getVal(pit, 'Team number') })}>
+							role="button"
+							tabindex="0"
+							on:click={() => handleRowClick({ 'Team #': getVal(pit, 'Team number') })}
+							on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': getVal(pit, 'Team number') })}>
 							<div class="flex justify-between items-start mb-6">
 								<div>
 									<h2 class="text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{getVal(pit, 'Team number')}</h2>
@@ -668,9 +747,16 @@
 							</div>
 
 							{#if getDriveDirectLink(getVal(pit, 'Bot pic'))}
-								<div class="w-full h-48 rounded-3xl overflow-hidden mb-6 bg-black/40 border border-white/5 relative group-hover:scale-[1.02] transition-transform duration-500">
-									<img src={getDriveDirectLink(getVal(pit, 'Bot pic'))} alt="Robot" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+								<div class="w-full h-48 rounded-3xl overflow-hidden mb-6 bg-black/40 border border-white/5 relative group-hover:scale-[1.02] transition-transform duration-500 cursor-zoom-in"
+									role="button"
+									tabindex="0"
+									on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}
+									on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}>
+									<img src={getDriveDirectLink(getVal(pit, 'Bot pic'))} alt="Robot" class="w-full h-full object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
 									<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+									<div class="absolute top-3 right-3 bg-black/60 text-white text-xs font-black px-3 py-1 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+										🔍 Click to zoom
+									</div>
 								</div>
 							{/if}
 
@@ -714,7 +800,10 @@
 									{@const colors = teamColorsMap.get(simRedTeams[i]) || { primary: '#ef4444', secondary: '#991b1b' }}
 									<div class="flex-1 bg-zinc-900/60 rounded-[2rem] border-2 border-zinc-800 p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
 										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-										on:click={() => handleRowClick({ 'Team #': simRedTeams[i] })}>
+										role="button"
+										tabindex="0"
+										on:click={() => handleRowClick({ 'Team #': simRedTeams[i] })}
+										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simRedTeams[i] })}>
 										
 										<div class="flex justify-between items-start mb-4 relative z-10">
 											<div>
@@ -728,8 +817,12 @@
 												</div>
 											</div>
 											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg">
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
+												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-red-500 transition-colors"
+													role="button"
+													tabindex="0"
+													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
+													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
 												</div>
 											{/if}
 										</div>
@@ -767,7 +860,10 @@
 									{@const colors = teamColorsMap.get(simBlueTeams[i]) || { primary: '#3b82f6', secondary: '#1e40af' }}
 									<div class="flex-1 bg-zinc-900/60 rounded-[2rem] border-2 border-zinc-800 p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
 										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-										on:click={() => handleRowClick({ 'Team #': simBlueTeams[i] })}>
+										role="button"
+										tabindex="0"
+										on:click={() => handleRowClick({ 'Team #': simBlueTeams[i] })}
+										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simBlueTeams[i] })}>
 										
 										<div class="flex justify-between items-start mb-4 relative z-10">
 											<div>
@@ -781,8 +877,12 @@
 												</div>
 											</div>
 											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg">
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
+												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
+													role="button"
+													tabindex="0"
+													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
+													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
 												</div>
 											{/if}
 										</div>
@@ -933,7 +1033,10 @@
 	{@const colors = teamColorsMap.get(getVal(selectedRow, 'Team #')) || { primary: '#3b82f6', secondary: '#1e40af' }}
 	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
 		style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-		on:click|self={() => selectedRow = null}>
+		role="button"
+		tabindex="0"
+		on:click|self={() => selectedRow = null}
+		on:keydown={(e) => e.key === 'Escape' && (selectedRow = null)}>
 		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-[3rem] w-full max-w-5xl max-h-[95vh] overflow-y-auto shadow-[0_0_150px_rgba(0,0,0,1)]">
 			<div class="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md p-10 border-b-2 border-zinc-800 flex justify-between items-center z-10">
 				<div>
@@ -963,9 +1066,16 @@
 			</div>
 			<div class="p-10 space-y-12">
 				{#if teamStats?.pit && getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))}
-					<div class="w-full h-64 rounded-[3rem] overflow-hidden border-2 border-zinc-800 shadow-2xl relative group">
-						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+					<div class="w-full h-64 rounded-[3rem] overflow-hidden border-2 border-zinc-800 shadow-2xl relative group bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
+						role="button"
+						tabindex="0"
+						on:click={() => openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}
+						on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}>
+						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" />
 						<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8"><p class="text-xs font-black text-white uppercase tracking-[0.5em]">Tactical Visual Confirmed</p></div>
+						<div class="absolute top-5 right-5 bg-black/60 text-white text-sm font-black px-4 py-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+							🔍 Click to zoom
+						</div>
 					</div>
 				{/if}
 				
@@ -1044,6 +1154,76 @@
 					</section>
 				{/if}
 			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Image Viewer Modal -->
+{#if viewerImageSrc}
+	<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/98 backdrop-blur-lg animate-in fade-in duration-200"
+		role="dialog"
+		aria-modal="true"
+		aria-label="Image viewer"
+		on:click={closeImageViewer}
+		on:keydown={(e) => e.key === 'Escape' && closeImageViewer()}>
+		
+		<!-- Controls -->
+		<div class="absolute top-6 right-6 flex gap-3 z-10">
+			<button 
+				on:click|stopPropagation={() => viewerScale = Math.max(0.5, viewerScale - 0.25)}
+				class="bg-zinc-900/80 hover:bg-zinc-800 text-white p-3 rounded-xl font-black text-xl transition shadow-2xl backdrop-blur-sm border border-zinc-700"
+				aria-label="Zoom out">
+				−
+			</button>
+			<div class="bg-zinc-900/80 text-white px-4 py-3 rounded-xl font-black text-sm backdrop-blur-sm border border-zinc-700">
+				{Math.round(viewerScale * 100)}%
+			</div>
+			<button 
+				on:click|stopPropagation={() => viewerScale = Math.min(5, viewerScale + 0.25)}
+				class="bg-zinc-900/80 hover:bg-zinc-800 text-white p-3 rounded-xl font-black text-xl transition shadow-2xl backdrop-blur-sm border border-zinc-700"
+				aria-label="Zoom in">
+				+
+			</button>
+			<button 
+				on:click|stopPropagation={() => { viewerScale = 1; viewerTranslateX = 0; viewerTranslateY = 0; }}
+				class="bg-zinc-900/80 hover:bg-zinc-800 text-white px-4 py-3 rounded-xl font-black text-xs uppercase tracking-widest transition shadow-2xl backdrop-blur-sm border border-zinc-700"
+				aria-label="Reset view">
+				Reset
+			</button>
+			<button 
+				on:click={closeImageViewer}
+				class="bg-red-600/80 hover:bg-red-600 text-white p-3 rounded-xl font-black text-2xl transition shadow-2xl backdrop-blur-sm border border-red-700"
+				aria-label="Close viewer">
+				✕
+			</button>
+		</div>
+
+		<!-- Instructions -->
+		<div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/80 text-zinc-400 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest backdrop-blur-sm border border-zinc-700">
+			{#if viewerScale > 1}
+				<span class="text-blue-400">Drag to pan</span> • 
+			{/if}
+			Scroll to zoom • Click outside to close • ESC to exit
+		</div>
+
+		<!-- Image Container -->
+		<div class="w-full h-full flex items-center justify-center p-8 overflow-hidden"
+			on:click|stopPropagation
+			on:wheel={handleViewerWheel}
+			on:mousedown={handleViewerMouseDown}
+			on:mousemove={handleViewerMouseMove}
+			on:mouseup={handleViewerMouseUp}
+			on:mouseleave={handleViewerMouseUp}
+			on:touchstart={handleViewerTouchStart}
+			on:touchmove={handleViewerTouchMove}
+			on:touchend={handleViewerTouchEnd}
+			style="cursor: {viewerScale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'}">
+			<img 
+				src={viewerImageSrc} 
+				alt="Robot fullscreen view"
+				class="max-w-full max-h-full object-contain select-none transition-transform duration-100"
+				style="transform: scale({viewerScale}) translate({viewerTranslateX / viewerScale}px, {viewerTranslateY / viewerScale}px); transform-origin: center;"
+				draggable="false" />
 		</div>
 	</div>
 {/if}
