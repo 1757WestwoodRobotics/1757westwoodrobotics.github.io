@@ -647,21 +647,34 @@
 
 <div class="min-h-screen bg-[#050505] text-white p-4 font-sans">
 	<div class="container mx-auto">
-		<div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-			<div class="flex items-center gap-4">
-				<h1 class="text-4xl font-black text-blue-500 uppercase tracking-tighter shadow-blue-500/20 drop-shadow-lg">Scouting Dashboard</h1>
-				<div class="flex gap-2">
-					<button on:click={() => { pitMode = !pitMode; if(pitMode) { simulatorMode = false; selectionMode = false; defenseMode = false; } }} class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition border-2 {pitMode ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">No Statistics</button>
-					<button on:click={() => { simulatorMode = !simulatorMode; if(simulatorMode) { selectionMode = false; pitMode = false; defenseMode = false; } }} class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition border-2 {simulatorMode ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Simulator</button>
-					<button on:click={() => { selectionMode = !selectionMode; if(selectionMode) { simulatorMode = false; pitMode = false; defenseMode = false; } }} class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition border-2 {selectionMode ? 'bg-orange-600 border-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Selection Mode</button>
-					<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; } }} class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest transition border-2 {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
+		<div class="flex flex-col gap-4 mb-8">
+			<!-- Title Row -->
+			<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+				<h1 class="text-3xl sm:text-4xl font-black text-blue-500 uppercase tracking-tighter shadow-blue-500/20 drop-shadow-lg">Scouting Dashboard</h1>
+				<div class="flex items-center gap-2 w-full sm:w-auto">
+					<div class="relative flex-1 sm:w-64">
+						<input type="text" bind:value={searchTerm} placeholder="Search Team #..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 px-5 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm placeholder:text-zinc-600 font-bold" />
+					</div>
+					<button on:click={() => fetchData(true)} class="bg-zinc-900 hover:bg-zinc-800 p-3 px-4 sm:px-6 rounded-xl font-black text-xs transition border border-zinc-800 shadow-lg active:scale-95 text-blue-500 whitespace-nowrap">REFRESH</button>
 				</div>
 			</div>
-			<div class="flex items-center gap-2 w-full md:w-auto">
-				<div class="relative flex-1 md:w-64">
-					<input type="text" bind:value={searchTerm} placeholder="Search Team #..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 px-5 focus:ring-2 focus:ring-blue-500 outline-none transition text-sm placeholder:text-zinc-600 font-bold" />
-				</div>
-				<button on:click={() => fetchData(true)} class="bg-zinc-900 hover:bg-zinc-800 p-3 px-6 rounded-xl font-black text-xs transition border border-zinc-800 shadow-lg active:scale-95 text-blue-500">REFRESH</button>
+			
+			<!-- Mode Buttons Row -->
+			<div class="flex flex-wrap gap-2">
+				<button on:click={() => { pitMode = !pitMode; if(pitMode) { simulatorMode = false; selectionMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {pitMode ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+					<span class="hidden sm:inline">No Statistics</span>
+					<span class="sm:hidden">Pit</span>
+				</button>
+				<button on:click={() => { simulatorMode = !simulatorMode; if(simulatorMode) { selectionMode = false; pitMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {simulatorMode ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Simulator</button>
+				<button on:click={() => { selectionMode = !selectionMode; if(selectionMode) { simulatorMode = false; pitMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {selectionMode ? 'bg-orange-600 border-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+					<span class="hidden sm:inline">Selection Mode</span>
+					<span class="sm:hidden">Selection</span>
+				</button>
+				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
+				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+					<span class="hidden sm:inline">All Data</span>
+					<span class="sm:hidden">All</span>
+				</button>
 			</div>
 		</div>
 
@@ -752,7 +765,7 @@
 									tabindex="0"
 									on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}
 									on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}>
-									<img src={getDriveDirectLink(getVal(pit, 'Bot pic'))} alt="Robot" class="w-full h-full object-contain opacity-60 group-hover:opacity-100 transition-opacity" />
+									<img src={getDriveDirectLink(getVal(pit, 'Bot pic'))} alt="Robot" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
 									<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
 									<div class="absolute top-3 right-3 bg-black/60 text-white text-xs font-black px-3 py-1 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
 										🔍 Click to zoom
@@ -822,7 +835,7 @@
 													tabindex="0"
 													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
 													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
 												</div>
 											{/if}
 										</div>
