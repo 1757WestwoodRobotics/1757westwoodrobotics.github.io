@@ -341,7 +341,7 @@
 
 	async function fetchSchedule() {
 		try {
-			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/matches/simple`, {
+			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/matches`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
 			});
 			if (res.ok) {
@@ -729,7 +729,7 @@
 	function getMatchScoutingData(matchNumber) {
 		const scoutedTeams = scoutingData.filter(r => getVal(r, 'Match #') == matchNumber);
 		const breakdown = schedule.find(m => m.match_number === matchNumber);
-		if (!breakdown) return { red: [], blue: [] };
+		if (!breakdown) return { red: [], blue: [], videos: [] };
 
 		const red = breakdown.alliances.red.team_keys.map(key => {
 			const team = key.replace('frc', '');
@@ -741,7 +741,22 @@
 			const scout = scoutedTeams.find(r => getVal(r, 'Team #') === team);
 			return { team, scout };
 		});
-		return { red, blue };
+
+		// Extract YouTube videos if available
+		const videos = [];
+		if (breakdown.videos && Array.isArray(breakdown.videos)) {
+			breakdown.videos.forEach(video => {
+				if (video.type === 'youtube' && video.key) {
+					videos.push({
+						key: video.key,
+						type: video.type,
+						url: `https://www.youtube.com/embed/${video.key}`
+					});
+				}
+			});
+		}
+
+		return { red, blue, videos };
 	}
 
 	function getMatchesWithIssues(teamNum) {
@@ -1801,6 +1816,40 @@
 
 			<!-- Content -->
 			<div class="p-3 md:p-10 space-y-8 md:space-y-12">
+				<!-- Match Videos -->
+				{#if matchData.videos && matchData.videos.length > 0}
+					<section class="flex flex-col items-center">
+						<h3 class="text-lg md:text-2xl font-black text-purple-500 uppercase tracking-wider mb-6 flex items-center gap-3">
+							<div class="w-4 h-4 rounded-lg bg-purple-600"></div>
+							Match Videos
+						</h3>
+						<div class="w-full flex justify-center">
+							<div class="w-full flex gap-4 md:gap-6 max-w-4xl items-center justify-center">
+								{#each matchData.videos as video}
+									<div class="bg-purple-950/20 border-2 border-purple-500/30 rounded-2xl overflow-hidden hover:border-purple-500/60 transition-all group">
+										<div class="relative w-full aspect-video bg-black flex items-center justify-center">
+											<iframe
+												width="100%"
+												height="100%"
+												src={video.url}
+												title="Match Video"
+												frameborder="0"
+												allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+												allowfullscreen
+												class="w-full h-full">
+											</iframe>
+										</div>
+										<div class="p-3 md:p-4">
+											<p class="text-[9px] md:text-xs font-black text-purple-400 uppercase tracking-widest">YouTube Video</p>
+											<a href={`https://www.youtube.com/watch?v=${video.key}`} target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-sm font-black text-purple-300 hover:text-purple-200 transition truncate block mt-1">Watch on YouTube →</a>
+										</div>
+									</div>
+								{/each}
+							</div>
+						</div>
+					</section>
+				{/if}
+
 				<!-- Match Result/Prediction -->
 				{#if selectedMatchPopup}
 					{@const hasScouted = hasMatchScoutedData(selectedMatchPopup.match_number)}
@@ -1956,6 +2005,7 @@
 						{/each}
 					</div>
 				</section>
+
 			</div>
 		</div>
 	</div>
