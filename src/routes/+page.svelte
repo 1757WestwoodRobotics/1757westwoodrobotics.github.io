@@ -3,7 +3,7 @@
 	import Footer from '../components/footer.svelte';
 	import { onMount } from 'svelte';
 
-	import { browser } from '$app/env';
+	import { browser } from '$app/environment';
 
 	let Carousel; // for saving Carousel component class
 	let carousel; // for calling methods of the carousel instance

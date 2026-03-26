@@ -1,6 +1,6 @@
 <script>
-	import Navbar from '../components/navbar.svelte';
-	import Footer from '../components/footer.svelte';
+	import Navbar from '../../components/navbar.svelte';
+	import Footer from '../../components/footer.svelte';
 	import { onMount } from 'svelte';
 
 	// Counters
@@ -422,12 +422,11 @@ const parseCSV = (csvText) => {
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1 tracking-wide">Comments</label>
             <p class="text-s">Please fill this section out, while not explicitly required, we do read every comment when making decisions about a given team. This is the best way you have to describe any qualitative nuances found within any robot</p>
 						<textarea
-							rows="4"
-							name="entry.568874806"
-							class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-							placeholder="General observations..."
-						/>
-					</div>
+						  rows="4"
+						  name="entry.568874806"
+						  class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+						  placeholder="General observations..."
+						></textarea>					</div>
 				</div>
 			</div>
 

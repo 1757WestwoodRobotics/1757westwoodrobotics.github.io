@@ -1,5 +1,5 @@
 <script>
-	import Fa from 'svelte-fa/src/fa.svelte';
+	import Fa from 'svelte-fa';
 	import { faTwitter } from '@fortawesome/free-brands-svg-icons/faTwitter';
 	import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
 	import { faFacebook } from '@fortawesome/free-brands-svg-icons/faFacebook';

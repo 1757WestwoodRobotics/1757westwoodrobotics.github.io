@@ -1,7 +1,7 @@
 <script>
-	import RobotPage from '../components/robotPage.svelte';
-	import Navbar from '../components/navbar.svelte';
-	import Footer from '../components/footer.svelte';
+	import RobotPage from '../../components/robotPage.svelte';
+	import Navbar from '../../components/navbar.svelte';
+	import Footer from '../../components/footer.svelte';
 
 	let robots = [
 		{

@@ -109,12 +109,6 @@
 				>
 					Media
 				</a>
-				<a
-					href="/scouting-dashboard"
-					class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-				>
-					Scouting
-				</a>
 			</div>
 		</div>
 	</div>
@@ -128,12 +122,6 @@
 					href="/"
 					class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
 					aria-current="page">Home</a
-				>
-
-				<a
-					href="/scouting-dashboard"
-					class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium"
-					>Scouting</a
 				>
 
 				<a
