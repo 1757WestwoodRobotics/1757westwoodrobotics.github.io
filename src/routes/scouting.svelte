@@ -143,6 +143,9 @@ const parseCSV = (csvText) => {
 					<button type="button" on:click={resetMatch} class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-bold text-xs">
 						RESET
 					</button>
+					<a href="/scouting-dashboard" class="px-4 py-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg font-bold text-xs flex items-center">
+						DASHBOARD
+					</a>
 				</div>
 			</div>
 			{#if timeline.length > 0}
