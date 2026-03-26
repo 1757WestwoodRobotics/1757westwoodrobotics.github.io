@@ -20,6 +20,14 @@
 	let pitData = [];
 	let schedule = []; // All matches from TBA
 	let loading = true;
+	let loadingSteps = {
+		scoutingData: false,
+		pitData: false,
+		eventStats: false,
+		schedule: false,
+		teamStats: false
+	};
+	let currentStep = '';
 	let error = null;
 	let searchTerm = '';
 	let selectedRow = null;
@@ -214,7 +222,12 @@
 	async function fetchData(force = false) {
 		try {
 			loading = true;
+      console.log('Starting data fetch with force=', force);
+			currentStep = '';
+			
 			if (force || scoutingData.length === 0) {
+				currentStep = 'scoutingData';
+				loadingSteps.scoutingData = true;
 				const res = await fetch(CSV_URL);
 				if (res.ok) {
 					const text = await res.text();
@@ -234,8 +247,11 @@
 							return teamNum && teamNum !== 'N/A' && matchNum && matchNum !== 'N/A';
 						});
 				}
+				loadingSteps.scoutingData = false;
 			}
 			if (force || pitData.length === 0) {
+				currentStep = 'pitData';
+				loadingSteps.pitData = true;
 				const resPit = await fetch(PIT_CSV_URL);
 				if (resPit.ok) {
 					const textPit = await resPit.text();
@@ -254,15 +270,30 @@
 							return teamNum && teamNum !== 'N/A';
 						});
 				}
+				loadingSteps.pitData = false;
 			}
 			saveCache();
+			
+			currentStep = 'eventStats';
+			loadingSteps.eventStats = true;
 			await fetchEventStats();
+			loadingSteps.eventStats = false;
+			
+			currentStep = 'schedule';
+			loadingSteps.schedule = true;
 			await fetchSchedule();
-			fetchAllTeamStats();
+			loadingSteps.schedule = false;
+			
+			currentStep = 'teamStats';
+			loadingSteps.teamStats = true;
+			await fetchAllTeamStats();
+			loadingSteps.teamStats = false;
 		} catch (e) {
 			error = e.message;
+			console.error('Load error:', e);
 		} finally {
 			loading = false;
+			currentStep = '';
 		}
 	}
 
@@ -376,24 +407,44 @@
 	}
 
 	onMount(() => {
+		console.log('onMount called, loading:', loading);
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
 			const parsed = JSON.parse(cached);
 			const { data, pit, stats, colors, details, timestamp } = parsed;
+			console.log('Cache found, age:', Date.now() - timestamp);
 			if (Date.now() - timestamp < 3600000) {
+				console.log('Cache is fresh, loading from cache');
 				scoutingData = data;
 				pitData = pit || [];
 				if (stats) teamStatsMap = new Map(stats);
 				if (colors) teamColorsMap = new Map(colors);
 				if (details) teamDetailsMap = new Map(details);
-				loading = false;
+				
+				// Still show loading while fetching fresh data
+				currentStep = 'eventStats';
+				loadingSteps.eventStats = true;
+				loading = true;
 				fetchEventStats().then(() => {
-					fetchSchedule();
-					fetchAllTeamStats();
+					loadingSteps.eventStats = false;
+					currentStep = 'schedule';
+					loadingSteps.schedule = true;
+					return fetchSchedule();
+				}).then(() => {
+					loadingSteps.schedule = false;
+					currentStep = 'teamStats';
+					loadingSteps.teamStats = true;
+					return fetchAllTeamStats();
+				}).then(() => {
+					loadingSteps.teamStats = false;
+					loading = false;
+					currentStep = '';
+					console.log('All tasks complete, loading:', loading);
 				});
 				return;
 			}
 		}
+		console.log('No cache or cache expired, fetching fresh data');
 		fetchData();
 	});
 
@@ -645,6 +696,100 @@
 
 <Navbar />
 
+<!-- Loading Overlay -->
+{#if loading}
+	<div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/95 backdrop-blur-lg animate-in fade-in duration-300">
+		<div class="flex flex-col items-center gap-6 max-w-md px-6">
+			<!-- Logo/Icon -->
+			<div class="flex flex-col items-center gap-4">
+				<div class="relative w-16 h-16">
+					<div class="absolute inset-0 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+					<div class="absolute inset-1.5 border-4 border-transparent border-b-orange-500 rounded-full animate-spin" style="animation-direction: reverse;"></div>
+				</div>
+				<h2 class="text-2xl font-black text-white uppercase tracking-tighter">Initializing</h2>
+			</div>
+
+			<!-- Progress Steps -->
+			<div class="w-full space-y-2">
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.scoutingData ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.scoutingData}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Scouting Data</p>
+						<p class="text-xs text-zinc-400">{scoutingData.length} entries loaded</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.pitData ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.pitData}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Pit Data</p>
+						<p class="text-xs text-zinc-400">{pitData.length} teams scouted</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.eventStats ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.eventStats}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Event Stats (TBA)</p>
+						<p class="text-xs text-zinc-400">OPR & EPA</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.schedule ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.schedule}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Match Schedule</p>
+						<p class="text-xs text-zinc-400">{schedule.length} matches</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamStats ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.teamStats}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Team Analytics</p>
+						<p class="text-xs text-zinc-400">{teamStatsMap.size} teams indexed</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Loading Message -->
+			<div class="text-center">
+				<p class="text-xs font-black text-zinc-500 uppercase tracking-widest">Processing competition data...</p>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <div class="min-h-screen bg-[#050505] text-white p-4 font-sans">
 	<div class="container mx-auto">
 		<div class="flex flex-col gap-4 mb-8">
@@ -740,16 +885,16 @@
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 					{#each pitData.filter(p => !searchTerm || getVal(p, 'Team number').includes(searchTerm)).sort((a,b) => parseInt(getVal(a, 'Team number')) - parseInt(getVal(b, 'Team number'))) as pit}
 						{@const colors = teamColorsMap.get(getVal(pit, 'Team number')) || { primary: '#3b82f6', secondary: '#1e40af' }}
-						<div class="bg-zinc-900/40 border-2 border-zinc-800 rounded-[2.5rem] p-6 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative shadow-2xl" 
+						<div class="bg-zinc-900/40 border-2 border-zinc-800 rounded-xl md:rounded-[2.5rem] p-3 md:p-6 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative shadow-2xl" 
 							style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 							role="button"
 							tabindex="0"
 							on:click={() => handleRowClick({ 'Team #': getVal(pit, 'Team number') })}
 							on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': getVal(pit, 'Team number') })}>
-							<div class="flex justify-between items-start mb-6">
+							<div class="flex justify-between items-start mb-4 md:mb-6">
 								<div>
-									<h2 class="text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{getVal(pit, 'Team number')}</h2>
-									<p class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
+									<h2 class="text-3xl md:text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{getVal(pit, 'Team number')}</h2>
+									<p class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
 								</div>
 								{#if getVal(pit, 'Under trench?') === 'Yes' || getVal(pit, 'Over bump?') === 'Yes'}
 									<div class="flex gap-1.5">
@@ -798,121 +943,121 @@
 				</div>
 			</div>
 		{:else if simulatorMode}
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 animate-in fade-in slide-in-from-top-4">
-				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-[2rem] p-8 shadow-2xl backdrop-blur-sm">
-					<div class="flex justify-between items-center mb-8">
-						<h2 class="text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
-						<div class="text-right"><p class="text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-5xl font-black text-white">{simAggregates.red.score.toFixed(1)}</p></div>
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 mb-12 animate-in fade-in slide-in-from-top-4">
+				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
+					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
+						<h2 class="text-2xl md:text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
+						<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-2xl md:text-5xl font-black text-white">{simAggregates.red.score.toFixed(1)}</p></div>
 					</div>
-					<div class="space-y-6">
+					<div class="space-y-4 md:space-y-6">
 						{#each simRedTeams as team, i}
-							<div class="flex flex-col md:flex-row gap-4">
-								<input type="text" bind:value={simRedTeams[i]} on:input={() => fetchTeamColors(simRedTeams[i])} placeholder="Team #" class="w-full md:w-28 h-fit bg-black/60 border-2 border-red-500/30 rounded-xl p-3 text-center font-black text-lg focus:border-red-500 outline-none transition" />
+							<div class="flex flex-col gap-3">
+								<input type="text" bind:value={simRedTeams[i]} on:input={() => fetchTeamColors(simRedTeams[i])} placeholder="Team #" class="w-full bg-black/60 border-2 border-red-500/30 rounded-xl p-3 text-center font-black text-base md:text-lg focus:border-red-500 outline-none transition" />
 								{#if getTeamSummary(simRedTeams[i])}
 									{@const s = getTeamSummary(simRedTeams[i])}
 									{@const colors = teamColorsMap.get(simRedTeams[i]) || { primary: '#ef4444', secondary: '#991b1b' }}
-									<div class="flex-1 bg-zinc-900/60 rounded-[2rem] border-2 border-zinc-800 p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
+									<div class="bg-zinc-900/60 rounded-2xl border-2 border-zinc-800 p-4 md:p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
 										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 										role="button"
 										tabindex="0"
 										on:click={() => handleRowClick({ 'Team #': simRedTeams[i] })}
 										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simRedTeams[i] })}>
 										
-										<div class="flex justify-between items-start mb-4 relative z-10">
+										<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
 											<div>
-												<div class="flex items-center gap-3">
-													<span class="text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simRedTeams[i]}</span>
-													<span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simRedTeams[i])?.nickname || ''}</span>
+												<div class="flex items-center gap-2 flex-wrap">
+													<span class="text-xl md:text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simRedTeams[i]}</span>
+													<span class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simRedTeams[i])?.nickname || ''}</span>
 												</div>
-												<div class="flex gap-4 mt-2">
-													<div class="flex flex-col"><span class="text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="text-sm font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
-													<div class="flex flex-col"><span class="text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="text-sm font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
+												<div class="flex gap-3 md:gap-4 mt-2 text-xs md:text-sm">
+													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
+													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
 												</div>
 											</div>
 											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-red-500 transition-colors"
+												<div class="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-red-500 transition-colors flex-shrink-0"
 													role="button"
 													tabindex="0"
 													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
 													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
 												</div>
 											{/if}
 										</div>
 
 										{#if s.pit}
-											<div class="grid grid-cols-2 gap-3 relative z-10">
-												<div class="bg-black/40 p-2 rounded-xl border border-white/5">
-													<p class="text-[7px] font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
-													<p class="text-[10px] font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
+											<div class="grid grid-cols-2 gap-2 md:gap-3 relative z-10">
+												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+													<p class="font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
+													<p class="font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
 												</div>
-												<div class="bg-black/40 p-2 rounded-xl border border-white/5">
-													<p class="text-[7px] font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
-													<p class="text-[10px] font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
+												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+													<p class="font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
+													<p class="font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
 												</div>
 											</div>
 										{/if}
-										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-6xl font-black italic">{simRedTeams[i]}</div>
+										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{simRedTeams[i]}</div>
 									</div>
 								{/if}
 							</div>
 						{/each}
 					</div>
 				</div>
-				<div class="bg-blue-950/10 border-2 border-blue-500/20 rounded-[2rem] p-8 shadow-2xl backdrop-blur-sm">
-					<div class="flex justify-between items-center mb-8">
-						<h2 class="text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
-						<div class="text-right"><p class="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-5xl font-black text-white">{simAggregates.blue.score.toFixed(1)}</p></div>
+				<div class="bg-blue-950/10 border-2 border-blue-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
+					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
+						<h2 class="text-2xl md:text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
+						<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Alliance EPA</p><p class="text-2xl md:text-5xl font-black text-white">{simAggregates.blue.score.toFixed(1)}</p></div>
 					</div>
-					<div class="space-y-6">
+					<div class="space-y-4 md:space-y-6">
 						{#each simBlueTeams as team, i}
-							<div class="flex flex-col md:flex-row gap-4">
-								<input type="text" bind:value={simBlueTeams[i]} on:input={() => fetchTeamColors(simBlueTeams[i])} placeholder="Team #" class="w-full md:w-28 h-fit bg-black/60 border-2 border-blue-500/30 rounded-xl p-3 text-center font-black text-lg focus:border-blue-500 outline-none transition" />
+							<div class="flex flex-col gap-3">
+								<input type="text" bind:value={simBlueTeams[i]} on:input={() => fetchTeamColors(simBlueTeams[i])} placeholder="Team #" class="w-full bg-black/60 border-2 border-blue-500/30 rounded-xl p-3 text-center font-black text-base md:text-lg focus:border-blue-500 outline-none transition" />
 								{#if getTeamSummary(simBlueTeams[i])}
 									{@const s = getTeamSummary(simBlueTeams[i])}
 									{@const colors = teamColorsMap.get(simBlueTeams[i]) || { primary: '#3b82f6', secondary: '#1e40af' }}
-									<div class="flex-1 bg-zinc-900/60 rounded-[2rem] border-2 border-zinc-800 p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
+									<div class="bg-zinc-900/60 rounded-2xl border-2 border-zinc-800 p-4 md:p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
 										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 										role="button"
 										tabindex="0"
 										on:click={() => handleRowClick({ 'Team #': simBlueTeams[i] })}
 										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simBlueTeams[i] })}>
 										
-										<div class="flex justify-between items-start mb-4 relative z-10">
+										<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
 											<div>
-												<div class="flex items-center gap-3">
-													<span class="text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simBlueTeams[i]}</span>
-													<span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simBlueTeams[i])?.nickname || ''}</span>
+												<div class="flex items-center gap-2 flex-wrap">
+													<span class="text-xl md:text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simBlueTeams[i]}</span>
+													<span class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simBlueTeams[i])?.nickname || ''}</span>
 												</div>
-												<div class="flex gap-4 mt-2">
-													<div class="flex flex-col"><span class="text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="text-sm font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
-													<div class="flex flex-col"><span class="text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="text-sm font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
+												<div class="flex gap-3 md:gap-4 mt-2 text-xs md:text-sm">
+													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
+													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
 												</div>
 											</div>
 											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-20 h-20 rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
+												<div class="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors flex-shrink-0"
 													role="button"
 													tabindex="0"
 													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
 													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
 												</div>
 											{/if}
 										</div>
 
 										{#if s.pit}
-											<div class="grid grid-cols-2 gap-3 relative z-10">
-												<div class="bg-black/40 p-2 rounded-xl border border-white/5">
-													<p class="text-[7px] font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
-													<p class="text-[10px] font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
+											<div class="grid grid-cols-2 gap-2 md:gap-3 relative z-10">
+												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+													<p class="font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
+													<p class="font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
 												</div>
-												<div class="bg-black/40 p-2 rounded-xl border border-white/5">
-													<p class="text-[7px] font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
-													<p class="text-[10px] font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
+												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+													<p class="font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
+													<p class="font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
 												</div>
 											</div>
 										{/if}
-										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-6xl font-black italic">{simBlueTeams[i]}</div>
+										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{simBlueTeams[i]}</div>
 									</div>
 								{/if}
 							</div>
@@ -922,7 +1067,8 @@
 			</div>
 		{:else if selectionMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
-				<div class="overflow-x-auto bg-zinc-900/40 rounded-[2.5rem] border-2 border-orange-500/20 shadow-2xl backdrop-blur-xl">
+				<!-- Desktop Table -->
+				<div class="hidden md:block bg-zinc-900/40 rounded-[2.5rem] border-2 border-orange-500/20 shadow-2xl backdrop-blur-xl overflow-x-auto">
 					<table class="w-full text-left border-separate border-spacing-0">
 						<thead>
 							<tr class="bg-orange-950/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.3em]">
@@ -938,7 +1084,7 @@
 						<tbody class="divide-y divide-zinc-800">
 							{#each sortedLeaderboard as m}
 								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
-									<td class="p-8 font-black text-white text-4xl group-hover:pl-12 transition-all">{m.teamNum}</td>
+									<td class="p-2 md:p-8 font-black text-white text-xl md:text-4xl group-hover:pl-4 md:group-hover:pl-12 transition-all">{m.teamNum}</td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{m.epa.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-zinc-300">{m.opr.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-orange-400">{m.avgEff.toFixed(1)}</span></td>
@@ -952,10 +1098,44 @@
 						</tbody>
 					</table>
 				</div>
+
+				<!-- Mobile Cards -->
+				<div class="md:hidden space-y-3">
+					{#each sortedLeaderboard as m}
+						<div class="bg-zinc-900/40 border-2 border-orange-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-orange-500/40 transition-all" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
+							<div class="flex justify-between items-start gap-3 mb-3">
+								<div class="flex-1">
+									<p class="text-2xl font-black text-orange-400">{m.teamNum}</p>
+									<p class="text-xs text-zinc-500 font-black uppercase mt-1">{m.entryCount} matches</p>
+								</div>
+								<button on:click|stopPropagation={() => handleRowClick({ 'Team #': m.teamNum })} class="bg-zinc-800 hover:bg-orange-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg transition uppercase tracking-widest flex-shrink-0">View</button>
+							</div>
+							<div class="grid grid-cols-3 gap-2">
+								<div class="bg-black/30 p-2 rounded-lg">
+									<p class="text-[7px] font-black text-blue-400 uppercase">EPA</p>
+									<p class="text-lg font-black text-white">{m.epa.toFixed(1)}</p>
+								</div>
+								<div class="bg-black/30 p-2 rounded-lg">
+									<p class="text-[7px] font-black text-zinc-400 uppercase">OPR</p>
+									<p class="text-lg font-black text-white">{m.opr.toFixed(1)}</p>
+								</div>
+								<div class="bg-black/30 p-2 rounded-lg">
+									<p class="text-[7px] font-black text-purple-400 uppercase">Climb</p>
+									<p class="text-lg font-black text-white">{(m.climbRate * 100).toFixed(0)}%</p>
+								</div>
+							</div>
+							<div class="mt-2 p-2 bg-black/20 rounded-lg">
+								<p class="text-[7px] font-black text-orange-400 uppercase mb-1">Scoring Eff</p>
+								<p class="text-base font-black text-orange-400">{m.avgEff.toFixed(1)}/5</p>
+							</div>
+						</div>
+					{/each}
+				</div>
 			</div>
 		{:else if defenseMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
-				<div class="overflow-x-auto bg-zinc-900/40 rounded-[2.5rem] border-2 border-red-500/20 shadow-2xl backdrop-blur-xl">
+				<!-- Desktop Table -->
+				<div class="hidden md:block bg-zinc-900/40 rounded-[2.5rem] border-2 border-red-500/20 shadow-2xl backdrop-blur-xl overflow-x-auto">
 					<table class="w-full text-left border-separate border-spacing-0">
 						<thead>
 							<tr class="bg-red-950/20 text-red-400 text-[10px] font-black uppercase tracking-[0.3em]">
@@ -994,19 +1174,56 @@
 						</tbody>
 					</table>
 				</div>
+
+				<!-- Mobile Cards -->
+				<div class="md:hidden space-y-3">
+					{#each defenseMetrics as m}
+						<div class="bg-zinc-900/40 border-2 border-red-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-red-500/40 transition-all" on:click={() => handleRowClick({ 'Team #': m.teamNum, 'Match #': m.matchNum })}>
+							<div class="flex justify-between items-start gap-3 mb-3">
+								<div class="flex-1">
+									<p class="text-2xl font-black text-red-400">{m.teamNum}</p>
+									<p class="text-xs text-zinc-500 font-black uppercase mt-1">Match {m.matchNum}</p>
+								</div>
+								<button on:click|stopPropagation={() => handleRowClick({ 'Team #': m.teamNum, 'Match #': m.matchNum })} class="bg-zinc-800 hover:bg-red-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg transition uppercase tracking-widest flex-shrink-0">View</button>
+							</div>
+							<div class="grid grid-cols-2 gap-2 mb-2">
+								<div class="bg-black/30 p-2 rounded-lg">
+									<p class="text-[7px] font-black text-orange-400 uppercase">Defense Time</p>
+									<p class="text-lg font-black text-white">{m.defenseTime}s</p>
+									{#if m.defenseTime > 0}
+										<div class="w-full bg-zinc-800 h-1 rounded-full mt-1 overflow-hidden">
+											<div class="bg-orange-500 h-full rounded-full transition-all" style="width: {Math.min(100, (m.defenseTime / 150) * 100)}%"></div>
+										</div>
+									{/if}
+								</div>
+								<div class="bg-black/30 p-2 rounded-lg">
+									<p class="text-[7px] font-black text-red-400 uppercase">Def Score</p>
+									<p class="text-lg font-black {m.defenseScore >= 4 ? 'text-red-400' : m.defenseScore >= 3 ? 'text-orange-400' : 'text-zinc-500'}">{m.defenseScore.toFixed(1)}</p>
+								</div>
+							</div>
+							{#if m.comments}
+								<div class="p-2 bg-black/20 rounded-lg">
+									<p class="text-[7px] font-black text-zinc-400 uppercase mb-1">Comment</p>
+									<p class="text-xs text-zinc-300 italic truncate">{m.comments}</p>
+								</div>
+							{/if}
+						</div>
+					{/each}
+				</div>
+				
 				{#if defenseMetrics.length === 0}
-					<div class="text-center py-20 text-zinc-600 font-black uppercase tracking-widest">
-						<p class="text-2xl mb-2">No Defense Data Available</p>
-						<p class="text-sm text-zinc-700">Teams with defense actions will appear here</p>
+					<div class="text-center py-12 md:py-20 text-zinc-600 font-black uppercase tracking-widest">
+						<p class="text-lg md:text-2xl mb-2">No Defense Data Available</p>
+						<p class="text-xs md:text-sm text-zinc-700">Teams with defense actions will appear here</p>
 					</div>
 				{/if}
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-				<div class="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 shadow-xl"><p class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Scouted Entries</p><p class="text-4xl font-black text-white">{scoutingData.length}</p></div>
-				<div class="bg-zinc-900/50 p-6 rounded-3xl border border-zinc-800 shadow-xl"><p class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Teams Ranked</p><p class="text-4xl font-black text-white">{teamMetrics.length}</p></div>
-				<div class="bg-blue-600/10 p-6 rounded-3xl border-2 border-blue-500/30 shadow-xl group hover:border-blue-500 transition-colors"><p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1">Top EPA Power</p><p class="text-4xl font-black text-white">{[...teamMetrics].sort((a,b) => b.epa - a.epa)[0]?.teamNum || 'N/A'} <span class="text-xs font-black text-blue-400/60 ml-1">({([...teamMetrics].sort((a,b) => b.epa - a.epa)[0]?.epa || 0).toFixed(1)})</span></p></div>
-				<div class="bg-purple-600/10 p-6 rounded-3xl border-2 border-purple-500/30 shadow-xl group hover:border-purple-500 transition-colors"><p class="text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] mb-1">Best Climber</p><p class="text-4xl font-black text-white">{[...teamMetrics].sort((a,b) => b.climbRate - a.climbRate)[0]?.teamNum || 'N/A'} <span class="text-xs font-black text-purple-400/60 ml-1">({(([...teamMetrics].sort((a,b) => b.climbRate - a.climbRate)[0]?.climbRate || 0) * 100).toFixed(0)}%)</span></p></div>
+				<div class="bg-zinc-900/50 p-3 md:p-6 rounded-2xl md:rounded-3xl border border-zinc-800 shadow-xl"><p class="text-[8px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Scouted Entries</p><p class="text-2xl md:text-4xl font-black text-white">{scoutingData.length}</p></div>
+				<div class="bg-zinc-900/50 p-3 md:p-6 rounded-2xl md:rounded-3xl border border-zinc-800 shadow-xl"><p class="text-[8px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Teams Ranked</p><p class="text-2xl md:text-4xl font-black text-white">{teamMetrics.length}</p></div>
+				<div class="bg-blue-600/10 p-3 md:p-6 rounded-2xl md:rounded-3xl border-2 border-blue-500/30 shadow-xl group hover:border-blue-500 transition-colors"><p class="text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1">Top EPA Power</p><p class="text-2xl md:text-4xl font-black text-white">{[...teamMetrics].sort((a,b) => b.epa - a.epa)[0]?.teamNum || 'N/A'} <span class="text-[7px] md:text-xs font-black text-blue-400/60 ml-1">({([...teamMetrics].sort((a,b) => b.epa - a.epa)[0]?.epa || 0).toFixed(1)})</span></p></div>
+				<div class="bg-purple-600/10 p-3 md:p-6 rounded-2xl md:rounded-3xl border-2 border-purple-500/30 shadow-xl group hover:border-purple-500 transition-colors"><p class="text-[8px] md:text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] mb-1">Best Climber</p><p class="text-2xl md:text-4xl font-black text-white">{[...teamMetrics].sort((a,b) => b.climbRate - a.climbRate)[0]?.teamNum || 'N/A'} <span class="text-[7px] md:text-xs font-black text-purple-400/60 ml-1">({(([...teamMetrics].sort((a,b) => b.climbRate - a.climbRate)[0]?.climbRate || 0) * 100).toFixed(0)}%)</span></p></div>
 			</div>
 
 			<div class="overflow-x-auto bg-zinc-900/20 rounded-[2rem] border-2 border-zinc-800 shadow-2xl backdrop-blur-xl">
@@ -1025,7 +1242,8 @@
 					<tbody class="divide-y divide-zinc-800">
 						{#each filteredData as row}
 							{@const metrics = teamMetrics.find(m => m.teamNum === getVal(row, 'Team #'))}
-							<tr class="hover:bg-blue-600/10 transition-all duration-300 cursor-pointer group" on:click={() => handleRowClick(row)}>
+							{@const hasCard = getVal(row, 'card') && getVal(row, 'card') !== 'No' && getVal(row, 'card') !== 'No Card'}
+							<tr class="hover:bg-blue-600/10 transition-all duration-300 cursor-pointer group {hasCard ? 'border-l-4 border-l-yellow-500' : ''}" on:click={() => handleRowClick(row)}>
 								<td class="p-6 font-black text-blue-400 text-2xl group-hover:pl-10 transition-all">{getVal(row, 'Team #')}</td>
 								<td class="p-6 font-mono text-sm text-zinc-300">M{getVal(row, 'Match #')}</td>
 								<td class="p-6"><span class="text-xl font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">{metrics?.epa.toFixed(1) || '...'}</span></td>
@@ -1044,22 +1262,23 @@
 
 {#if selectedRow}
 	{@const colors = teamColorsMap.get(getVal(selectedRow, 'Team #')) || { primary: '#3b82f6', secondary: '#1e40af' }}
-	<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
+	<div class="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
 		style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 		role="button"
 		tabindex="0"
 		on:click|self={() => selectedRow = null}
 		on:keydown={(e) => e.key === 'Escape' && (selectedRow = null)}>
-		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-[3rem] w-full max-w-5xl max-h-[95vh] overflow-y-auto shadow-[0_0_150px_rgba(0,0,0,1)]">
-			<div class="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md p-10 border-b-2 border-zinc-800 flex justify-between items-center z-10">
-				<div>
-					<div class="flex items-center gap-6">
-						<h2 class="text-6xl font-black uppercase tracking-tighter" style="color: var(--team-primary)">Team {getVal(selectedRow, 'Team #')}</h2>
+		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-t-[2rem] md:rounded-[3rem] w-full md:max-w-5xl max-h-[90vh] md:max-h-[95vh] overflow-y-auto shadow-[0_0_150px_rgba(0,0,0,1)]">
+			<!-- Header -->
+			<div class="sticky top-0 bg-[#0a0a0a]/90 backdrop-blur-md p-3 md:p-10 border-b-2 border-zinc-800 flex flex-col md:flex-row md:justify-between md:items-center gap-3 z-10">
+				<div class="flex-1 min-w-0">
+					<div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2 md:mb-0">
+						<h2 class="text-2xl md:text-6xl font-black uppercase tracking-tighter break-words" style="color: var(--team-primary)">Team {getVal(selectedRow, 'Team #')}</h2>
 						{#if selectedTeamMatches.length > 1}
 							<select 
 								on:change={(e) => selectTeamMatch(selectedTeamMatches[e.target.selectedIndex])}
 								value={getVal(selectedRow, 'Match #')}
-								class="bg-zinc-900 border-2 border-zinc-700 rounded-xl px-4 py-2 text-sm font-black uppercase tracking-widest text-white hover:border-blue-500 focus:border-blue-500 outline-none transition cursor-pointer">
+								class="bg-zinc-900 border-2 border-zinc-700 rounded-lg md:rounded-xl px-2 md:px-4 py-1 md:py-2 text-xs md:text-sm font-black uppercase tracking-widest text-white hover:border-blue-500 focus:border-blue-500 outline-none transition cursor-pointer flex-shrink-0">
 								{#each selectedTeamMatches as matchRow}
 									<option value={getVal(matchRow, 'Match #')} selected={getVal(matchRow, 'Match #') === getVal(selectedRow, 'Match #')}>
 										Match {getVal(matchRow, 'Match #')}
@@ -1067,62 +1286,113 @@
 								{/each}
 							</select>
 						{/if}
-						<button on:click={() => { const t = getVal(selectedRow, 'Team #'); if (simRedTeams.includes(t) || simBlueTeams.includes(t)) return; if (simRedTeams.includes('')) simRedTeams[simRedTeams.indexOf('')] = t; else if (simBlueTeams.includes('')) simBlueTeams[simBlueTeams.indexOf('')] = t; simulatorMode = true; selectionMode = false; pitMode = false; }} 
-							class="text-[10px] font-black uppercase tracking-[0.3em] bg-white/5 border-2 border-white/10 text-white/60 px-6 py-2 rounded-full hover:bg-white hover:text-black transition shadow-lg active:scale-95">
-							+ Add to Simulator
-						</button>
 					</div>
-					{#if teamStats}<p class="text-lg text-zinc-400 font-black uppercase tracking-widest mt-2">{teamStats.nickname} • {teamStats.city}, {teamStats.state}</p>{/if}
-					<p class="text-xs text-zinc-600 uppercase font-black tracking-[0.4em] mt-3">Intelligence Report: Match {getVal(selectedRow, 'Match #')} • Field Agent: {getVal(selectedRow, 'Scouter initials')}</p>
+					<div class="flex flex-col gap-1">
+						{#if teamStats}<p class="text-sm md:text-lg text-zinc-400 font-black uppercase tracking-widest">{teamStats.nickname} • {teamStats.city}, {teamStats.state}</p>{/if}
+						<p class="text-[10px] md:text-xs text-zinc-600 uppercase font-black tracking-[0.2em] md:tracking-[0.4em]">Match {getVal(selectedRow, 'Match #')} • Scout: {getVal(selectedRow, 'Scouter initials')}</p>
+					</div>
 				</div>
-				<button on:click={() => selectedRow = null} class="w-16 h-16 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-[1.5rem] transition text-zinc-400 hover:text-white shadow-2xl group"><span class="text-3xl group-hover:rotate-90 transition-transform duration-300">✕</span></button>
+				<div class="flex gap-2 flex-shrink-0">
+					<button on:click={() => { const t = getVal(selectedRow, 'Team #'); if (simRedTeams.includes(t) || simBlueTeams.includes(t)) return; if (simRedTeams.includes('')) simRedTeams[simRedTeams.indexOf('')] = t; else if (simBlueTeams.includes('')) simBlueTeams[simBlueTeams.indexOf('')] = t; simulatorMode = true; selectionMode = false; pitMode = false; }} 
+						class="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] bg-white/5 border-2 border-white/10 text-white/60 px-3 md:px-6 py-1 md:py-2 rounded-full hover:bg-white hover:text-black transition shadow-lg active:scale-95 whitespace-nowrap">
+						+ Simulator
+					</button>
+					<button on:click={() => selectedRow = null} class="w-10 h-10 md:w-16 md:h-16 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-lg md:rounded-[1.5rem] transition text-zinc-400 hover:text-white shadow-2xl group flex-shrink-0"><span class="text-xl md:text-3xl group-hover:rotate-90 transition-transform duration-300">✕</span></button>
+				</div>
 			</div>
-			<div class="p-10 space-y-12">
+			
+			<!-- Content -->
+			<div class="p-3 md:p-10 space-y-6 md:space-y-12">
 				{#if teamStats?.pit && getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))}
-					<div class="w-full h-64 rounded-[3rem] overflow-hidden border-2 border-zinc-800 shadow-2xl relative group bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
+					<div class="w-full h-40 md:h-64 rounded-2xl md:rounded-[3rem] overflow-hidden border-2 border-zinc-800 shadow-2xl relative group bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
 						role="button"
 						tabindex="0"
 						on:click={() => openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}
 						on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}>
-						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-						<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8"><p class="text-xs font-black text-white uppercase tracking-[0.5em]">Tactical Visual Confirmed</p></div>
-						<div class="absolute top-5 right-5 bg-black/60 text-white text-sm font-black px-4 py-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" />
+						<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-3 md:p-8"><p class="text-[10px] md:text-xs font-black text-white uppercase tracking-[0.3em] md:tracking-[0.5em]">Tactical Visual Confirmed</p></div>
+						<div class="absolute top-2 md:top-5 right-2 md:right-5 bg-black/60 text-white text-xs md:text-sm font-black px-2 md:px-4 py-1 md:py-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
 							🔍 Click to zoom
 						</div>
 					</div>
 				{/if}
 				
 				{#if !pitMode}
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-						<div class="bg-blue-600/5 border-2 border-blue-500/20 p-8 rounded-[2rem] shadow-xl group hover:border-blue-500 transition-all duration-500"><p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] mb-3">Predicted Power (EPA)</p><p class="text-5xl font-black text-white">{teamStats?.epa?.toFixed(1) || '...'}</p></div>
-						<div class="bg-purple-600/5 border-2 border-purple-500/20 p-8 rounded-[2rem] shadow-xl group hover:border-purple-500 transition-all duration-500"><p class="text-[10px] font-black text-purple-500 uppercase tracking-[0.3em] mb-3">Unitless Global Rank</p><p class="text-5xl font-black text-white">{teamStats?.rank || '...'}</p></div>
-						<div class="bg-orange-600/5 border-2 border-orange-500/20 p-8 rounded-[2rem] shadow-xl group hover:border-orange-500 transition-all duration-500"><p class="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] mb-3">Event OPR (TBA)</p><p class="text-5xl font-black text-white">{teamStats?.opr?.toFixed(1) || '0.0'}</p></div>
+					<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
+						<div class="bg-blue-600/5 border-2 border-blue-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-blue-500 transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Predicted Power (EPA)</p>
+							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.epa?.toFixed(1) || '...'}</p>
+						</div>
+						<div class="bg-purple-600/5 border-2 border-purple-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-purple-500 transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Unitless Global Rank</p>
+							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.rank || '...'}</p>
+						</div>
+						<div class="bg-orange-600/5 border-2 border-orange-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-orange-500 transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black text-orange-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Event OPR (TBA)</p>
+							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.opr?.toFixed(1) || '0.0'}</p>
+						</div>
 					</div>
 				{/if}
 
 				{#if teamStats?.pit}
 					<section>
-						<div class="flex items-center gap-6 mb-8"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Pit Scouting Intelligence</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
-						<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-							<div class="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800"><p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Drive Train</p><p class="text-lg font-black text-white">{getVal(teamStats.pit, 'Drive Train Type')}</p><p class="text-[10px] text-zinc-500">{getVal(teamStats.pit, 'Swerve Gearing')}</p></div>
-							<div class="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800"><p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Dimensions / Weight</p><p class="text-lg font-black text-white">{getVal(teamStats.pit, 'Frame dimensions')}</p><p class="text-[10px] text-zinc-500">{getVal(teamStats.pit, 'Weight')} lbs</p></div>
-							<div class="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800"><p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Capabilities</p><div class="flex flex-wrap gap-2 mt-1">{#if getVal(teamStats.pit, 'Under trench?') === 'Yes'} <span class="bg-green-900/30 text-green-400 text-[8px] px-2 py-0.5 rounded font-black uppercase">Trench</span> {/if}{#if getVal(teamStats.pit, 'Over bump?') === 'Yes'} <span class="bg-blue-900/30 text-blue-400 text-[8px] px-2 py-0.5 rounded font-black uppercase">Bump</span> {/if}</div></div>
-							<div class="bg-zinc-900/60 p-6 rounded-2xl border border-zinc-800"><p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Best Auto</p><p class="text-[10px] font-bold text-zinc-300 italic">"{getVal(teamStats.pit, 'Best Auto')}"</p></div>
+						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8">
+							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Pit Intelligence</h3>
+							<div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
+						</div>
+						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
+								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Drive Train</p>
+								<p class="text-sm md:text-lg font-black text-white">{getVal(teamStats.pit, 'Drive Train Type')}</p>
+								<p class="text-[8px] md:text-[10px] text-zinc-500">{getVal(teamStats.pit, 'Swerve Gearing')}</p>
+							</div>
+							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
+								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Dimensions / Weight</p>
+								<p class="text-sm md:text-lg font-black text-white truncate">{getVal(teamStats.pit, 'Frame dimensions')}</p>
+								<p class="text-[8px] md:text-[10px] text-zinc-500">{getVal(teamStats.pit, 'Weight')} lbs</p>
+							</div>
+							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
+								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Capabilities</p>
+								<div class="flex flex-wrap gap-1 mt-1">
+									{#if getVal(teamStats.pit, 'Under trench?') === 'Yes'} <span class="bg-green-900/30 text-green-400 text-[7px] md:text-[8px] px-1.5 md:px-2 py-0.5 rounded font-black uppercase">Trench</span> {/if}
+									{#if getVal(teamStats.pit, 'Over bump?') === 'Yes'} <span class="bg-blue-900/30 text-blue-400 text-[7px] md:text-[8px] px-1.5 md:px-2 py-0.5 rounded font-black uppercase">Bump</span> {/if}
+								</div>
+							</div>
+							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
+								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Best Auto</p>
+								<p class="text-[8px] md:text-[10px] font-bold text-zinc-300 italic truncate">"{getVal(teamStats.pit, 'Best Auto')}"</p>
+							</div>
 						</div>
 					</section>
 				{/if}
 
 				{#if !pitMode}
-					<div class="bg-black/60 p-10 rounded-[3rem] border-2 border-zinc-900 h-96 shadow-inner relative group"><div class="absolute top-6 left-10 text-[10px] font-black uppercase text-zinc-700 tracking-widest group-hover:text-zinc-500 transition-colors">Performance Velocity</div><Line data={getChartData(getVal(selectedRow, 'Team #'))} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 5, ticks: { color: '#3f3f46', font: { weight: 'black', size: 10 } }, grid: { color: '#18181b' } }, x: { ticks: { color: '#3f3f46', font: { weight: 'black', size: 10 } }, grid: { display: false } } }, plugins: { legend: { position: 'top', align: 'end', labels: { color: '#71717a', font: { weight: 'black', size: 10 }, usePointStyle: true, padding: 30 } } } }} /></div>
+					<div class="bg-black/60 p-4 md:p-10 rounded-xl md:rounded-[3rem] border-2 border-zinc-900 h-48 md:h-96 shadow-inner relative group overflow-hidden">
+						<div class="absolute top-2 md:top-6 left-3 md:left-10 text-[8px] md:text-[10px] font-black uppercase text-zinc-700 group-hover:text-zinc-500 transition-colors tracking-widest z-10">Performance Velocity</div>
+						<Line data={getChartData(getVal(selectedRow, 'Team #'))} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 5, ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { color: '#18181b' } }, x: { ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { display: false } } }, plugins: { legend: { position: 'top', align: 'end', labels: { color: '#71717a', font: { weight: 'black', size: 8 }, usePointStyle: true, padding: 15 } } } }} />
+					</div>
 					<section>
-						<div class="flex items-center gap-6 mb-8"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Battle Sequence</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
-						<div class="bg-black/60 p-10 rounded-[3rem] border-2 border-zinc-900 shadow-2xl">
-							<div class="space-y-3">
-								<div class="grid grid-cols-[140px_1fr] gap-6 mb-6"><div></div><div class="relative h-8 text-[10px] font-black font-mono text-zinc-700 border-b-2 border-zinc-800 flex items-end pb-2">{#each [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150] as t}<div class="absolute flex flex-col items-center group/time" style="left: {(t/150)*100}%"><div class="w-0.5 h-2 bg-zinc-800 group-hover/time:bg-blue-500 transition-colors mb-1"></div>{t}s</div>{/each}</div></div>
+						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8">
+							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Battle Sequence</h3>
+							<div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
+						</div>
+						<div class="bg-black/60 p-3 md:p-10 rounded-xl md:rounded-[3rem] border-2 border-zinc-900 shadow-2xl overflow-x-auto">
+							<div class="space-y-2 md:space-y-3 min-w-max">
+								<div class="grid gap-3 md:gap-6 mb-4 md:mb-6" style="grid-template-columns: 80px 1fr; --gap: 0.75rem;">
+									<div></div>
+									<div class="relative h-6 md:h-8 text-[8px] md:text-[10px] font-black font-mono text-zinc-700 border-b-2 border-zinc-800 flex items-end pb-1 md:pb-2">
+										{#each [0, 15, 30, 45, 60, 75, 90, 105, 120, 135, 150] as t}
+											<div class="absolute flex flex-col items-center group/time text-[7px] md:text-[10px]" style="left: {(t/150)*100}%">
+												<div class="w-0.5 h-1.5 md:h-2 bg-zinc-800 group-hover/time:bg-blue-500 transition-colors mb-0.5 md:mb-1"></div>
+												{t}s
+											</div>
+										{/each}
+									</div>
+								</div>
 								{#each getGanttData(getVal(selectedRow, 'actions')) as { code, events }}
 									<div class="grid grid-cols-[140px_1fr] gap-6 group/row">
 										<div class="text-[10px] font-black text-zinc-600 uppercase flex items-center justify-end text-right leading-tight truncate group-hover/row:text-blue-400 transition-all duration-300" title={formatCode(code)}>{formatCode(code)}</div>
-										<div class="relative h-10 bg-zinc-950/90 rounded-2xl border border-zinc-900 flex items-center overflow-hidden shadow-inner group-hover/row:border-zinc-700 transition-colors"><div class="absolute left-[10%] inset-y-0 w-0.5 bg-blue-500/20 z-0 shadow-[0_0_15px_rgba(59,130,246,0.2)]"></div>{#each events as event}{#if event.type === 'range'}<div class="absolute h-6 rounded-lg {getActionColor(code)} border-2 border-white/10 z-10 shadow-xl group-hover/row:brightness-125 transition-all duration-500 cursor-help" style="left: {(event.start/150)*100}%; width: {Math.max(1.5, ((event.end - event.start)/150)*100)}%" title="{formatCode(code)} ({event.start}s - {event.end}s)"></div>{:else}<div class="absolute w-2.5 h-6 {getActionColor(code)} border-2 border-white/30 z-10 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)]" style="left: {(event.time/150)*100}%; margin-left: -5px" title="{formatCode(code)} ({event.time}s)"></div>{/if}{/each}</div>
+										<div class="relative h-10 bg-zinc-950/90 rounded-2xl border border-zinc-900 flex items-center overflow-hidden shadow-inner group-hover/row:border-zinc-700 transition-colors"><div class="absolute left-[10%] inset-y-0 w-0.5 bg-blue-500/20 z-0 shadow-[0_0_15px_rgba(59,130,246,0.2)]"></div>{#each events as event}{#if event.type === 'range'}<div class="absolute h-6 rounded-lg {getActionColor(code)} border-2 border-white/10 shadow-xl group-hover/row:brightness-125 transition-all duration-500 cursor-help" style="left: {(event.start/150)*100}%; width: {Math.max(1.5, ((event.end - event.start)/150)*100)}%" title="{formatCode(code)} ({event.start}s - {event.end}s)"></div>{:else}<div class="absolute w-2.5 h-6 {getActionColor(code)} border-2 border-white/30 z-10 rounded-full shadow-[0_0_20px_rgba(255,255,255,0.2)]" style="left: {(event.time/150)*100}%; margin-left: -5px" title="{formatCode(code)} ({event.time}s)"></div>{/if}{/each}</div>
 									</div>
 								{:else}<div class="text-center py-20 text-[10px] font-black text-zinc-800 uppercase tracking-[1em] border-4 border-dashed border-zinc-900/50 rounded-[3rem]">Null Stream</div>{/each}
 							</div>
@@ -1130,38 +1400,101 @@
 					</section>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
 						<section>
+							<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Match Incidents</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
+							{#if selectedRow}
+								{@const hasMechanical = getVal(selectedRow, 'mech issue') === 'TRUE' || getVal(selectedRow, 'mechanical issue') === 'Yes'}
+								{@const hasTipped = getVal(selectedRow, 'tipped') === 'TRUE' || getVal(selectedRow, 'tipped') === 'Yes'}
+								{@const hasDied = getVal(selectedRow, 'died') === 'TRUE' || getVal(selectedRow, 'died') === 'Yes'}
+								{@const hasCard = getVal(selectedRow, 'card') !== 'No Card' && getVal(selectedRow, 'card') !== 'N/A' && getVal(selectedRow, 'card') !== ''}
+								{@const hasAnyIssue = hasMechanical || hasTipped || hasDied || hasCard}
+								
+								<div class="space-y-2">
+									<!-- Overall Alert -->
+									{#if hasAnyIssue}
+										<div class="bg-red-950/40 border-2 border-red-500 rounded-lg p-3 animate-pulse">
+											<p class="text-xs font-black text-red-400 uppercase tracking-widest">⚠️ INCIDENT(S) DETECTED</p>
+										</div>
+									{/if}
+									
+									<!-- Individual Incident Cards -->
+									<div class="grid grid-cols-2 gap-2">
+										<!-- Mechanical -->
+										<div class="p-3 rounded-lg transition-all {hasMechanical ? 'bg-red-900/60 border-2 border-red-500 shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 'bg-zinc-900/40 border border-zinc-800'}">
+											<p class="text-[7px] font-black uppercase tracking-wider {hasMechanical ? 'text-red-300' : 'text-zinc-600'} mb-0.5">Mechanical</p>
+											<p class="text-2xl font-black {hasMechanical ? 'text-red-400' : 'text-zinc-500'}">{hasMechanical ? '⚙️' : '✓'}</p>
+											<p class="text-[10px] font-black {hasMechanical ? 'text-red-300' : 'text-zinc-600'} mt-1">{hasMechanical ? 'FAILED' : 'OK'}</p>
+										</div>
+										
+										<!-- Tipped -->
+										<div class="p-3 rounded-lg transition-all {hasTipped ? 'bg-orange-900/60 border-2 border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.4)]' : 'bg-zinc-900/40 border border-zinc-800'}">
+											<p class="text-[7px] font-black uppercase tracking-wider {hasTipped ? 'text-orange-300' : 'text-zinc-600'} mb-0.5">Tipped</p>
+											<p class="text-2xl font-black {hasTipped ? 'text-orange-400' : 'text-zinc-500'}">{hasTipped ? '⚠️' : '✓'}</p>
+											<p class="text-[10px] font-black {hasTipped ? 'text-orange-300' : 'text-zinc-600'} mt-1">{hasTipped ? 'TIPPED' : 'OK'}</p>
+										</div>
+										
+										<!-- Dead -->
+										<div class="p-3 rounded-lg transition-all {hasDied ? 'bg-red-950/60 border-2 border-red-600 shadow-[0_0_15px_rgba(180,0,0,0.5)]' : 'bg-zinc-900/40 border border-zinc-800'}">
+											<p class="text-[7px] font-black uppercase tracking-wider {hasDied ? 'text-red-300' : 'text-zinc-600'} mb-0.5">Dead</p>
+											<p class="text-2xl font-black {hasDied ? 'text-red-500' : 'text-zinc-500'}">{hasDied ? '💀' : '✓'}</p>
+											<p class="text-[10px] font-black {hasDied ? 'text-red-300' : 'text-zinc-600'} mt-1">{hasDied ? 'DEAD' : 'OK'}</p>
+										</div>
+										
+										<!-- Card -->
+										<div class="p-3 rounded-lg transition-all {hasCard ? 'bg-yellow-900/60 border-2 border-yellow-500 shadow-[0_0_15px_rgba(202,138,4,0.5)]' : 'bg-zinc-900/40 border border-zinc-800'}">
+											<p class="text-[7px] font-black uppercase tracking-wider {hasCard ? 'text-yellow-300' : 'text-zinc-600'} mb-0.5">Card</p>
+											<p class="text-2xl font-black {hasCard ? 'text-yellow-400' : 'text-zinc-500'}">{hasCard ? '🟡' : '✓'}</p>
+											<p class="text-[9px] font-black {hasCard ? 'text-yellow-300' : 'text-zinc-600'} mt-1 truncate">{hasCard ? getVal(selectedRow, 'card') : 'OK'}</p>
+										</div>
+									</div>
+								</div>
+							{/if}
+						</section>
+						<section>
 							<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Tactical Specs</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
 							<div class="bg-zinc-900/40 p-8 rounded-[2.5rem] border-2 border-zinc-900 space-y-6 shadow-xl"><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Start Vector</span> <span class="font-black text-white bg-zinc-800 px-5 py-2 rounded-2xl border border-zinc-700">{getVal(selectedRow, 'Starting position?')}</span></div><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Auto Ascension</span> <span class="font-black text-blue-400 bg-blue-400/10 px-5 py-2 rounded-2xl border border-blue-500/20">{getVal(selectedRow, 'Auto climb?')}</span></div></div>
 						</section>
+					</div>
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
 						<section>
-							<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Final Sequence</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
-							<div class="bg-zinc-900/40 p-8 rounded-[2.5rem] border-2 border-zinc-900 space-y-6 shadow-xl"><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Climb Grade</span> <span class="font-black text-purple-400 bg-purple-400/10 border-2 border-purple-500/30 px-5 py-2 rounded-2xl shadow-[0_0_15px_rgba(168,85,247,0.2)]">{getVal(selectedRow, 'climb level')}</span></div><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Final Anchor</span> <span class="font-black text-zinc-300 bg-zinc-800 px-5 py-2 rounded-2xl border border-zinc-700">{getVal(selectedRow, 'end climb pos')}</span></div></div>
+							<div class="bg-zinc-900/40 p-4 md:p-8 rounded-lg md:rounded-[2.5rem] border-2 border-zinc-900 space-y-3 md:space-y-6 shadow-xl">
+								<div class="flex justify-between items-center gap-2">
+									<span class="text-[8px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">Climb Grade</span>
+									<span class="font-black text-purple-400 bg-purple-400/10 border-2 border-purple-500/30 px-3 md:px-5 py-1 md:py-2 rounded-lg md:rounded-2xl shadow-[0_0_15px_rgba(168,85,247,0.2)] text-xs md:text-base">{getVal(selectedRow, 'climb level')}</span>
+								</div>
+								<div class="flex justify-between items-center gap-2">
+									<span class="text-[8px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">Final Anchor</span>
+									<span class="font-black text-zinc-300 bg-zinc-800 px-3 md:px-5 py-1 md:py-2 rounded-lg md:rounded-2xl border border-zinc-700 text-xs md:text-base">{getVal(selectedRow, 'end climb pos')}</span>
+								</div>
+							</div>
 						</section>
 					</div>
 					<section>
-						<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Field Observations</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
-						<div class="space-y-6">
+						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-6">
+							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Field Observations</h3>
+							<div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
+						</div>
+						<div class="space-y-3 md:space-y-6">
 							{#each selectedTeamMatches as matchRow}
 								{@const comment = getVal(matchRow, 'comments')}
 								{#if comment && comment !== 'N/A'}
-									<div class="bg-zinc-900/60 p-8 rounded-[2.5rem] border-l-8 border-blue-600 shadow-2xl backdrop-blur-sm group hover:border-blue-500 transition-all">
-										<div class="flex items-center justify-between mb-4">
-											<div class="flex items-center gap-4">
-												<span class="text-[10px] font-black text-blue-500 uppercase tracking-[0.3em] bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-500/20">Match {getVal(matchRow, 'Match #')}</span>
-												<span class="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Scout: {getVal(matchRow, 'Scouter initials')}</span>
+									<div class="bg-zinc-900/60 p-3 md:p-8 rounded-lg md:rounded-[2.5rem] border-l-4 md:border-l-8 border-blue-600 shadow-2xl backdrop-blur-sm group hover:border-blue-500 transition-all">
+										<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 md:mb-4">
+											<div class="flex flex-wrap items-center gap-2 md:gap-4">
+												<span class="text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em] bg-blue-500/10 px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl border border-blue-500/20">Match {getVal(matchRow, 'Match #')}</span>
+												<span class="text-[7px] md:text-[8px] font-black text-zinc-600 uppercase tracking-widest">Scout: {getVal(matchRow, 'Scouter initials')}</span>
 											</div>
 											<button 
 												on:click={() => selectTeamMatch(matchRow)}
-												class="text-[8px] font-black uppercase tracking-widest bg-zinc-800 hover:bg-blue-600 text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg transition active:scale-95">
+												class="text-[7px] md:text-[8px] font-black uppercase tracking-widest bg-zinc-800 hover:bg-blue-600 text-zinc-400 hover:text-white px-2 md:px-3 py-1 md:py-1.5 rounded-lg transition active:scale-95 w-fit">
 												View Details
 											</button>
 										</div>
-										<p class="font-black text-zinc-200 text-lg leading-relaxed italic tracking-tight">"{comment}"</p>
+										<p class="font-black text-zinc-200 text-sm md:text-lg leading-relaxed italic tracking-tight break-words">"{comment}"</p>
 									</div>
 								{/if}
 							{/each}
 							{#if selectedTeamMatches.filter(m => getVal(m, 'comments') && getVal(m, 'comments') !== 'N/A').length === 0}
-								<div class="bg-zinc-900/60 p-10 rounded-[3rem] border-l-8 border-zinc-800 font-black text-zinc-600 text-xl leading-relaxed shadow-2xl italic tracking-tight backdrop-blur-sm text-center">DIRECT OBSERVATIONS UNAVAILABLE.</div>
+								<div class="bg-zinc-900/60 p-6 md:p-10 rounded-lg md:rounded-[3rem] border-l-4 md:border-l-8 border-zinc-800 font-black text-zinc-600 text-sm md:text-xl leading-relaxed shadow-2xl italic tracking-tight backdrop-blur-sm text-center">DIRECT OBSERVATIONS UNAVAILABLE.</div>
 							{/if}
 						</div>
 					</section>
