@@ -404,6 +404,17 @@
 			const opr = eventOprs[`frc${teamNumber}`] || 0;
 			const pit = pitData.find(p => getVal(p, 'Team number') === teamNumber);
 
+			// Calculate auto win % and get score how
+			const teamRows = scoutingData.filter(r => getVal(r, 'Team #') === teamNumber);
+			const autoWins = teamRows.filter(r => {
+				const autoVal = getVal(r, 'won auto');
+				return autoVal === 'Yes' || autoVal === 'yes' || autoVal === 'Y' || autoVal === 'TRUE';
+			}).length;
+			const autoWinPercent = teamRows.length > 0 ? (autoWins / teamRows.length) * 100 : 0;
+
+			// Get most recent score how value
+			const scoreHowVal = teamRows.length > 0 ? getVal(teamRows[teamRows.length - 1], 'Score how?') : 'N/A';
+
 			teamStats = {
 				epa: global.epa || 0,
 				rank: global.unitless || 'N/A',
@@ -411,7 +422,9 @@
 				nickname: tbaData?.nickname || `Team ${teamNumber}`,
 				city: tbaData?.city || '',
 				state: tbaData?.state_prov || '',
-				pit: pit
+				pit: pit,
+				autoWinPercent: autoWinPercent,
+				scoreHow: scoreHowVal
 			};
 		} catch (e) {
 			console.error('Error fetching details:', e);
@@ -1365,6 +1378,30 @@
 							<p class="text-[8px] md:text-[10px] font-black {teamStats?.opr !== undefined ? 'text-orange-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Event OPR (TBA)</p>
 							{#if teamStats?.opr !== undefined}
 								<p class="text-xl md:text-5xl font-black text-white">{teamStats.opr.toFixed(1)}</p>
+							{:else}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
+							{/if}
+						</div>
+					</div>
+
+					<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-8">
+						<div class="bg-green-600/5 border-2 {teamStats?.autoWinPercent !== undefined ? 'border-green-500/20 hover:border-green-500' : 'border-red-500/30'} p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black {teamStats?.autoWinPercent !== undefined ? 'text-green-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Auto Win Rate</p>
+							{#if teamStats?.autoWinPercent !== undefined}
+								<p class="text-xl md:text-5xl font-black text-white">{teamStats.autoWinPercent.toFixed(0)}%</p>
+							{:else}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
+							{/if}
+						</div>
+						<div class="bg-cyan-600/5 border-2 {teamStats?.scoreHow ? 'border-cyan-500/20 hover:border-cyan-500' : 'border-red-500/30'} p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black {teamStats?.scoreHow ? 'text-cyan-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Primary Scoring Method</p>
+							{#if teamStats?.scoreHow && teamStats.scoreHow !== 'N/A'}
+								<p class="text-sm md:text-lg font-black text-white break-words line-clamp-3">{teamStats.scoreHow}</p>
+							{:else if teamStats?.scoreHow}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">No Data</p>
 							{:else}
 								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
 								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
