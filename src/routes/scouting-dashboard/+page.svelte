@@ -895,7 +895,7 @@
 													tabindex="0"
 													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
 													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
+													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-cover" />
 												</div>
 											{/if}
 										</div>
@@ -1084,7 +1084,7 @@
 						tabindex="0"
 						on:click={() => openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}
 						on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(teamStats.pit, 'Bot pic')))}>
-						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-700" />
+						<img src={getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))} alt="Bot pic" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
 						<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-8"><p class="text-xs font-black text-white uppercase tracking-[0.5em]">Tactical Visual Confirmed</p></div>
 						<div class="absolute top-5 right-5 bg-black/60 text-white text-sm font-black px-4 py-2 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
 							🔍 Click to zoom
@@ -1212,7 +1212,7 @@
 		</div>
 
 		<!-- Instructions -->
-		<div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/80 text-zinc-400 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest backdrop-blur-sm border border-zinc-700">
+		<div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900/80 text-zinc-400 px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest backdrop-blur-sm border border-zinc-700 z-[200]">
 			{#if viewerScale > 1}
 				<span class="text-blue-400">Drag to pan</span> • 
 			{/if}
