@@ -729,7 +729,7 @@
 	function getMatchScoutingData(matchNumber) {
 		const scoutedTeams = scoutingData.filter(r => getVal(r, 'Match #') == matchNumber);
 		const breakdown = schedule.find(m => m.match_number === matchNumber);
-		if (!breakdown) return { red: [], blue: [], videos: [] };
+		if (!breakdown) return { red: [], blue: [], videos: [], ganttData: [] };
 
 		const red = breakdown.alliances.red.team_keys.map(key => {
 			const team = key.replace('frc', '');
@@ -756,7 +756,29 @@
 			});
 		}
 
-		return { red, blue, videos };
+		// Build Gantt chart data from all teams' actions
+		const ganttData = [];
+		[...red, ...blue].forEach(({ team, scout }) => {
+			if (scout) {
+				const actionStr = getVal(scout, 'actions');
+				const ganttGroups = getGanttData(actionStr);
+				ganttGroups.forEach(group => {
+					group.events.forEach(event => {
+						if (event.type === 'range') {
+							ganttData.push({
+								team,
+								code: group.code,
+								start: event.start,
+								end: event.end,
+								alliance: red.some(r => r.team === team) ? 'red' : 'blue'
+							});
+						}
+					});
+				});
+			}
+		});
+
+		return { red, blue, videos, ganttData };
 	}
 
 	function getMatchesWithIssues(teamNum) {
@@ -1844,6 +1866,53 @@
 											<a href={`https://www.youtube.com/watch?v=${video.key}`} target="_blank" rel="noopener noreferrer" class="text-[10px] md:text-sm font-black text-purple-300 hover:text-purple-200 transition truncate block mt-1">Watch on YouTube →</a>
 										</div>
 									</div>
+								{/each}
+							</div>
+						</div>
+					</section>
+				{/if}
+
+				<!-- Match Events Timeline / Gantt Chart -->
+				{#if matchData.ganttData && matchData.ganttData.length > 0}
+					<section>
+						<h3 class="text-lg md:text-2xl font-black text-cyan-500 uppercase tracking-wider mb-6 flex items-center gap-3">
+							<div class="w-4 h-4 rounded-lg bg-cyan-600"></div>
+							Match Timeline
+						</h3>
+						<div class="bg-zinc-900/40 border-2 border-cyan-500/20 rounded-2xl p-4 md:p-6 overflow-x-auto">
+							<div class="min-w-full space-y-4">
+								{#each [...matchData.red, ...matchData.blue] as { team, scout }}
+									{@const isRed = matchData.red.some(r => r.team === team)}
+									{@const teamEvents = matchData.ganttData.filter(g => g.team === team).sort((a, b) => a.start - b.start)}
+									{#if teamEvents.length > 0}
+										<div class="pb-4 last:pb-0">
+											<div class="flex items-center gap-2 mb-2">
+												<div class="w-3 h-3 rounded-full {isRed ? 'bg-red-500' : 'bg-blue-500'}"></div>
+												<p class="text-sm md:text-base font-black {isRed ? 'text-red-400' : 'text-blue-400'} min-w-fit">Team {team}</p>
+											</div>
+											<div class="relative w-full h-10 md:h-12 bg-zinc-950/50 rounded-lg border border-zinc-800 flex items-center">
+												<!-- Time markers -->
+												<div class="absolute inset-0 flex text-[8px] text-zinc-600 pointer-events-none">
+													{#each [0, 30, 60, 90, 120, 150] as time}
+														<div class="flex-1 border-r border-zinc-800/50 px-1">{time}s</div>
+													{/each}
+												</div>
+												
+												<!-- Events -->
+												{#each teamEvents as event}
+													{@const startPercent = (event.start / 150) * 100}
+													{@const widthPercent = Math.max(((event.end - event.start) / 150) * 100, 2)}
+													{@const eventColor = getActionColor(event.code)}
+													<div
+														class="absolute top-1 md:top-2 bottom-1 md:bottom-2 rounded text-[7px] md:text-[9px] font-black text-white px-1 md:px-1.5 flex items-center justify-center truncate {eventColor}"
+														style="left: {startPercent}%; width: {widthPercent}%;"
+														title="{event.code}: {event.start}s - {event.end}s ({event.end - event.start}s)">
+														<span class="truncate">{event.code}</span>
+													</div>
+												{/each}
+											</div>
+										</div>
+									{/if}
 								{/each}
 							</div>
 						</div>
