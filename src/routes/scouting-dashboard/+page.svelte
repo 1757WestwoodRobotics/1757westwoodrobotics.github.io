@@ -224,6 +224,20 @@
 			loading = true;
       console.log('Starting data fetch with force=', force);
 			currentStep = '';
+      loadingSteps = {
+        scoutingData: false,
+        pitData: false,
+        eventStats: false,
+        schedule: false,
+        teamStats: false
+      };
+      if(force){
+        scoutingData = [];
+        pitData = [];
+        teamStatsMap = new Map();
+        teamColorsMap = new Map();
+        teamDetailsMap = new Map();
+      }
 			
 			if (force || scoutingData.length === 0) {
 				currentStep = 'scoutingData';
@@ -711,12 +725,14 @@
 
 			<!-- Progress Steps -->
 			<div class="w-full space-y-2">
-				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.scoutingData ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.scoutingData || !scoutingData.length ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
 					<div class="flex-shrink-0">
 						{#if loadingSteps.scoutingData}
 							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
-						{:else}
+						{:else if scoutingData.length}
 							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
 						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
@@ -725,12 +741,14 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.pitData ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.pitData || !pitData.length ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
 					<div class="flex-shrink-0">
 						{#if loadingSteps.pitData}
 							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
-						{:else}
+						{:else if pitData.length}
 							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
 						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
@@ -739,12 +757,14 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.eventStats ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.eventStats || !schedule.length ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
 					<div class="flex-shrink-0">
 						{#if loadingSteps.eventStats}
 							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
-						{:else}
+						{:else if schedule.length}
 							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
 						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
@@ -757,8 +777,10 @@
 					<div class="flex-shrink-0">
 						{#if loadingSteps.schedule}
 							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
-						{:else}
+						{:else if schedule.length}
 							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
 						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
@@ -767,12 +789,14 @@
 					</div>
 				</div>
 
-				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamStats ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamStats || !teamStatsMap.size ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
 					<div class="flex-shrink-0">
 						{#if loadingSteps.teamStats}
 							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
-						{:else}
+						{:else if teamStatsMap.size}
 							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
 						{/if}
 					</div>
 					<div class="flex-1 min-w-0">
@@ -1319,17 +1343,32 @@
 				
 				{#if !pitMode}
 					<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-8">
-						<div class="bg-blue-600/5 border-2 border-blue-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-blue-500 transition-all duration-500">
-							<p class="text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Predicted Power (EPA)</p>
-							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.epa?.toFixed(1) || '...'}</p>
+						<div class="bg-blue-600/5 border-2 {teamStats?.epa !== undefined ? 'border-blue-500/20 hover:border-blue-500' : 'border-red-500/30'} p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black {teamStats?.epa !== undefined ? 'text-blue-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Predicted Power (EPA)</p>
+							{#if teamStats?.epa !== undefined}
+								<p class="text-xl md:text-5xl font-black text-white">{teamStats.epa.toFixed(1)}</p>
+							{:else}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
+							{/if}
 						</div>
-						<div class="bg-purple-600/5 border-2 border-purple-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-purple-500 transition-all duration-500">
-							<p class="text-[8px] md:text-[10px] font-black text-purple-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Unitless Global Rank</p>
-							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.rank || '...'}</p>
+						<div class="bg-purple-600/5 border-2 {teamStats?.rank !== undefined ? 'border-purple-500/20 hover:border-purple-500' : 'border-red-500/30'} p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black {teamStats?.rank !== undefined ? 'text-purple-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Unitless Global Rank</p>
+							{#if teamStats?.rank !== undefined}
+								<p class="text-xl md:text-5xl font-black text-white">{teamStats.rank}</p>
+							{:else}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
+							{/if}
 						</div>
-						<div class="bg-orange-600/5 border-2 border-orange-500/20 p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group hover:border-orange-500 transition-all duration-500">
-							<p class="text-[8px] md:text-[10px] font-black text-orange-500 uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Event OPR (TBA)</p>
-							<p class="text-xl md:text-5xl font-black text-white">{teamStats?.opr?.toFixed(1) || '0.0'}</p>
+						<div class="bg-orange-600/5 border-2 {teamStats?.opr !== undefined ? 'border-orange-500/20 hover:border-orange-500' : 'border-red-500/30'} p-4 md:p-8 rounded-xl md:rounded-[2rem] shadow-xl group transition-all duration-500">
+							<p class="text-[8px] md:text-[10px] font-black {teamStats?.opr !== undefined ? 'text-orange-500' : 'text-red-500'} uppercase tracking-[0.2em] md:tracking-[0.3em] mb-2 md:mb-3">Event OPR (TBA)</p>
+							{#if teamStats?.opr !== undefined}
+								<p class="text-xl md:text-5xl font-black text-white">{teamStats.opr.toFixed(1)}</p>
+							{:else}
+								<p class="text-3xl md:text-5xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">Loading...</p>
+							{/if}
 						</div>
 					</div>
 				{/if}
@@ -1367,9 +1406,16 @@
 				{/if}
 
 				{#if !pitMode}
-					<div class="bg-black/60 p-4 md:p-10 rounded-xl md:rounded-[3rem] border-2 border-zinc-900 h-48 md:h-96 shadow-inner relative group overflow-hidden">
-						<div class="absolute top-2 md:top-6 left-3 md:left-10 text-[8px] md:text-[10px] font-black uppercase text-zinc-700 group-hover:text-zinc-500 transition-colors tracking-widest z-10">Performance Velocity</div>
-						<Line data={getChartData(getVal(selectedRow, 'Team #'))} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 5, ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { color: '#18181b' } }, x: { ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { display: false } } }, plugins: { legend: { position: 'top', align: 'end', labels: { color: '#71717a', font: { weight: 'black', size: 8 }, usePointStyle: true, padding: 15 } } } }} />
+					<div class="bg-black/60 p-4 md:p-10 rounded-xl md:rounded-[3rem] border-2 {scoutingData.filter(r => getVal(r, 'Team #') === getVal(selectedRow, 'Team #')).length > 0 ? 'border-zinc-900' : 'border-red-500/30'} h-48 md:h-96 shadow-inner relative group overflow-hidden flex items-center justify-center">
+						<div class="absolute top-2 md:top-6 left-3 md:left-10 text-[8px] md:text-[10px] font-black uppercase {scoutingData.filter(r => getVal(r, 'Team #') === getVal(selectedRow, 'Team #')).length > 0 ? 'text-zinc-700 group-hover:text-zinc-500' : 'text-red-600'} transition-colors tracking-widest z-10">Performance Velocity</div>
+						{#if scoutingData.filter(r => getVal(r, 'Team #') === getVal(selectedRow, 'Team #')).length > 0}
+							<Line data={getChartData(getVal(selectedRow, 'Team #'))} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 5, ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { color: '#18181b' } }, x: { ticks: { color: '#3f3f46', font: { weight: 'black', size: 8 } }, grid: { display: false } } }, plugins: { legend: { position: 'top', align: 'end', labels: { color: '#71717a', font: { weight: 'black', size: 8 }, usePointStyle: true, padding: 15 } } } }} />
+						{:else}
+							<div class="flex flex-col items-center">
+								<p class="text-4xl font-black text-red-500/40">✕</p>
+								<p class="text-[10px] font-black text-red-400/60 mt-2">No Match Data</p>
+							</div>
+						{/if}
 					</div>
 					<section>
 						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8">
