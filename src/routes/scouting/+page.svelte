@@ -20,6 +20,8 @@
 	let timeline = [];
 	let activeActions = new Set();
 
+	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
+
 	const toggleTimer = () => {
 		if (matchStarted) {
 			clearInterval(timerInterval);
@@ -85,37 +87,108 @@
 	const changeTeleopFuelFed = (val) => {
 		if (val > 0) recordPointAction('tele_fed');
 		teleopFuelFed = Math.max(0, teleopFuelFed + val);
-  };
+	};
 
-const parseCSV = (csvText) => {
-  const lines = csvText.trim().split('\n');
-  const headers = lines[0].split(',');
-  const result = [];
+	const parseCSV = (csvText) => {
+	  const lines = csvText.trim().split('\n');
+	  const headers = lines[0].split(',');
+	  const result = [];
 
-  for (let i = 1; i < lines.length; i++) {
-    const obj = {};
-    const currentline = lines[i].split(',');
+	  for (let i = 1; i < lines.length; i++) {
+	    const obj = {};
+	    const currentline = lines[i].split(',');
 
-    for (let j = 0; j < headers.length; j++) {
-      obj[headers[j].trim()] = currentline[j].trim();
-    }
-    result.push(obj);
-  }
-  return result;
-}
-  let selectedMatchData = null;
+	    for (let j = 0; j < headers.length; j++) {
+	      obj[headers[j].trim()] = currentline[j].trim();
+	    }
+	    result.push(obj);
+	  }
+	  return result;
+	}
+	let selectedMatchData = null;
+	let selectedTeam = 0;
+	let matchTeams = [];
 
-  const getGamblescout = async () => {
-    selectedMatchData = null;
-    let res = await fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRUxqLukIXm32NQACEavD7l8jzLbR8y5VJK_c5p3mfKkx4D-tlii9SiPpsVgaElgTjUgWyUfym_T4jo/pub?gid=1678037315&single=true&output=csv");
-    let text = await res.text();
-    let data = parseCSV(text);
-    console.log(data);
-      const matchNum = document.querySelector('input[name="entry.528540297"]').value;
-    selectedMatchData = data.find(row => row["Match"]== `Qual ${matchNum}`);
-      console.log(selectedMatchData);
-  }
-  let selectedTeam = 0;
+	// Fetch match data from TBA API
+	const getMatchData = async () => {
+		selectedMatchData = null;
+		matchTeams = [];
+		
+		try {
+			const matchNumInput = document.querySelector('input[name="entry.528540297"]');
+			if (!matchNumInput || !matchNumInput.value) return;
+			
+			const matchNum = matchNumInput.value;
+			const EVENT_KEY_LOCAL = import.meta.env.VITE_EVENT_KEY || '2026rikin';
+			const matchKey = `${EVENT_KEY_LOCAL}_qm${matchNum}`;
+			
+			// Fetch match data from TBA
+			const matchRes = await fetch(
+				`https://www.thebluealliance.com/api/v3/match/${matchKey}`,
+				{ headers: { 'X-TBA-Auth-Key': TBA_KEY } }
+			);
+			
+			if (!matchRes.ok) {
+				console.error('Match not found in TBA');
+				return;
+			}
+			
+			const matchData = await matchRes.json();
+			// Extract team keys and convert to numbers
+			const redTeams = matchData.alliances.red.team_keys.map(key => key.replace('frc', ''));
+			const blueTeams = matchData.alliances.blue.team_keys.map(key => key.replace('frc', ''));
+			matchTeams = [...redTeams, ...blueTeams];
+			
+			// Fetch match predictions from Statbotics (single call, not per-team)
+			let matchPrediction = null;
+			try {
+				const statRes = await fetch(
+					`https://api.statbotics.io/v3/match/${EVENT_KEY_LOCAL}_qm${matchNum}`
+				);
+				if (statRes.ok) {
+					matchPrediction = await statRes.json();
+				}
+			} catch (e) {
+				console.error('Error fetching statbotics match prediction:', e);
+			}
+			
+			// Calculate alliance predictions from match data
+			let redScore = matchPrediction?.pred?.red_score || 0;
+			let blueScore = matchPrediction?.pred?.blue_score || 0;
+			
+			// Fallback calculation if direct scores aren't available
+			if (redScore === 0 && blueScore === 0 && matchPrediction) {
+				redScore = matchPrediction.red_rp_1 + matchPrediction.red_rp_2 || 0;
+				blueScore = matchPrediction.blue_rp_1 + matchPrediction.blue_rp_2 || 0;
+			}
+			
+			const redWinPct = redScore > 0 || blueScore > 0 
+				? Math.round((redScore / (redScore + blueScore)) * 100)
+				: 50;
+			const blueWinPct = 100 - redWinPct;
+			
+			// Build match data object compatible with template
+			selectedMatchData = {
+				'Match': `Qual ${matchNum}`,
+				'R1': redTeams[0] || '',
+				'R2': redTeams[1] || '',
+				'R3': redTeams[2] || '',
+				'B1': blueTeams[0] || '',
+				'B2': blueTeams[1] || '',
+				'B3': blueTeams[2] || '',
+				'Red win %': `${redWinPct}%`,
+				'Blue win %': `${blueWinPct}%`,
+				// Estimate points (rough calculation)
+				'Points if guessed blue correctly': Math.round(redWinPct) || 25,
+				'Points if guessed red correctly': Math.round(blueWinPct) || 25,
+				'Points if incorrectly guessed': Math.min(redWinPct / 2, blueWinPct / 2)
+			};
+			
+			console.log('Match data:', selectedMatchData);
+		} catch (e) {
+			console.error('Error fetching match data:', e);
+		}
+	};
 </script>
 
 <svelte:head>
@@ -173,7 +246,7 @@ const parseCSV = (csvText) => {
 					</div>
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Match Number</label>
-            <input type="number" name="entry.528540297" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required on:input={getGamblescout}/>
+            <input type="number" name="entry.528540297" class="bg-zinc-800 border border-zinc-700 rounded p-2 focus:ring-2 focus:ring-blue-500 outline-none" placeholder="1" required on:input={getMatchData}/>
 					</div>
 					<div class="flex flex-col">
 						<label class="text-xs font-semibold uppercase text-zinc-400 mb-1">Team Number</label>
@@ -426,6 +499,7 @@ const parseCSV = (csvText) => {
 						  name="entry.568874806"
 						  class="bg-zinc-800 border border-zinc-700 rounded p-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
 						  placeholder="General observations..."
+              required
 						></textarea>					</div>
 				</div>
 			</div>
