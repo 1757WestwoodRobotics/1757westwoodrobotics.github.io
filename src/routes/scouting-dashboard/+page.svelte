@@ -52,6 +52,11 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 
+	function clearSimulator() {
+		simRedTeams = ['', '', ''];
+		simBlueTeams = ['', '', ''];
+	}
+
 	let crossedOffTeams = new Set();
 	function toggleCrossOff(teamNum) {
 		if (crossedOffTeams.has(teamNum)) {
@@ -1417,6 +1422,11 @@
 					<span class="hidden sm:inline">All Data</span>
 					<span class="sm:hidden">All</span>
 				</button>
+				{#if simulatorMode}
+					<button on:click={clearSimulator} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] ml-auto">
+						Clear All
+					</button>
+				{/if}
 			</div>
 		</div>
 
