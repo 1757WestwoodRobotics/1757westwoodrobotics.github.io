@@ -50,6 +50,41 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 
+	const funMessages = [
+		'Recalibrating flux capacitors...',
+		'Optimizing intake geometry...',
+		'Analyzing PID coefficients...',
+		'Tuning Kalman filters...',
+		'Scanning for swerve modules...',
+		'Greasing the drivetrain...',
+		'Inflating pneumatics...',
+		'Calibrating vision sensors...',
+		'Synchronizing CAN bus...',
+		'Charging high-power batteries...',
+		'Initializing autonomous routines...',
+		'Verifying driver station link...',
+		'Checking robot signal light...',
+		'Polling for scouting data...',
+		'Baking cookies for the judges...',
+    'Asking for a replay...',
+    'Giving a ref an uno reverse card...',
+    'Pretending to understand the rules...',
+    'Trying to find the ball under the field...',
+    'Secretly hoping for a rain delay...',
+    'Running away to join the circus...',
+    'Consulting the magic 8-ball for match predictions...',
+    'Asking the team mascot for advice...',
+    'Bribing the head ref with cookies...',
+    'Trying to decode the secret handshake for alliance selection...',
+    'Attempting to communicate with the robot using Morse code...',
+    'Setting up a betting pool on match outcomes...',
+    'Trying to find the hidden Easter egg in the scouting data...',
+    'Asking the team psychologist for insights on team performance...',
+    'Consulting the ancient scrolls of FRC wisdom...',
+    'Trying to summon the spirit of Dean Kamen for guidance...'
+	];
+	let currentMessageIndex = Math.floor(Math.random() * funMessages.length);
+
 	// Video sync
 	let videoCurrentTime = 0;
 	let videoElement = null;
@@ -464,6 +499,14 @@
 	}
 
 	onMount(() => {
+		const messageInterval = setInterval(() => {
+			let nextIndex;
+			do {
+				nextIndex = Math.floor(Math.random() * funMessages.length);
+			} while (nextIndex === currentMessageIndex);
+			currentMessageIndex = nextIndex;
+		}, 3000);
+
 		console.log('onMount called, loading:', loading);
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
@@ -498,11 +541,13 @@
 					currentStep = '';
 					console.log('All tasks complete, loading:', loading);
 				});
-				return;
+				return () => clearInterval(messageInterval);
 			}
 		}
 		console.log('No cache or cache expired, fetching fresh data');
 		fetchData();
+
+		return () => clearInterval(messageInterval);
 	});
 
 	function handleSort(key) {
@@ -1205,8 +1250,27 @@
 			</div>
 
 			<!-- Loading Message -->
-			<div class="text-center">
-				<p class="text-xs font-black text-zinc-500 uppercase tracking-widest">Processing competition data...</p>
+			<div class="text-center relative group cursor-help">
+				<p class="text-xs font-black text-zinc-500 uppercase tracking-widest animate-pulse transition-all duration-500 min-h-[1rem]">
+					{funMessages[currentMessageIndex]}
+				</p>
+				
+				<!-- Fun Messages Menu (Tooltip) -->
+				<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-6 w-72 bg-zinc-900/95 backdrop-blur-xl border-2 border-zinc-800 rounded-2xl p-5 shadow-[0_0_50px_rgba(0,0,0,0.5)] opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none group-hover:translate-y-[-10px] z-[200]">
+					<div class="flex items-center justify-between mb-4 border-b border-zinc-800 pb-2">
+						<p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em]">Background Tasks</p>
+						<span class="text-[8px] font-black text-zinc-600 uppercase bg-zinc-800 px-2 py-0.5 rounded-full">{funMessages.length} Ops</span>
+					</div>
+					<div class="space-y-2.5 max-h-60 overflow-y-auto pr-2 custom-scrollbar text-left">
+						{#each funMessages as msg, i}
+							<div class="flex items-center gap-3 transition-colors duration-300 {i === currentMessageIndex ? 'text-white' : 'text-zinc-600'}">
+								<div class="flex-shrink-0 w-1.5 h-1.5 rounded-full {i === currentMessageIndex ? 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)] animate-pulse' : 'bg-zinc-800'}"></div>
+								<p class="text-[10px] font-bold uppercase tracking-tight {i === currentMessageIndex ? 'translate-x-1' : ''} transition-transform duration-300">{msg}</p>
+							</div>
+						{/each}
+					</div>
+					<div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-zinc-900 border-r-2 border-b-2 border-zinc-800 rotate-45"></div>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -2414,4 +2478,17 @@
 	::-webkit-scrollbar-thumb { background: #18181b; border-radius: 10px; }
 	::-webkit-scrollbar-thumb:hover { background: #27272a; }
 	.shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.6); }
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 4px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: #27272a;
+		border-radius: 10px;
+	}
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: #3b82f6;
+	}
 </style>
