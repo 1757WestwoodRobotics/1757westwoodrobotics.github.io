@@ -1,6 +1,10 @@
 <script>
 	import Navbar from '../../components/navbar.svelte';
 	import Footer from '../../components/footer.svelte';
+	import CoverageMap from '../../components/scoutingDashboard/CoverageMap.svelte';
+	import SimulatorHeader from '../../components/scoutingDashboard/SimulatorHeader.svelte';
+	import SimulatorTeamCard from '../../components/scoutingDashboard/SimulatorTeamCard.svelte';
+	import ContextMenu from '../../components/scoutingDashboard/ContextMenu.svelte';
 	import { onMount } from 'svelte';
 	import { Line } from 'svelte-chartjs';
 	import {
@@ -367,29 +371,45 @@
 	async function fetchAllTeamStats() {
 		const uniqueTeams = Array.from(new Set(scoutingData.map(r => getVal(r, 'Team #')))).filter(t => t && t !== 'N/A');
 		const currentYear = 2026;
-		let updated = false;
+		
+		// Filter out teams we already have cached
+		const teamsToFetch = uniqueTeams.filter(t => !teamStatsMap.has(t));
+		
+		if (teamsToFetch.length === 0) return;
 
-		for (let i = 0; i < uniqueTeams.length; i++) {
-			const teamNum = uniqueTeams[i];
-			if (teamStatsMap.has(teamNum)) continue;
+		try {
+			// Fetch all teams concurrently
+			const promises = teamsToFetch.map(teamNum =>
+				fetch(`https://api.statbotics.io/v3/team_year/${teamNum}/${currentYear}`)
+					.then(res => res.ok ? res.json().then(data => ({ teamNum, data })) : { teamNum, data: null })
+					.catch(e => {
+						console.error(`Error fetching stats for ${teamNum}:`, e);
+						return { teamNum, data: null };
+					})
+			);
 
-			try {
-				const statRes = await fetch(`https://api.statbotics.io/v3/team_year/${teamNum}/${currentYear}`);
-				if (statRes.ok) {
-					const data = await statRes.json();
+			const results = await Promise.all(promises);
+
+			// Process all results and update map
+			let updated = false;
+			results.forEach(({ teamNum, data }) => {
+				if (data) {
 					teamStatsMap.set(teamNum, {
 						epa: data?.epa?.total_points?.mean || 0,
 						rank: data?.epa?.ranks?.total?.rank || 0,
 						norm: data?.epa?.norm || 0
 					});
-					teamStatsMap = teamStatsMap; 
 					updated = true;
 				}
-			} catch (e) {
-				console.error(`Error fetching stats for ${teamNum}:`, e);
+			});
+
+			if (updated) {
+				teamStatsMap = teamStatsMap;
+				saveCache();
 			}
+		} catch (e) {
+			console.error('Error fetching team stats:', e);
 		}
-		if (updated) saveCache();
 	}
 
 	async function fetchSelectedTeamDetails(teamNumber) {
@@ -1023,7 +1043,7 @@
 					</div>
 					<div class="flex-1 min-w-0">
 						<p class="text-sm font-black text-white uppercase tracking-widest">Event Stats (TBA)</p>
-						<p class="text-xs text-zinc-400">OPR & EPA</p>
+						<p class="text-xs text-zinc-400">OPR</p>
 					</div>
 				</div>
 
@@ -1055,6 +1075,7 @@
 					</div>
 					<div class="flex-1 min-w-0">
 						<p class="text-sm font-black text-white uppercase tracking-widest">Team Analytics</p>
+            <p class="text-xs text-zinc-400">Powered by Statbotics</p>
 						<p class="text-xs text-zinc-400">{teamStatsMap.size} teams indexed</p>
 					</div>
 				</div>
@@ -1102,66 +1123,22 @@
 		</div>
 
 		<!-- Match Coverage Map -->
-		<section class="mb-12 bg-zinc-900/30 border border-zinc-800 p-6 rounded-[2rem] backdrop-blur-sm relative">
-			<div class="flex items-center justify-between mb-4">
-				<h3 class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Quals Coverage Map</h3>
-				<div class="flex gap-4 text-[8px] font-bold uppercase text-zinc-600">
-					<div class="flex items-center gap-1"><div class="w-2 h-2 bg-blue-600 rounded-sm"></div> Full (6)</div>
-					<div class="flex items-center gap-1"><div class="w-2 h-2 bg-blue-900/40 rounded-sm"></div> Partial</div>
-					<div class="flex items-center gap-1"><div class="w-2 h-2 bg-zinc-800 rounded-sm"></div> Missing</div>
-				</div>
-			</div>
-			<div class="flex flex-wrap gap-1.5">
-				{#each schedule as match}
-					{@const count = getScouterCount(match.match_number)}
-					{@const searchTeamNum = searchTerm.trim() ? parseInt(searchTerm.trim()) : null}
-					{@const teamInMatch = searchTeamNum && teamIsInMatch(searchTeamNum, match)}
-					<button class="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black transition-all border cursor-pointer hover:scale-110 relative {count >= 6 ? 'bg-blue-600 border-blue-400 text-white hover:bg-blue-500' : count > 0 ? 'bg-blue-900/40 border-blue-700 text-blue-300 hover:bg-blue-900/60' : 'bg-zinc-900 border-zinc-800 text-zinc-700 hover:border-zinc-700'} {teamInMatch ? 'shadow-[0_0_12px_rgba(34,197,94,0.6),0_0_24px_rgba(34,197,94,0.3)] ring-2 ring-green-500/50' : ''}" 
-					on:mouseenter={() => hoveredMatch = match} 
-					on:mouseleave={() => hoveredMatch = null}
-					on:focus={() => hoveredMatch = match}
-					on:blur={() => hoveredMatch = null}
-					on:click={() => selectedMatchPopup = match}
-					on:contextmenu={(e) => {
-						e.preventDefault();
-						contextMenu = { x: e.clientX, y: e.clientY };
-						contextMenuMatch = match;
-					}}>
-					{match.match_number}
-						{#if hoveredMatch === match}
-							<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-[110] animate-in fade-in zoom-in-95 duration-150">
-								<div class="bg-zinc-900 border-2 border-zinc-800 p-4 rounded-2xl shadow-2xl min-w-[200px]">
-									<p class="text-[10px] font-black text-white uppercase tracking-widest mb-3 border-b border-zinc-800 pb-2">Match {match.match_number} Breakdown</p>
-									<div class="grid grid-cols-2 gap-4">
-										<div class="space-y-1.5">
-											<p class="text-[8px] font-black text-red-500 uppercase tracking-tighter mb-1">Red</p>
-											{#each getMatchBreakdown(match).red as t}
-												<div class="flex justify-between items-center gap-3">
-													<span class="text-[9px] font-bold text-zinc-500">{t.pos}</span>
-													<span class="text-[10px] font-black {t.scouted ? 'text-white' : 'text-zinc-700 line-through'}">{t.team}</span>
-													<div class="w-1.5 h-1.5 rounded-full {t.scouted ? 'bg-green-500' : 'bg-red-900'}"></div>
-												</div>
-											{/each}
-										</div>
-										<div class="space-y-1.5">
-											<p class="text-[8px] font-black text-blue-500 uppercase tracking-tighter mb-1">Blue</p>
-											{#each getMatchBreakdown(match).blue as t}
-												<div class="flex justify-between items-center gap-3">
-													<span class="text-[9px] font-bold text-zinc-500">{t.pos}</span>
-													<span class="text-[10px] font-black {t.scouted ? 'text-white' : 'text-zinc-700 line-through'}">{t.team}</span>
-													<div class="w-1.5 h-1.5 rounded-full {t.scouted ? 'bg-green-500' : 'bg-red-900'}"></div>
-												</div>
-											{/each}
-										</div>
-									</div>
-								</div>
-								<div class="w-2 h-2 bg-zinc-900 border-r-2 border-b-2 border-zinc-800 rotate-45 absolute -bottom-1.5 left-1/2 -translate-x-1/2"></div>
-							</div>
-						{/if}
-					</button>
-				{/each}
-			</div>
-		</section>
+		<CoverageMap
+			{schedule}
+			{hoveredMatch}
+			{searchTerm}
+			{getScouterCount}
+			{getMatchBreakdown}
+			{teamIsInMatch}
+			onMatchClick={(match) => selectedMatchPopup = match}
+			onMatchContextMenu={(e, match) => {
+				e.preventDefault();
+				contextMenu = { x: e.clientX, y: e.clientY };
+				contextMenuMatch = match;
+			}}
+			onMatchHover={(match) => hoveredMatch = match}
+			onMatchHoverEnd={() => hoveredMatch = null}
+		/>
 
 		{#if pitMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
@@ -1176,7 +1153,7 @@
 							on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': getVal(pit, 'Team number') })}>
 							<div class="flex justify-between items-start mb-4 md:mb-6">
 								<div>
-									<h2 class="text-3xl md:text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{getVal(pit, 'Team number')}</h2>
+                  <h2 class="text-3xl md:text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors" style="color: var(--team-primary);">{getVal(pit, 'Team number')}</h2>
 									<p class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
 								</div>
 								{#if getVal(pit, 'Under trench?') === 'Yes' || getVal(pit, 'Over bump?') === 'Yes'}
@@ -1218,7 +1195,7 @@
 								</div>
 							</div>
 							
-							<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 pointer-events-none">
+              <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 pointer-events-none" style="color: var(--team-secondary);">
 								<h1 class="text-9xl font-black italic">{getVal(pit, 'Team number')}</h1>
 							</div>
 						</div>
@@ -1237,56 +1214,19 @@
 					</div>
 					<div class="space-y-4 md:space-y-6">
 						{#each simRedTeams as team, i}
-							<div class="flex flex-col gap-3">
-								<input type="text" bind:value={simRedTeams[i]} on:input={() => fetchTeamColors(simRedTeams[i])} placeholder="Team #" class="w-full bg-black/60 border-2 border-red-500/30 rounded-xl p-3 text-center font-black text-base md:text-lg focus:border-red-500 outline-none transition" />
-								{#if getTeamSummary(simRedTeams[i])}
-									{@const s = getTeamSummary(simRedTeams[i])}
-									{@const colors = teamColorsMap.get(simRedTeams[i]) || { primary: '#ef4444', secondary: '#991b1b' }}
-									<div class="bg-zinc-900/60 rounded-2xl border-2 border-zinc-800 p-4 md:p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
-										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-										role="button"
-										tabindex="0"
-										on:click={() => handleRowClick({ 'Team #': simRedTeams[i] })}
-										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simRedTeams[i] })}>
-										
-										<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
-											<div>
-												<div class="flex items-center gap-2 flex-wrap">
-													<span class="text-xl md:text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simRedTeams[i]}</span>
-													<span class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simRedTeams[i])?.nickname || ''}</span>
-												</div>
-												<div class="flex gap-3 md:gap-4 mt-2 text-xs md:text-sm">
-													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
-													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
-												</div>
-											</div>
-											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-red-500 transition-colors flex-shrink-0"
-													role="button"
-													tabindex="0"
-													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
-													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
-												</div>
-											{/if}
-										</div>
-
-										{#if s.pit}
-											<div class="grid grid-cols-2 gap-2 md:gap-3 relative z-10">
-												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
-													<p class="font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
-													<p class="font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
-												</div>
-												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
-													<p class="font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
-													<p class="font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
-												</div>
-											</div>
-										{/if}
-										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{simRedTeams[i]}</div>
-									</div>
-								{/if}
-							</div>
+							<SimulatorTeamCard
+								{team}
+								teamIndex={i}
+								alliance="red"
+								{getTeamSummary}
+								{teamColorsMap}
+								{teamDetailsMap}
+								onTeamInput={(idx, val) => { simRedTeams[idx] = val; fetchTeamColors(val); }}
+								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
+								onImageClick={(url) => openImageViewer(url)}
+								{getDriveDirectLink}
+								{getVal}
+							/>
 						{/each}
 					</div>
 				</div>
@@ -1300,56 +1240,19 @@
 					</div>
 					<div class="space-y-4 md:space-y-6">
 						{#each simBlueTeams as team, i}
-							<div class="flex flex-col gap-3">
-								<input type="text" bind:value={simBlueTeams[i]} on:input={() => fetchTeamColors(simBlueTeams[i])} placeholder="Team #" class="w-full bg-black/60 border-2 border-blue-500/30 rounded-xl p-3 text-center font-black text-base md:text-lg focus:border-blue-500 outline-none transition" />
-								{#if getTeamSummary(simBlueTeams[i])}
-									{@const s = getTeamSummary(simBlueTeams[i])}
-									{@const colors = teamColorsMap.get(simBlueTeams[i]) || { primary: '#3b82f6', secondary: '#1e40af' }}
-									<div class="bg-zinc-900/60 rounded-2xl border-2 border-zinc-800 p-4 md:p-5 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative" 
-										style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
-										role="button"
-										tabindex="0"
-										on:click={() => handleRowClick({ 'Team #': simBlueTeams[i] })}
-										on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': simBlueTeams[i] })}>
-										
-										<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
-											<div>
-												<div class="flex items-center gap-2 flex-wrap">
-													<span class="text-xl md:text-2xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors">{simBlueTeams[i]}</span>
-													<span class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-widest">{teamDetailsMap.get(simBlueTeams[i])?.nickname || ''}</span>
-												</div>
-												<div class="flex gap-3 md:gap-4 mt-2 text-xs md:text-sm">
-													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">EPA</span><span class="font-black text-blue-400">{s.epa.toFixed(1)}</span></div>
-													<div class="flex flex-col"><span class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase">Climb</span><span class="font-black text-purple-400">{(s.climbRate*100).toFixed(0)}%</span></div>
-												</div>
-											</div>
-											{#if s.pit && getDriveDirectLink(getVal(s.pit, 'Bot pic'))}
-												<div class="w-16 h-16 md:w-20 md:h-20 rounded-lg md:rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors flex-shrink-0"
-													role="button"
-													tabindex="0"
-													on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}
-													on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(s.pit, 'Bot pic')))}>
-													<img src={getDriveDirectLink(getVal(s.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
-												</div>
-											{/if}
-										</div>
-
-										{#if s.pit}
-											<div class="grid grid-cols-2 gap-2 md:gap-3 relative z-10">
-												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
-													<p class="font-black text-zinc-500 uppercase mb-0.5">Drivetrain</p>
-													<p class="font-black text-white truncate">{getVal(s.pit, 'Drive Train Type')}</p>
-												</div>
-												<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
-													<p class="font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
-													<p class="font-black text-zinc-300 truncate italic">"{getVal(s.pit, 'Best Auto')}"</p>
-												</div>
-											</div>
-										{/if}
-										<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{simBlueTeams[i]}</div>
-									</div>
-								{/if}
-							</div>
+							<SimulatorTeamCard
+								{team}
+								teamIndex={i}
+								alliance="blue"
+								{getTeamSummary}
+								{teamColorsMap}
+								{teamDetailsMap}
+								onTeamInput={(idx, val) => { simBlueTeams[idx] = val; fetchTeamColors(val); }}
+								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
+								onImageClick={(url) => openImageViewer(url)}
+								{getDriveDirectLink}
+								{getVal}
+							/>
 						{/each}
 					</div>
 				</div>
@@ -2251,33 +2154,12 @@
 {/if}
 
 <!-- Simulator Load Context Menu -->
-{#if contextMenu && contextMenuMatch}
-	<div 
-		class="fixed inset-0 z-[150]"
-		on:click={() => contextMenu = null}
-		on:contextmenu={(e) => e.preventDefault()}>
-		<div 
-			class="fixed bg-zinc-900 border-2 border-zinc-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-			style="left: {contextMenu.x}px; top: {contextMenu.y}px;"
-			on:click|stopPropagation>
-			<div class="min-w-[200px]">
-				<p class="text-[10px] font-black text-zinc-400 uppercase tracking-widest px-3 py-2 border-b border-zinc-800">Match {contextMenuMatch.match_number}</p>
-				<button 
-					on:click={() => loadMatchIntoSimulator(contextMenuMatch)}
-					class="w-full text-left px-3 py-2 text-[11px] font-black text-white hover:bg-blue-600 hover:text-white transition flex items-center gap-2">
-					<span>🎮</span>
-					<span>Load in Simulator</span>
-				</button>
-				<button 
-					on:click={() => contextMenu = null}
-					class="w-full text-left px-3 py-2 text-[11px] font-black text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200 transition flex items-center gap-2">
-					<span>✕</span>
-					<span>Close</span>
-				</button>
-			</div>
-		</div>
-	</div>
-{/if}
+<ContextMenu
+	{contextMenu}
+	{contextMenuMatch}
+	onLoadSimulator={(match) => loadMatchIntoSimulator(match)}
+	onClose={() => contextMenu = null}
+/>
 
 <Footer />
 
