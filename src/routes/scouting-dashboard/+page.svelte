@@ -29,7 +29,9 @@
 		pitData: false,
 		eventStats: false,
 		schedule: false,
-		teamStats: false
+		teamStats: false,
+		teamColors: false,
+		teamDetails: false
 	};
 	let currentStep = '';
 	let error = null;
@@ -288,7 +290,9 @@
         pitData: false,
         eventStats: false,
         schedule: false,
-        teamStats: false
+        teamStats: false,
+        teamColors: false,
+        teamDetails: false
       };
       if(force){
         scoutingData = [];
@@ -361,6 +365,16 @@
 			loadingSteps.teamStats = true;
 			await fetchAllTeamStats();
 			loadingSteps.teamStats = false;
+			
+			currentStep = 'teamColors';
+			loadingSteps.teamColors = true;
+			await fetchAllTeamColors();
+			loadingSteps.teamColors = false;
+
+			currentStep = 'teamDetails';
+			loadingSteps.teamDetails = true;
+			await fetchAllTeamDetails();
+			loadingSteps.teamDetails = false;
 		} catch (e) {
 			error = e.message;
 			console.error('Load error:', e);
@@ -454,6 +468,61 @@
 			}
 		} catch (e) {
 			console.error('Error fetching team stats:', e);
+		}
+	}
+
+	async function fetchAllTeamColors() {
+		const uniqueTeams = Array.from(new Set([
+			...scoutingData.map(r => getVal(r, 'Team #')),
+			...pitData.map(p => getVal(p, 'Team number'))
+		])).filter(t => t && t !== 'N/A' && !teamColorsMap.has(t));
+
+		if (uniqueTeams.length === 0) return;
+
+		try {
+			// Fetch colors concurrently
+			const promises = uniqueTeams.map(teamNum => fetchTeamColors(teamNum));
+			await Promise.all(promises);
+		} catch (e) {
+			console.error('Error prefetching team colors:', e);
+		}
+	}
+
+	async function fetchAllTeamDetails() {
+		const uniqueTeams = Array.from(new Set([
+			...scoutingData.map(r => getVal(r, 'Team #')),
+			...pitData.map(p => getVal(p, 'Team number'))
+		])).filter(t => t && t !== 'N/A' && !teamDetailsMap.has(t));
+
+		if (uniqueTeams.length === 0) return;
+
+		try {
+			// Fetch team details concurrently
+			const promises = uniqueTeams.map(teamNum => 
+				fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNum}`, {
+					headers: { 'X-TBA-Auth-Key': TBA_KEY }
+				}).then(res => res.ok ? res.json().then(data => ({ teamNum, data })) : { teamNum, data: null })
+				.catch(e => {
+					console.error(`Error fetching TBA details for ${teamNum}:`, e);
+					return { teamNum, data: null };
+				})
+			);
+
+			const results = await Promise.all(promises);
+			let updated = false;
+			results.forEach(({ teamNum, data }) => {
+				if (data) {
+					teamDetailsMap.set(teamNum, data);
+					updated = true;
+				}
+			});
+
+			if (updated) {
+				teamDetailsMap = teamDetailsMap;
+				saveCache();
+			}
+		} catch (e) {
+			console.error('Error prefetching team details:', e);
 		}
 	}
 
@@ -1255,6 +1324,38 @@
 						<p class="text-sm font-black text-white uppercase tracking-widest">Team Analytics</p>
             <p class="text-xs text-zinc-400">Powered by Statbotics</p>
 						<p class="text-xs text-zinc-400">{teamStatsMap.size} teams indexed</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamColors || !teamColorsMap.size ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.teamColors}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if teamColorsMap.size}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Team Visuals</p>
+						<p class="text-xs text-zinc-400">{teamColorsMap.size} brand colors loaded</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamDetails || !teamDetailsMap.size ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.teamDetails}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if teamDetailsMap.size}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Team Identities (TBA)</p>
+						<p class="text-xs text-zinc-400">{teamDetailsMap.size} profiles indexed</p>
 					</div>
 				</div>
 			</div>
