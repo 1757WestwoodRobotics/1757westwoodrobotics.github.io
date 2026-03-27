@@ -719,7 +719,8 @@
 			labels: teamRows.map(r => `M${getVal(r, 'Match #')}`),
 			datasets: [
 				{ label: 'Scoring Effectiveness', data: teamRows.map(r => parseInt(getVal(r, 'Scoring effectiveness?')) || 0), borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.5)', tension: 0.3, pointBackgroundColor: '#3b82f6', pointRadius: 4 },
-				{ label: 'Feeding Skill', data: teamRows.map(r => parseInt(getVal(r, 'feeding score?')) || 0), borderColor: '#fb923c', backgroundColor: 'rgba(251, 146, 60, 0.5)', tension: 0.3, pointBackgroundColor: '#fb923c', pointRadius: 4 }
+				{ label: 'Feeding Skill', data: teamRows.map(r => parseInt(getVal(r, 'feeding score?')) || 0), borderColor: '#fb923c', backgroundColor: 'rgba(251, 146, 60, 0.5)', tension: 0.3, pointBackgroundColor: '#fb923c', pointRadius: 4 },
+				{ label: 'Defense Effectivity', data: teamRows.map(r => parseInt(getVal(r, 'defense skill')) || 0), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.5)', tension: 0.3, pointBackgroundColor: '#ef4444', pointRadius: 4 }
 			]
 		};
 	}
@@ -780,6 +781,128 @@
 			opr: simBlueTeams.map(t => parseInt(t) || 0).reduce((acc, t) => acc + (eventOprs[`frc${t}`] || 0), 0)
 		}
 	};
+
+	function hasMatchIssues(scoutRow) {
+		const comments = (getVal(scoutRow, 'comments') || '').toLowerCase();
+		const hasMechanical = comments.includes('mechanical') || comments.includes('broke') || comments.includes('died');
+		const hasFouls = comments.includes('card') || comments.includes('yellow') || comments.includes('red');
+		const hasStability = comments.includes('tipped') || comments.includes('tip') || comments.includes('unstable');
+		return hasMechanical || hasFouls || hasStability;
+	}
+
+	function getTeamRoleRecommendation(teamNum) {
+		const summary = getTeamSummary(teamNum);
+		if (!summary) return null;
+
+		const teamRows = scoutingData.filter(r => getVal(r, 'Team #') === teamNum);
+		const avgEpa = summary.epa;
+		const avgEff = summary.avgEff;
+
+		// Filter out matches with issues for effectiveness calculation
+		const cleanRows = teamRows.filter(r => !hasMatchIssues(r));
+		const denominator = cleanRows.length || 1;
+
+		// Calculate role-specific effectiveness metrics (excluding matches with issues)
+		const scoringEff = cleanRows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'Scoring effectiveness?')) || 0), 0) / denominator;
+		const passingEff = cleanRows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'feeding score?')) || 0), 0) / denominator;
+		const defendingEff = cleanRows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'defense skill')) || 0), 0) / denominator;
+
+		const issues = [];
+
+		// Analyze match comments for patterns
+		const allComments = teamRows.map(r => (getVal(r, 'comments') || '').toLowerCase()).join(' ');
+
+		// Detect issues
+		if (allComments.includes('mechanical') || allComments.includes('broke') || allComments.includes('died')) {
+			issues.push('mechanical');
+		}
+		if (allComments.includes('card') || allComments.includes('yellow') || allComments.includes('red')) {
+			issues.push('fouls');
+		}
+		if (allComments.includes('tipped') || allComments.includes('tip') || allComments.includes('unstable')) {
+			issues.push('stability');
+		}
+
+		// Determine role based on effectiveness metrics combined with EPA
+		let role = 'Passing';
+		let recommendation = 'Focus on consistent piece feeding';
+		let roleScore = 0;
+
+		// Score each role
+		const scorerScore = scoringEff * 2.0 + (avgEpa / 50); // Weight scoring efficiency heavily
+		const passingScore = passingEff * 1.5 + (avgEpa / 100); // Passing is important but secondary
+		const defendingScore = defendingEff * 2.0; // Defending is pure effectiveness
+
+		if (defendingScore > scorerScore && defendingScore > passingScore && defendingEff >= 2) {
+			role = 'Defending';
+			recommendation = `Leverage defensive strength (${defendingEff.toFixed(1)}/5) to disrupt opponent offense`;
+		} else if (scorerScore > passingScore && scoringEff >= 2) {
+			role = 'Scoring';
+			recommendation = `Maximize scoring efficiency (${scoringEff.toFixed(1)}/5) with EPA focus`;
+		} else if (passingEff >= 2.5) {
+			role = 'Passing';
+			recommendation = `Drive consistent piece feeding (${passingEff.toFixed(1)}/5) to enable scoring`;
+		} else {
+			role = 'Passing';
+			recommendation = 'Focus on consistent piece feeding';
+		}
+
+		return {
+			teamNum,
+			role,
+			recommendation,
+			stats: {
+				epa: avgEpa,
+				avgEff: avgEff,
+				scoringEff,
+				passingEff,
+				defendingEff,
+				matchCount: teamRows.length
+			},
+			issues
+		};
+	}
+
+	function getAllianceStrategy(teams) {
+		const recommendations = teams
+			.map(t => getTeamRoleRecommendation(t))
+			.filter(Boolean);
+
+		if (recommendations.length === 0) return null;
+
+		// Sort by role priority
+		const roleOrder = { 'Scoring': 0, 'Passing': 1, 'Defending': 2 };
+		recommendations.sort((a, b) => (roleOrder[a.role] || 999) - (roleOrder[b.role] || 999));
+
+		const avgEpa = recommendations.reduce((acc, r) => acc + r.stats.epa, 0) / recommendations.length;
+
+		return {
+			recommendations,
+			avgEpa,
+			strategy: generateStrategy(recommendations)
+		};
+	}
+
+	function generateStrategy(recommendations) {
+		const scorers = recommendations.filter(r => r.role === 'Scoring').length;
+		const passers = recommendations.filter(r => r.role === 'Passing').length;
+		const defenders = recommendations.filter(r => r.role === 'Defending').length;
+
+		let strategy = '';
+		if (scorers >= 2 && passers >= 1) {
+			strategy = 'Strong scoring pipeline with multiple feeders';
+		} else if (scorers >= 2) {
+			strategy = 'Dual scoring focus with balanced support';
+		} else if (defenders >= 2) {
+			strategy = 'Defensive-focused; disrupt opponent offense';
+		} else if (passers >= 2) {
+			strategy = 'Emphasize feeding efficiency for consistent scoring';
+		} else {
+			strategy = 'Balanced approach; focus on consistency';
+		}
+
+		return strategy;
+	}
 
 	function getMatchScoutingData(matchNumber) {
 		const scoutedTeams = scoutingData.filter(r => getVal(r, 'Match #') == matchNumber);
@@ -1257,6 +1380,89 @@
 					</div>
 				</div>
 			</div>
+
+			<!-- Strategic Recommendations -->
+			<div class="mt-12 animate-in fade-in slide-in-from-bottom-4">
+				<div class="bg-gradient-to-r from-purple-950/30 via-black/40 to-purple-950/30 border-2 border-purple-500/30 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-sm">
+					<h3 class="text-2xl md:text-3xl font-black text-purple-400 uppercase italic tracking-tighter mb-6">Match Strategy</h3>
+					
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+						<!-- Red Alliance Strategy -->
+						{#if simRedTeams.some(t => t)}
+							{@const redStrategy = getAllianceStrategy(simRedTeams.filter(t => t))}
+							{#if redStrategy}
+								<div class="bg-red-950/20 border-2 border-red-500/20 rounded-2xl p-5 md:p-6">
+									<div class="flex items-center gap-2 mb-4">
+										<div class="w-3 h-3 rounded-full bg-red-500"></div>
+										<h4 class="text-lg md:text-xl font-black text-red-400 uppercase">Red Strategy</h4>
+										<span class="text-[10px] md:text-xs font-black text-red-500/60 uppercase ml-auto">{redStrategy.recommendations.length} Teams</span>
+									</div>
+
+									<p class="text-sm md:text-base font-bold text-red-300/80 mb-5 italic">{redStrategy.strategy}</p>
+
+									<div class="space-y-3">
+										{#each redStrategy.recommendations as rec (rec.teamNum)}
+											<div class="bg-black/40 border border-red-500/20 rounded-xl p-3 hover:border-red-500/40 transition">
+												<div class="flex items-start justify-between gap-2 mb-2">
+													<div>
+														<p class="text-[10px] font-black text-red-400 uppercase tracking-tight">Team {rec.teamNum}</p>
+														<p class="text-sm md:text-base font-black text-white">{rec.role}</p>
+													</div>
+													<div class="text-right text-[8px] md:text-[9px]">
+														<p class="font-black text-zinc-400">EPA {rec.stats.epa.toFixed(1)}</p>
+														<p class="font-black text-zinc-400">Eff {rec.stats.avgEff.toFixed(1)}</p>
+													</div>
+												</div>
+												<p class="text-[8px] md:text-xs text-zinc-300 line-clamp-2">{rec.recommendation}</p>
+												{#if rec.issues.length > 0}
+													<p class="text-[7px] md:text-[8px] text-red-400/70 mt-2">⚠️ Issues: {rec.issues.join(', ')}</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						{/if}
+
+						<!-- Blue Alliance Strategy -->
+						{#if simBlueTeams.some(t => t)}
+							{@const blueStrategy = getAllianceStrategy(simBlueTeams.filter(t => t))}
+							{#if blueStrategy}
+								<div class="bg-blue-950/20 border-2 border-blue-500/20 rounded-2xl p-5 md:p-6">
+									<div class="flex items-center gap-2 mb-4">
+										<div class="w-3 h-3 rounded-full bg-blue-500"></div>
+										<h4 class="text-lg md:text-xl font-black text-blue-400 uppercase">Blue Strategy</h4>
+										<span class="text-[10px] md:text-xs font-black text-blue-500/60 uppercase ml-auto">{blueStrategy.recommendations.length} Teams</span>
+									</div>
+
+									<p class="text-sm md:text-base font-bold text-blue-300/80 mb-5 italic">{blueStrategy.strategy}</p>
+
+									<div class="space-y-3">
+										{#each blueStrategy.recommendations as rec (rec.teamNum)}
+											<div class="bg-black/40 border border-blue-500/20 rounded-xl p-3 hover:border-blue-500/40 transition">
+												<div class="flex items-start justify-between gap-2 mb-2">
+													<div>
+														<p class="text-[10px] font-black text-blue-400 uppercase tracking-tight">Team {rec.teamNum}</p>
+														<p class="text-sm md:text-base font-black text-white">{rec.role}</p>
+													</div>
+													<div class="text-right text-[8px] md:text-[9px]">
+														<p class="font-black text-zinc-400">EPA {rec.stats.epa.toFixed(1)}</p>
+														<p class="font-black text-zinc-400">Eff {rec.stats.avgEff.toFixed(1)}</p>
+													</div>
+												</div>
+												<p class="text-[8px] md:text-xs text-zinc-300 line-clamp-2">{rec.recommendation}</p>
+												{#if rec.issues.length > 0}
+													<p class="text-[7px] md:text-[8px] text-blue-400/70 mt-2">⚠️ Issues: {rec.issues.join(', ')}</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						{/if}
+					</div>
+				</div>
+			</div>
 		{:else if selectionMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
 				<!-- Desktop Table -->
@@ -1486,7 +1692,7 @@
 
 {#if selectedRow}
 	{@const colors = teamColorsMap.get(getVal(selectedRow, 'Team #')) || { primary: '#3b82f6', secondary: '#1e40af' }}
-	<div class="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
+	<div class="fixed inset-0 z-[100] flex items-end md:items-center justify-center p-2 md:p-4 bg-black/30 backdrop-blur-lg animate-in fade-in zoom-in-95 duration-200" 
 		style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 		role="button"
 		tabindex="0"
@@ -1641,6 +1847,44 @@
 							</div>
 						{/if}
 					</div>
+
+					{@const teamMatchesWithIssues = scoutingData.filter(r => getVal(r, 'Team #') === getVal(selectedRow, 'Team #')).filter(r => {
+						const hasMechanical = getVal(r, 'mech issue') === 'TRUE' || getVal(r, 'mechanical issue') === 'Yes';
+						const hasTipped = getVal(r, 'tipped') === 'TRUE' || getVal(r, 'tipped') === 'Yes';
+						const hasDied = getVal(r, 'died') === 'TRUE' || getVal(r, 'died') === 'Yes';
+						const hasCard = getVal(r, 'card') !== 'No Card' && getVal(r, 'card') !== 'N/A' && getVal(r, 'card') !== '';
+						return hasMechanical || hasTipped || hasDied || hasCard;
+					})}
+					{#if teamMatchesWithIssues.length > 0}
+						<section>
+							<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8">
+								<h3 class="text-xs font-black text-yellow-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">⚠ Matches with Issues</h3>
+								<div class="h-0.5 flex-1 bg-gradient-to-r from-yellow-800/30 to-transparent"></div>
+							</div>
+							<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4">
+								{#each teamMatchesWithIssues as match}
+									<div class="bg-yellow-900/10 border-2 border-yellow-800/30 hover:border-yellow-600/50 p-3 md:p-6 rounded-lg md:rounded-2xl transition-all">
+										<p class="text-sm md:text-base font-black text-yellow-400 mb-2">Match {getVal(match, 'Match #')}</p>
+										<div class="flex flex-wrap gap-1 md:gap-2">
+											{#if getVal(match, 'mech issue') === 'TRUE' || getVal(match, 'mechanical issue') === 'Yes'}
+												<span class="bg-red-900/30 text-red-400 text-[7px] md:text-[8px] px-2 py-1 rounded font-black uppercase">🔧 Mechanical</span>
+											{/if}
+											{#if getVal(match, 'died') === 'TRUE' || getVal(match, 'died') === 'Yes'}
+												<span class="bg-red-900/30 text-red-400 text-[7px] md:text-[8px] px-2 py-1 rounded font-black uppercase">⚡ Died</span>
+											{/if}
+											{#if getVal(match, 'card') !== 'No Card' && getVal(match, 'card') !== 'N/A' && getVal(match, 'card') !== ''}
+												<span class="bg-orange-900/30 text-orange-400 text-[7px] md:text-[8px] px-2 py-1 rounded font-black uppercase">🟨 {getVal(match, 'card')}</span>
+											{/if}
+											{#if getVal(match, 'tipped') === 'TRUE' || getVal(match, 'tipped') === 'Yes'}
+												<span class="bg-red-900/30 text-red-400 text-[7px] md:text-[8px] px-2 py-1 rounded font-black uppercase">📌 Tipped</span>
+											{/if}
+										</div>
+									</div>
+								{/each}
+							</div>
+						</section>
+					{/if}
+
 					<section>
 						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-8">
 							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Battle Sequence</h3>
