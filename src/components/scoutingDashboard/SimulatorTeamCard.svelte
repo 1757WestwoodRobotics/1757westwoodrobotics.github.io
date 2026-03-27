@@ -28,6 +28,14 @@
 		tabindex="0"
 		on:click={() => onTeamClick(team)}
 		on:keydown={(e) => e.key === 'Enter' && onTeamClick(team)}>
+  <!-- clear team button -->
+  <button
+    class="absolute top-1 right-1 w-12 h-12 rounded-full bg-black/50 text-white text-lg flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity z-20"
+    on:click|stopPropagation={() => onTeamInput(teamIndex, '')}
+    on:keydown={(e) => e.key === 'Enter' && onTeamInput(teamIndex, '')}
+    aria-label="Clear team selection">
+    &times;
+  </button>
 
 		<!-- Header: Team number and nickname -->
 		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
