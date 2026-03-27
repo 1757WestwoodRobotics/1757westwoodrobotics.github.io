@@ -50,6 +50,16 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 
+	let crossedOffTeams = new Set();
+	function toggleCrossOff(teamNum) {
+		if (crossedOffTeams.has(teamNum)) {
+			crossedOffTeams.delete(teamNum);
+		} else {
+			crossedOffTeams.add(teamNum);
+		}
+		crossedOffTeams = crossedOffTeams; // Trigger Svelte reactivity
+	}
+
 	const funMessages = [
 		'Recalibrating flux capacitors...',
 		'Optimizing intake geometry...',
@@ -1535,6 +1545,7 @@
 						<thead>
 							<tr class="bg-orange-950/20 text-orange-400 text-[10px] font-black uppercase tracking-[0.3em]">
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white" on:click={() => handleSort('Team #')}>Team {sortKey === 'Team #' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
+								<th class="p-8 border-b-2 border-zinc-800 text-center">Cross Off</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('EPA')}>EPA (Statbotics) {sortKey === 'EPA' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('OPR')}>OPR (TBA) {sortKey === 'OPR' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Avg Eff.')}>Avg Eff. {sortKey === 'Avg Eff.' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
@@ -1547,8 +1558,16 @@
 						<tbody class="divide-y divide-zinc-800">
 							{#each sortedLeaderboard as m}
 								{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
-								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
+								{@const isCrossedOff = crossedOffTeams.has(m.teamNum)}
+								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group {isCrossedOff ? 'opacity-30 line-through decoration-orange-500 decoration-4' : ''}" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
 									<td class="p-2 md:p-8 font-black text-white text-xl md:text-4xl group-hover:pl-4 md:group-hover:pl-12 transition-all">{m.teamNum}</td>
+									<td class="p-8 text-center">
+										<button 
+											on:click|stopPropagation={() => toggleCrossOff(m.teamNum)}
+											class="p-4 rounded-full transition-all {isCrossedOff ? 'bg-orange-500 text-white shadow-lg scale-110' : 'bg-zinc-800 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300'}">
+											<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+										</button>
+									</td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{m.epa.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-zinc-300">{m.opr.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-orange-400">{m.avgEff.toFixed(1)}</span></td>
@@ -1586,13 +1605,21 @@
 				<div class="md:hidden space-y-3">
 					{#each sortedLeaderboard as m}
 						{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
-						<div class="bg-zinc-900/40 border-2 border-orange-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-orange-500/40 transition-all" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
+						{@const isCrossedOff = crossedOffTeams.has(m.teamNum)}
+						<div class="bg-zinc-900/40 border-2 border-orange-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-orange-500/40 transition-all {isCrossedOff ? 'opacity-30' : ''}" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
 							<div class="flex justify-between items-start gap-3 mb-3">
 								<div class="flex-1">
-									<p class="text-2xl font-black text-orange-400">{m.teamNum}</p>
+									<p class="text-2xl font-black {isCrossedOff ? 'line-through decoration-orange-500 decoration-2' : 'text-orange-400'}">{m.teamNum}</p>
 									<p class="text-xs text-zinc-500 font-black uppercase mt-1">{m.entryCount} matches</p>
 								</div>
-								<button on:click|stopPropagation={() => handleRowClick({ 'Team #': m.teamNum })} class="bg-zinc-800 hover:bg-orange-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg transition uppercase tracking-widest flex-shrink-0">View</button>
+								<div class="flex gap-2">
+									<button 
+										on:click|stopPropagation={() => toggleCrossOff(m.teamNum)}
+										class="p-2 rounded-lg transition-all {isCrossedOff ? 'bg-orange-500 text-white' : 'bg-zinc-800 text-zinc-500'}">
+										<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" /></svg>
+									</button>
+									<button on:click|stopPropagation={() => handleRowClick({ 'Team #': m.teamNum })} class="bg-zinc-800 hover:bg-orange-600 text-white text-[9px] font-black px-3 py-1.5 rounded-lg transition uppercase tracking-widest flex-shrink-0">View</button>
+								</div>
 							</div>
 							<div class="grid grid-cols-3 gap-2">
 								<div class="bg-black/30 p-2 rounded-lg">
