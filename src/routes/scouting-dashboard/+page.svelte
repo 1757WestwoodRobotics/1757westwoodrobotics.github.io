@@ -48,6 +48,7 @@
 	let pitMode = false;
 	let simulatorMode = false;
 	let selectionMode = false;
+	let selectionSearchTerm = '';
 	let defenseMode = false;
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
@@ -703,6 +704,14 @@
 		if (valA < valB) return -1 * sortOrder;
 		if (valA > valB) return 1 * sortOrder;
 		return 0;
+	});
+
+	$: filteredLeaderboard = sortedLeaderboard.filter(m => {
+		if (!selectionSearchTerm) return true;
+		const teamNum = m.teamNum.toLowerCase();
+		const nickname = (teamDetailsMap.get(m.teamNum)?.nickname || '').toLowerCase();
+		const term = selectionSearchTerm.toLowerCase();
+		return teamNum.includes(term) || nickname.includes(term);
 	});
 
 	$: defenseMetrics = scoutingData
@@ -1650,6 +1659,21 @@
 			</div>
 		{:else if selectionMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
+				<!-- Search Box for Selection Mode -->
+				<div class="mb-6 max-w-md">
+					<div class="relative">
+						<input
+							type="text"
+							bind:value={selectionSearchTerm}
+							placeholder="Go to team (name or #)..."
+							class="w-full bg-zinc-900/60 border-2 border-orange-500/20 rounded-2xl p-4 pl-12 focus:border-orange-500/50 outline-none transition-all font-black text-orange-400 placeholder:text-orange-950/40"
+						/>
+						<svg class="w-6 h-6 absolute left-4 top-1/2 -translate-y-1/2 text-orange-500/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+						</svg>
+					</div>
+				</div>
+
 				<!-- Desktop Table -->
 				<div class="hidden md:block bg-zinc-900/40 rounded-[2.5rem] border-2 border-orange-500/20 shadow-2xl backdrop-blur-xl overflow-x-auto">
 					<table class="w-full text-left border-separate border-spacing-0">
@@ -1667,7 +1691,7 @@
 							</tr>
 						</thead>
 						<tbody class="divide-y divide-zinc-800">
-							{#each sortedLeaderboard as m}
+							{#each filteredLeaderboard as m}
 								{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
 								{@const isCrossedOff = crossedOffTeams.has(m.teamNum)}
 								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group {isCrossedOff ? 'opacity-30 line-through decoration-orange-500 decoration-4' : ''}" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
@@ -1714,7 +1738,7 @@
 
 				<!-- Mobile Cards -->
 				<div class="md:hidden space-y-3">
-					{#each sortedLeaderboard as m}
+					{#each filteredLeaderboard as m}
 						{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
 						{@const isCrossedOff = crossedOffTeams.has(m.teamNum)}
 						<div class="bg-zinc-900/40 border-2 border-orange-500/20 rounded-2xl p-4 shadow-xl backdrop-blur-xl cursor-pointer hover:border-orange-500/40 transition-all {isCrossedOff ? 'opacity-30' : ''}" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
