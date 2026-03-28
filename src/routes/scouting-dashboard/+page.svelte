@@ -1475,9 +1475,9 @@
 									<p class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
 								</div>
 								{#if getVal(pit, 'Under trench?') === 'Yes' || getVal(pit, 'Over bump?') === 'Yes'}
-									<div class="flex gap-1.5">
-										{#if getVal(pit, 'Under trench?') === 'Yes'} <div class="w-3 h-3 rounded-full shadow-lg" style="background: var(--team-primary)" title="Under Trench"></div> {/if}
-										{#if getVal(pit, 'Over bump?') === 'Yes'} <div class="w-3 h-3 rounded-full shadow-lg" style="background: var(--team-secondary)" title="Over Bump"></div> {/if}
+									<div class="flex gap-1.5 flex-wrap justify-end">
+										{#if getVal(pit, 'Under trench?') === 'Yes'} <span class="bg-green-900/30 text-green-400 text-[8px] md:text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-500/20">Trench</span> {/if}
+										{#if getVal(pit, 'Over bump?') === 'Yes'} <span class="bg-blue-900/30 text-blue-400 text-[8px] md:text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-blue-500/20">Bump</span> {/if}
 									</div>
 								{/if}
 							</div>
