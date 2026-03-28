@@ -99,7 +99,8 @@
     'Trying to find the hidden Easter egg in the scouting data...',
     'Asking the team psychologist for insights on team performance...',
     'Consulting the ancient scrolls of FRC wisdom...',
-    'Trying to summon the spirit of Dean Kamen for guidance...'
+    'Trying to summon the spirit of Dean Kamen for guidance...',
+    'Banishing the spirit of Dean Kamen to keep YPP...',
 	];
 	let currentMessageIndex = Math.floor(Math.random() * funMessages.length);
 
