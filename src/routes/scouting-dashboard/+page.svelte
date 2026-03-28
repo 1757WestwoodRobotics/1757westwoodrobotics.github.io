@@ -669,6 +669,11 @@
 		}
 	}
 
+	$: allTeamsList = Array.from(new Set([
+		...scoutingData.map(r => getVal(r, 'Team #')),
+		...pitData.map(p => getVal(p, 'Team number'))
+	])).filter(t => t && t !== 'N/A').sort((a, b) => parseInt(a) - parseInt(b));
+
 	$: teamMetrics = Array.from(new Set(scoutingData.map(r => getVal(r, 'Team #'))))
 		.filter(t => t !== 'N/A')
 		.map(teamNum => {
@@ -1461,20 +1466,25 @@
 		{#if pitMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-					{#each pitData.filter(p => !searchTerm || getVal(p, 'Team number').includes(searchTerm)).sort((a,b) => parseInt(getVal(a, 'Team number')) - parseInt(getVal(b, 'Team number'))) as pit}
-						{@const colors = teamColorsMap.get(getVal(pit, 'Team number')) || { primary: '#3b82f6', secondary: '#1e40af' }}
+					{#each allTeamsList.filter(tNum => !searchTerm || tNum.includes(searchTerm)) as teamNum}
+						{@const pit = pitData.find(p => getVal(p, 'Team number') === teamNum)}
+						{@const colors = teamColorsMap.get(teamNum) || { primary: '#3b82f6', secondary: '#1e40af' }}
 						<div class="bg-zinc-900/40 border-2 border-zinc-800 rounded-xl md:rounded-[2.5rem] p-3 md:p-6 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative shadow-2xl" 
 							style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 							role="button"
 							tabindex="0"
-							on:click={() => handleRowClick({ 'Team #': getVal(pit, 'Team number') })}
-							on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': getVal(pit, 'Team number') })}>
+							on:click={() => handleRowClick({ 'Team #': teamNum })}
+							on:keydown={(e) => e.key === 'Enter' && handleRowClick({ 'Team #': teamNum })}>
 							<div class="flex justify-between items-start mb-4 md:mb-6">
 								<div>
-                  <h2 class="text-3xl md:text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors" style="color: var(--team-primary);">{getVal(pit, 'Team number')}</h2>
-									<p class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
+                  <h2 class="text-3xl md:text-5xl font-black text-white group-hover:text-[var(--team-primary)] transition-colors" style="color: var(--team-primary);">{teamNum}</h2>
+									{#if pit}
+										<p class="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mt-1">{getVal(pit, 'Drive Train Type')}</p>
+									{:else}
+										<p class="text-[9px] md:text-[10px] font-black text-red-500/60 uppercase tracking-[0.2em] mt-1">No Pit Info Found</p>
+									{/if}
 								</div>
-								{#if getVal(pit, 'Under trench?') === 'Yes' || getVal(pit, 'Over bump?') === 'Yes'}
+								{#if pit && (getVal(pit, 'Under trench?') === 'Yes' || getVal(pit, 'Over bump?') === 'Yes')}
 									<div class="flex gap-1.5 flex-wrap justify-end">
 										{#if getVal(pit, 'Under trench?') === 'Yes'} <span class="bg-green-900/30 text-green-400 text-[8px] md:text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-green-500/20">Trench</span> {/if}
 										{#if getVal(pit, 'Over bump?') === 'Yes'} <span class="bg-blue-900/30 text-blue-400 text-[8px] md:text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-widest border border-blue-500/20">Bump</span> {/if}
@@ -1482,7 +1492,7 @@
 								{/if}
 							</div>
 
-							{#if getDriveDirectLink(getVal(pit, 'Bot pic'))}
+							{#if pit && getDriveDirectLink(getVal(pit, 'Bot pic'))}
 								<div class="w-full h-48 rounded-3xl overflow-hidden mb-6 bg-black/40 border border-white/5 relative group-hover:scale-[1.02] transition-transform duration-500 cursor-zoom-in"
 									role="button"
 									tabindex="0"
@@ -1494,37 +1504,51 @@
 										🔍 Click to zoom
 									</div>
 								</div>
+							{:else}
+								<div class="w-full h-48 rounded-3xl overflow-hidden mb-6 bg-black/20 border-2 border-white/5 flex items-center justify-center border-dashed">
+									<p class="text-[10px] font-black text-zinc-700 uppercase tracking-widest">No Visual Data</p>
+								</div>
 							{/if}
 
 							<div class="space-y-4">
-								<div class="grid grid-cols-2 gap-3">
-									<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-										<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Dimensions</p>
-										<p class="text-xs font-black text-white">{getVal(pit, 'Frame dimensions') || 'N/A'}</p>
+								{#if pit}
+									<div class="grid grid-cols-2 gap-3">
+										<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+											<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Dimensions</p>
+											<p class="text-xs font-black text-white">{getVal(pit, 'Frame dimensions') || 'N/A'}</p>
+										</div>
+										<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+											<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Weight</p>
+											<p class="text-xs font-black text-white">{getVal(pit, 'Weight') || 'N/A'} lbs</p>
+										</div>
+									</div>
+									<div class="grid grid-cols-2 gap-3">
+										<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+											<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Drive Coach</p>
+											<p class="text-[10px] font-black text-white truncate">{getVal(pit, 'Drive Coach') || 'N/A'}</p>
+										</div>
+										<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+											<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Friendliness</p>
+											<p class="text-[10px] font-black text-white truncate">{getVal(pit, 'Team Friendliness') || 'N/A'}</p>
+										</div>
 									</div>
 									<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-										<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Weight</p>
-										<p class="text-xs font-black text-white">{getVal(pit, 'Weight') || 'N/A'} lbs</p>
+										<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Best Auto</p>
+										<p class="text-[10px] font-black text-zinc-300 italic">"{getVal(pit, 'Best Auto') || 'N/A'}"</p>
 									</div>
-								</div>
-								<div class="grid grid-cols-2 gap-3">
-									<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-										<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Drive Coach</p>
-										<p class="text-[10px] font-black text-white truncate">{getVal(pit, 'Drive Coach') || 'N/A'}</p>
+								{:else}
+									<div class="bg-black/20 p-8 rounded-2xl border-2 border-white/5 border-dashed flex flex-col items-center justify-center text-center gap-2">
+										<div class="w-8 h-8 rounded-full border-2 border-red-500/20 flex items-center justify-center mb-2">
+											<span class="text-red-500/40 text-xs">!</span>
+										</div>
+										<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Awaiting Pit Scout</p>
+										<p class="text-[8px] font-bold text-zinc-700 uppercase">This team has not been processed in the pits yet.</p>
 									</div>
-									<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-										<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Friendliness</p>
-										<p class="text-[10px] font-black text-white truncate">{getVal(pit, 'Team Friendliness') || 'N/A'}</p>
-									</div>
-								</div>
-								<div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-									<p class="text-[8px] font-black text-zinc-500 uppercase mb-1">Best Auto</p>
-									<p class="text-[10px] font-black text-zinc-300 italic">"{getVal(pit, 'Best Auto') || 'N/A'}"</p>
-								</div>
+								{/if}
 							</div>
 							
               <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-700 pointer-events-none" style="color: var(--team-secondary);">
-								<h1 class="text-9xl font-black italic">{getVal(pit, 'Team number')}</h1>
+								<h1 class="text-9xl font-black italic">{teamNum}</h1>
 							</div>
 						</div>
 					{/each}
