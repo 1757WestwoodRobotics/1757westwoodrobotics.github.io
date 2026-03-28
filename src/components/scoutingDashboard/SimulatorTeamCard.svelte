@@ -103,6 +103,14 @@
 					<p class="font-black text-zinc-500 uppercase mb-0.5">Best Auto</p>
 					<p class="font-black text-zinc-300 truncate italic">"{getVal(summary.pit, 'Best Auto')}"</p>
 				</div>
+				<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+					<p class="font-black text-zinc-500 uppercase mb-0.5">Drive Coach</p>
+					<p class="font-black text-white truncate">{getVal(summary.pit, 'Drive Coach')}</p>
+				</div>
+				<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px]">
+					<p class="font-black text-zinc-500 uppercase mb-0.5">Friendliness</p>
+					<p class="font-black text-white truncate">{getVal(summary.pit, 'Team Friendliness')}</p>
+				</div>
 				{#if getVal(summary.pit, 'Abilities')}
 					<div class="bg-black/40 p-2 rounded-lg md:rounded-xl border border-white/5 text-[7px] md:text-[8px] col-span-2">
 						<p class="font-black text-zinc-500 uppercase mb-0.5">Abilities</p>
