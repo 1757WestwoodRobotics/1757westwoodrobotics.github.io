@@ -1946,6 +1946,11 @@
 					</div>
 					<div class="flex flex-col gap-1">
 						{#if teamStats}<p class="text-sm md:text-lg text-zinc-400 font-black uppercase tracking-widest">{teamStats.nickname} • {teamStats.city}, {teamStats.state}</p>{/if}
+						{#if teamStats?.pit && getVal(teamStats.pit, 'Drive Coach') && getVal(teamStats.pit, 'Drive Coach') !== 'N/A'}
+							<p class="text-[10px] md:text-sm text-blue-500 font-black uppercase tracking-widest flex items-center gap-2">
+								<span class="text-zinc-600">Drive Coach:</span> {getVal(teamStats.pit, 'Drive Coach')}
+							</p>
+						{/if}
 						<p class="text-[10px] md:text-xs text-zinc-600 uppercase font-black tracking-[0.2em] md:tracking-[0.4em]">Match {getVal(selectedRow, 'Match #')} • Scout: {getVal(selectedRow, 'Scouter initials')}</p>
 					</div>
 				</div>
@@ -2036,7 +2041,7 @@
 							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Pit Intelligence</h3>
 							<div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
 						</div>
-						<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+						<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 md:gap-4">
 							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
 								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Drive Train</p>
 								<p class="text-sm md:text-lg font-black text-white">{getVal(teamStats.pit, 'Drive Train Type')}</p>
@@ -2053,6 +2058,10 @@
 									{#if getVal(teamStats.pit, 'Under trench?') === 'Yes'} <span class="bg-green-900/30 text-green-400 text-[7px] md:text-[8px] px-1.5 md:px-2 py-0.5 rounded font-black uppercase">Trench</span> {/if}
 									{#if getVal(teamStats.pit, 'Over bump?') === 'Yes'} <span class="bg-blue-900/30 text-blue-400 text-[7px] md:text-[8px] px-1.5 md:px-2 py-0.5 rounded font-black uppercase">Bump</span> {/if}
 								</div>
+							</div>
+							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
+								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Drive Coach</p>
+								<p class="text-sm md:text-lg font-black text-white">{getVal(teamStats.pit, 'Drive Coach')}</p>
 							</div>
 							<div class="bg-zinc-900/60 p-3 md:p-6 rounded-lg md:rounded-2xl border border-zinc-800">
 								<p class="text-[7px] md:text-[8px] font-black text-zinc-500 uppercase mb-0.5 md:mb-1">Best Auto</p>
