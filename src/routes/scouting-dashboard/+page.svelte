@@ -1522,7 +1522,7 @@
               <a href="https://www.thebluealliance.com/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
                 TBA Event
               </a>
-              <a href="https://www.statbotics.io/events/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white last:rounded-b-lg transition">
+              <a href="https://www.statbotics.io/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white last:rounded-b-lg transition">
                 Statbotics
               </a>
             </div>
