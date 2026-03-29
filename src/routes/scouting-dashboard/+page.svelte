@@ -2019,7 +2019,13 @@
 						{:else}
 							<div class="grid grid-cols-1 gap-4">
 								{#each overviewTeamSchedule as m}
-									<div class="group bg-zinc-900/40 border-2 {m.alliance === 'red' ? 'border-red-500/20 hover:border-red-500/40' : 'border-blue-500/20 hover:border-blue-500/40'} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden">
+									<div 
+										on:click={() => selectedMatchPopup = m}
+										role="button"
+										tabindex="0"
+										on:keydown={(e) => e.key === 'Enter' && (selectedMatchPopup = m)}
+										class="group bg-zinc-900/40 border-2 {m.alliance === 'red' ? 'border-red-500/20 hover:border-red-500/40' : 'border-blue-500/20 hover:border-blue-500/40'} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden cursor-pointer">
+
 										<div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
 											<div class="flex items-center gap-6">
 												<div class="w-20 h-20 rounded-2xl flex flex-col items-center justify-center {m.alliance === 'red' ? 'bg-red-500/10 border-2 border-red-500/20' : 'bg-blue-500/10 border-2 border-blue-500/20'}">
@@ -2041,12 +2047,12 @@
 													<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
 														<!-- Playing With -->
 														<div>
-															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Playing With</p>
+															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Red Alliance</p>
 															<div class="grid grid-cols-3 gap-2">
-																{#each m.alliances[m.alliance].team_keys as key}
+																{#each m.alliances['red'].team_keys as key}
 																	{@const tNum = key.replace('frc', '')}
 																	<button 
-																		on:click={() => handleRowClick({ 'Team #': tNum })}
+																		on:click|stopPropagation={() => handleRowClick({ 'Team #': tNum })}
 																		class="px-3 py-1.5 rounded-lg text-sm font-black {tNum === overviewTeam ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border-white/5'} border transition-all text-center whitespace-nowrap">
 																		{tNum}
 																	</button>
@@ -2056,14 +2062,14 @@
 														
 														<!-- Playing Against -->
 														<div>
-															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Playing Against</p>
+															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Blue Alliance</p>
 															<div class="grid grid-cols-3 gap-2">
-																{#each m.alliances[m.alliance === 'red' ? 'blue' : 'red'].team_keys as key}
-																	{@const tNumOpp = key.replace('frc', '')}
+																{#each m.alliances['blue'].team_keys as key}
+																	{@const tNum = key.replace('frc', '')}
 																	<button 
-																		on:click={() => handleRowClick({ 'Team #': tNumOpp })}
-																		class="px-3 py-1.5 rounded-lg text-sm font-black bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border border-white/5 transition-all text-center whitespace-nowrap">
-																		{tNumOpp}
+																		on:click|stopPropagation={() => handleRowClick({ 'Team #': tNumOpp })}
+																		class="px-3 py-1.5 rounded-lg text-sm font-black {tNum === overviewTeam ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border-white/5'} border transition-all text-center whitespace-nowrap">
+																		{tNum}
 																	</button>
 																{/each}
 															</div>
@@ -2080,7 +2086,7 @@
 													</div>
 												{/if}
 												<button 
-													on:click={() => loadMatchIntoSimulator(m)}
+													on:click|stopPropagation={() => loadMatchIntoSimulator(m)}
 													class="bg-zinc-800 hover:bg-purple-600 text-white text-[10px] font-black px-6 py-3 rounded-xl transition-all uppercase tracking-[0.2em] shadow-lg active:scale-95 border border-zinc-700">
 													Load Into Simulator
 												</button>
