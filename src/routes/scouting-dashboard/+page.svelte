@@ -56,6 +56,7 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 	let overviewTeam = '1757';
+	let quickLinksOpen = false;
 
 	function clearSimulator() {
 		simRedTeams = ['', '', ''];
@@ -195,6 +196,7 @@
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
 	const EVENT_KEY = import.meta.env.VITE_EVENT_KEY || '2026rikin';
 	const FILTER_TIME = import.meta.env.VITE_FILTER_TIME || '';
+	const PIT_SCOUTING_FORM_URL = import.meta.env.VITE_PIT_SCOUTING_FORM_URL;
 
 	async function fetchTeamColors(teamNumber) {
 		if (!teamNumber || teamColorsMap.has(teamNumber)) return teamColorsMap.get(teamNumber);
@@ -1503,9 +1505,29 @@
 					<span class="hidden sm:inline">All Data</span>
 					<span class="sm:hidden">All</span>
 				</button>
-        <button class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-zinc-800 text-zinc-500 hover:text-white ml-auto">
-          Quick Links
-        </button>
+        <div class="relative ml-auto">
+          <button on:click={() => { quickLinksOpen = !quickLinksOpen; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-700 {quickLinksOpen ? 'bg-zinc-800 text-white border-zinc-600' : ''}">
+            Quick Links
+          </button>
+          {#if quickLinksOpen}
+            <div class="absolute top-full mt-2 right-0 bg-zinc-900 border-2 border-zinc-700 rounded-lg shadow-lg z-50 min-w-max">
+              {#if PIT_SCOUTING_FORM_URL}
+                <a href={PIT_SCOUTING_FORM_URL} target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white first:rounded-t-lg transition">
+                  Pit Scouting Form
+                </a>
+              {/if}
+              <a href="/scouting" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
+                Scouting Form
+              </a>
+              <a href="https://www.thebluealliance.com/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
+                TBA Event
+              </a>
+              <a href="https://www.statbotics.io/events/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white last:rounded-b-lg transition">
+                Statbotics
+              </a>
+            </div>
+          {/if}
+        </div>
 				{#if simulatorMode}
 					<button on:click={clearSimulator} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] ml-auto">
 						Clear All
