@@ -23,12 +23,14 @@
 	let scoutingData = [];
 	let pitData = [];
 	let schedule = []; // All matches from TBA
+	let eventTeams = []; // All teams at the event from TBA
 	let loading = true;
 	let loadingSteps = {
 		scoutingData: false,
 		pitData: false,
 		eventStats: false,
 		schedule: false,
+		eventTeams: false,
 		teamStats: false,
 		teamColors: false,
 		teamDetails: false
@@ -192,6 +194,7 @@
 	const PIT_CSV_URL = import.meta.env.VITE_PIT_CSV_URL;
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
 	const EVENT_KEY = import.meta.env.VITE_EVENT_KEY || '2026rikin';
+	const FILTER_TIME = import.meta.env.VITE_FILTER_TIME || '';
 
 	async function fetchTeamColors(teamNumber) {
 		if (!teamNumber || teamColorsMap.has(teamNumber)) return teamColorsMap.get(teamNumber);
@@ -330,7 +333,7 @@
 						.filter(row => {
 							const teamNum = getVal(row, 'Team #');
 							const matchNum = getVal(row, 'Match #');
-							return teamNum && teamNum !== 'N/A' && matchNum && matchNum !== 'N/A';
+							return teamNum && teamNum !== 'N/A' && matchNum && matchNum !== 'N/A' && filterByTime(row);
 						});
 				}
 				loadingSteps.scoutingData = false;
@@ -369,6 +372,11 @@
 			loadingSteps.schedule = true;
 			await fetchSchedule();
 			loadingSteps.schedule = false;
+
+			currentStep = 'eventTeams';
+			loadingSteps.eventTeams = true;
+			await fetchEventTeams();
+			loadingSteps.eventTeams = false;
 			
 			currentStep = 'teamStats';
 			loadingSteps.teamStats = true;
@@ -398,6 +406,7 @@
 			localStorage.setItem('scouting_cache', JSON.stringify({
 				data: scoutingData,
 				pit: pitData,
+				teams: eventTeams,
 				stats: Array.from(teamStatsMap.entries()),
 				colors: Array.from(teamColorsMap.entries()),
 				details: Array.from(teamDetailsMap.entries()),
@@ -436,8 +445,23 @@
 		}
 	}
 
+	async function fetchEventTeams() {
+		try {
+			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/teams/keys`, {
+				headers: { 'X-TBA-Auth-Key': TBA_KEY }
+			});
+			if (res.ok) {
+				const data = await res.json();
+				eventTeams = data.map(key => key.replace('frc', '')).sort((a, b) => parseInt(a) - parseInt(b));
+				saveCache();
+			}
+		} catch (e) {
+			console.error('Error fetching event teams:', e);
+		}
+	}
+
 	async function fetchAllTeamStats() {
-		const uniqueTeams = Array.from(new Set(scoutingData.map(r => getVal(r, 'Team #')))).filter(t => t && t !== 'N/A');
+		const uniqueTeams = allTeamsList;
 		const currentYear = 2026;
 		
 		// Filter out teams we already have cached
@@ -481,10 +505,7 @@
 	}
 
 	async function fetchAllTeamColors() {
-		const uniqueTeams = Array.from(new Set([
-			...scoutingData.map(r => getVal(r, 'Team #')),
-			...pitData.map(p => getVal(p, 'Team number'))
-		])).filter(t => t && t !== 'N/A' && !teamColorsMap.has(t));
+		const uniqueTeams = allTeamsList.filter(t => !teamColorsMap.has(t));
 
 		if (uniqueTeams.length === 0) return;
 
@@ -498,10 +519,7 @@
 	}
 
 	async function fetchAllTeamDetails() {
-		const uniqueTeams = Array.from(new Set([
-			...scoutingData.map(r => getVal(r, 'Team #')),
-			...pitData.map(p => getVal(p, 'Team number'))
-		])).filter(t => t && t !== 'N/A' && !teamDetailsMap.has(t));
+		const uniqueTeams = allTeamsList.filter(t => !teamDetailsMap.has(t));
 
 		if (uniqueTeams.length === 0) return;
 
@@ -599,12 +617,13 @@
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
 			const parsed = JSON.parse(cached);
-			const { data, pit, stats, colors, details, timestamp } = parsed;
+			const { data, pit, teams, stats, colors, details, timestamp } = parsed;
 			console.log('Cache found, age:', Date.now() - timestamp);
 			if (Date.now() - timestamp < 3600000) {
 				console.log('Cache is fresh, loading from cache');
-				scoutingData = data;
+				scoutingData = data.filter(filterByTime);
 				pitData = pit || [];
+				eventTeams = teams || [];
 				if (stats) teamStatsMap = new Map(stats);
 				if (colors) teamColorsMap = new Map(colors);
 				if (details) teamDetailsMap = new Map(details);
@@ -620,6 +639,11 @@
 					return fetchSchedule();
 				}).then(() => {
 					loadingSteps.schedule = false;
+					currentStep = 'eventTeams';
+					loadingSteps.eventTeams = true;
+					return fetchEventTeams();
+				}).then(() => {
+					loadingSteps.eventTeams = false;
 					currentStep = 'teamStats';
 					loadingSteps.teamStats = true;
 					return fetchAllTeamStats();
@@ -671,20 +695,19 @@
 		}
 	}
 
-	$: allTeamsList = Array.from(new Set([
+	$: allTeamsList = (eventTeams.length > 0 ? eventTeams : Array.from(new Set([
 		...scoutingData.map(r => getVal(r, 'Team #')),
 		...pitData.map(p => getVal(p, 'Team number'))
-	])).filter(t => t && t !== 'N/A').sort((a, b) => parseInt(a) - parseInt(b));
+	]))).filter(t => t && t !== 'N/A').sort((a, b) => parseInt(a) - parseInt(b));
 
-	$: teamMetrics = Array.from(new Set(scoutingData.map(r => getVal(r, 'Team #'))))
-		.filter(t => t !== 'N/A')
+	$: teamMetrics = allTeamsList
 		.map(teamNum => {
 			const rows = scoutingData.filter(r => getVal(r, 'Team #') === teamNum);
-			const avgEff = rows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'Scoring effectiveness?')) || 0), 0) / rows.length;
-			const climbRate = rows.filter(r => {
+			const avgEff = rows.length > 0 ? rows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'Scoring effectiveness?')) || 0), 0) / rows.length : 0;
+			const climbRate = rows.length > 0 ? rows.filter(r => {
 				const val = getVal(r, 'climb level').toLowerCase();
 				return val !== 'no' && val !== 'no climb' && val !== 'f' && val !== 'failed' && val !== 'n/a';
-			}).length / rows.length;
+			}).length / rows.length : 0;
 			
 			const stats = teamStatsMap.get(teamNum) || { epa: 0 };
 			const opr = eventOprs[`frc${teamNum}`] || 0;
@@ -805,6 +828,14 @@
 		if (startsWith) return row[startsWith];
 		const key = keys.find(k => k.toLowerCase().includes(partialKey.toLowerCase()));
 		return (key && row[key]) ? row[key] : 'N/A';
+	}
+
+	function filterByTime(row) {
+		if (!FILTER_TIME) return true;
+		const rowTime = new Date(getVal(row, 'Timestamp')).getTime();
+		const filterTime = new Date(FILTER_TIME).getTime();
+		if (!isNaN(rowTime) && !isNaN(filterTime) && rowTime < filterTime) return false;
+		return true;
 	}
 
 	function handleRowClick(row) {
@@ -1345,6 +1376,22 @@
 					<div class="flex-1 min-w-0">
 						<p class="text-sm font-black text-white uppercase tracking-widest">Match Schedule</p>
 						<p class="text-xs text-zinc-400">{schedule.length} matches</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.eventTeams ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.eventTeams}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if eventTeams.length}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Event Teams</p>
+						<p class="text-xs text-zinc-400">{eventTeams.length} teams registered</p>
 					</div>
 				</div>
 
