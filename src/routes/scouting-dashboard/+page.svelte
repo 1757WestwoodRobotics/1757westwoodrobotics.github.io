@@ -48,10 +48,12 @@
 	let pitMode = false;
 	let simulatorMode = false;
 	let selectionMode = false;
+	let overviewMode = false;
 	let selectionSearchTerm = '';
 	let defenseMode = false;
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
+	let overviewTeam = '1757';
 
 	function clearSimulator() {
 		simRedTeams = ['', '', ''];
@@ -696,6 +698,22 @@
 				opr: opr
 			};
 		});
+
+	$: overviewTeamSchedule = overviewTeam ? schedule
+		.filter(m => teamIsInMatch(overviewTeam, m))
+		.map((m, idx, arr) => {
+			const isRed = m.alliances.red.team_keys.includes(`frc${overviewTeam}`);
+			const alliance = isRed ? 'red' : 'blue';
+			const nextMatch = arr[idx + 1];
+			let swapNeeded = false;
+			if (nextMatch) {
+				const nextIsRed = nextMatch.alliances.red.team_keys.includes(`frc${overviewTeam}`);
+				const nextAlliance = nextIsRed ? 'red' : 'blue';
+				swapNeeded = alliance !== nextAlliance;
+			}
+			const result = getMatchResult(m.match_number);
+			return { ...m, alliance, swapNeeded, isPlayed: !!result };
+		}) : [];
 
 	$: sortedLeaderboard = [...teamMetrics].sort((a, b) => {
 		let valA, valB;
@@ -1432,11 +1450,15 @@
 					<span class="hidden sm:inline">Selection Mode</span>
 					<span class="sm:hidden">Selection</span>
 				</button>
-				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
-				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; overviewMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
+				<button on:click={() => { overviewMode = !overviewMode; if(overviewMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; if(!overviewTeam && searchTerm) overviewTeam = searchTerm; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {overviewMode ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Overview</button>
+				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; overviewMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode && !overviewMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
 					<span class="hidden sm:inline">All Data</span>
 					<span class="sm:hidden">All</span>
 				</button>
+        <button class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-zinc-800 text-zinc-500 hover:text-white ml-auto">
+          Quick Links
+        </button>
 				{#if simulatorMode}
 					<button on:click={clearSimulator} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] ml-auto">
 						Clear All
@@ -1908,6 +1930,121 @@
 						<p class="text-xs md:text-sm text-zinc-700">Teams with defense actions will appear here</p>
 					</div>
 				{/if}
+			</div>
+		{:else if overviewMode}
+			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
+				<div class="flex flex-col md:flex-row gap-8">
+					<!-- Team Selector & Info -->
+					<div class="w-full md:w-80 flex-shrink-0">
+						<div class="bg-zinc-900/40 border-2 border-purple-500/20 rounded-3xl p-6 backdrop-blur-xl shadow-2xl sticky top-4">
+							<h3 class="text-xl font-black text-purple-400 uppercase italic tracking-tighter mb-4">Team Focus</h3>
+							<div class="relative mb-6">
+								<input 
+									type="text" 
+									bind:value={overviewTeam} 
+									placeholder="Enter Team #..." 
+									class="w-full bg-black/40 border-2 border-zinc-800 rounded-xl p-4 font-black text-white focus:border-purple-500 outline-none transition uppercase"
+								/>
+							</div>
+							
+							{#if overviewTeam}
+								{@const details = teamDetailsMap.get(overviewTeam)}
+								<div class="space-y-4">
+									<div class="p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl">
+										<p class="text-3xl font-black text-white">{overviewTeam}</p>
+										<p class="text-xs font-black text-zinc-500 uppercase tracking-widest truncate">{details?.nickname || 'Unknown Team'}</p>
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Schedule & Status -->
+					<div class="flex-1">
+						{#if !overviewTeam}
+							<div class="h-64 flex flex-col items-center justify-center bg-zinc-900/20 rounded-[2.5rem] border-2 border-zinc-800 border-dashed">
+								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">Select a team to view schedule</p>
+							</div>
+						{:else if overviewTeamSchedule.length === 0}
+							<div class="h-64 flex flex-col items-center justify-center bg-zinc-900/20 rounded-[2.5rem] border-2 border-zinc-800 border-dashed">
+								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">No matches found for Team {overviewTeam}</p>
+							</div>
+						{:else}
+							<div class="grid grid-cols-1 gap-4">
+								{#each overviewTeamSchedule as m}
+									<div class="group bg-zinc-900/40 border-2 {m.alliance === 'red' ? 'border-red-500/20 hover:border-red-500/40' : 'border-blue-500/20 hover:border-blue-500/40'} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden">
+										<div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+											<div class="flex items-center gap-6">
+												<div class="w-20 h-20 rounded-2xl flex flex-col items-center justify-center {m.alliance === 'red' ? 'bg-red-500/10 border-2 border-red-500/20' : 'bg-blue-500/10 border-2 border-blue-500/20'}">
+													<p class="text-[10px] font-black {m.alliance === 'red' ? 'text-red-500' : 'text-blue-500'} uppercase">Match</p>
+													<p class="text-3xl font-black text-white">{m.match_number}</p>
+												</div>
+												<div>
+													<div class="flex items-center gap-3 mb-3">
+														{#if m.isPlayed}
+															<span class="text-[10px] font-black text-green-500 uppercase tracking-widest flex items-center gap-1">
+																<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" /></svg>
+																Played
+															</span>
+														{:else}
+															<span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Upcoming</span>
+														{/if}
+													</div>
+													
+													<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+														<!-- Playing With -->
+														<div>
+															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Playing With</p>
+															<div class="grid grid-cols-3 gap-2">
+																{#each m.alliances[m.alliance].team_keys as key}
+																	{@const tNum = key.replace('frc', '')}
+																	<button 
+																		on:click={() => handleRowClick({ 'Team #': tNum })}
+																		class="px-3 py-1.5 rounded-lg text-sm font-black {tNum === overviewTeam ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border-white/5'} border transition-all text-center whitespace-nowrap">
+																		{tNum}
+																	</button>
+																{/each}
+															</div>
+														</div>
+														
+														<!-- Playing Against -->
+														<div>
+															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Playing Against</p>
+															<div class="grid grid-cols-3 gap-2">
+																{#each m.alliances[m.alliance === 'red' ? 'blue' : 'red'].team_keys as key}
+																	{@const tNumOpp = key.replace('frc', '')}
+																	<button 
+																		on:click={() => handleRowClick({ 'Team #': tNumOpp })}
+																		class="px-3 py-1.5 rounded-lg text-sm font-black bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border border-white/5 transition-all text-center whitespace-nowrap">
+																		{tNumOpp}
+																	</button>
+																{/each}
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="flex flex-col items-end gap-3">
+												{#if m.swapNeeded}
+													<div class="flex items-center gap-2 text-orange-400">
+														<svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+														<span class="text-xs font-black uppercase tracking-widest">Bumper Swap After Match</span>
+													</div>
+												{/if}
+												<button 
+													on:click={() => loadMatchIntoSimulator(m)}
+													class="bg-zinc-800 hover:bg-purple-600 text-white text-[10px] font-black px-6 py-3 rounded-xl transition-all uppercase tracking-[0.2em] shadow-lg active:scale-95 border border-zinc-700">
+													Load Into Simulator
+												</button>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				</div>
 			</div>
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
