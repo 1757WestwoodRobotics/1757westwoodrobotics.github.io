@@ -1821,7 +1821,16 @@
 								{@const issuesMatches = getMatchesWithIssues(m.teamNum)}
 								{@const isCrossedOff = crossedOffTeams.has(m.teamNum)}
 								<tr class="hover:bg-orange-500/10 transition-all duration-300 cursor-pointer group {isCrossedOff ? 'opacity-30 line-through decoration-orange-500 decoration-4' : ''}" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
-									<td class="p-2 md:p-8 font-black text-white text-xl md:text-4xl group-hover:pl-4 md:group-hover:pl-12 transition-all">{m.teamNum}</td>
+									<td class="p-2 md:p-8 font-black text-white group-hover:pl-4 md:group-hover:pl-12 transition-all">
+										<div class="text-xl md:text-4xl">{m.teamNum}</div>
+										{#if teamDetailsMap.get(m.teamNum)}
+											<div class="text-[10px] md:text-sm text-zinc-500 font-bold truncate">
+												{teamDetailsMap.get(m.teamNum).nickname}
+												<br/>
+												<span class="text-[8px] md:text-xs opacity-60 italic">{teamDetailsMap.get(m.teamNum).city}, {teamDetailsMap.get(m.teamNum).state_prov}</span>
+											</div>
+										{/if}
+									</td>
 									<td class="p-8 text-center">
 										<button 
 											on:click|stopPropagation={() => toggleCrossOff(m.teamNum)}
@@ -1932,7 +1941,16 @@
 						<tbody class="divide-y divide-zinc-800">
 							{#each defenseMetrics as m}
 								<tr class="hover:bg-red-500/10 transition-all duration-300 cursor-pointer group" on:click={() => handleRowClick({ 'Team #': m.teamNum, 'Match #': m.matchNum })}>
-									<td class="p-8 font-black text-red-400 text-3xl group-hover:pl-12 transition-all">{m.teamNum}</td>
+									<td class="p-8 font-black text-red-400 group-hover:pl-12 transition-all">
+										<div class="text-3xl">{m.teamNum}</div>
+										{#if teamDetailsMap.get(m.teamNum)}
+											<div class="text-sm text-zinc-500 font-bold truncate">
+												{teamDetailsMap.get(m.teamNum).nickname}
+												<br/>
+												<span class="text-xs opacity-60 italic">{teamDetailsMap.get(m.teamNum).city}, {teamDetailsMap.get(m.teamNum).state_prov}</span>
+											</div>
+										{/if}
+									</td>
 									<td class="p-8 text-center"><span class="text-2xl font-black text-white">M{m.matchNum}</span></td>
 									<td class="p-8 text-center">
 										<span class="text-2xl font-black text-orange-400">{m.defenseTime}s</span>
@@ -2147,7 +2165,16 @@
 							{@const metrics = teamMetrics.find(m => m.teamNum === getVal(row, 'Team #'))}
 							{@const hasCard = getVal(row, 'card') && getVal(row, 'card') !== 'No' && getVal(row, 'card') !== 'No Card'}
 							<tr class="hover:bg-blue-600/10 transition-all duration-300 cursor-pointer group {hasCard ? 'border-l-4 border-l-yellow-500' : ''}" on:click={() => handleRowClick(row)}>
-								<td class="p-6 font-black text-blue-400 text-2xl group-hover:pl-10 transition-all">{getVal(row, 'Team #')}</td>
+								<td class="p-6 font-black text-blue-400 group-hover:pl-10 transition-all">
+									<div class="text-2xl">{getVal(row, 'Team #')}</div>
+									{#if teamDetailsMap.get(getVal(row, 'Team #'))}
+										<div class="text-sm text-zinc-500 font-bold truncate">
+											{teamDetailsMap.get(getVal(row, 'Team #')).nickname}
+											<br/>
+											<span class="text-xs opacity-60 italic">{teamDetailsMap.get(getVal(row, 'Team #')).city}, {teamDetailsMap.get(getVal(row, 'Team #')).state_prov}</span>
+										</div>
+									{/if}
+								</td>
 								<td class="p-6 font-mono text-sm text-zinc-300">M{getVal(row, 'Match #')}</td>
 								<td class="p-6"><span class="text-xl font-black text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.1)]">{metrics?.epa.toFixed(1) || '...'}</span></td>
 								<td class="p-6"><span class="text-xl font-black text-zinc-400">{metrics?.opr.toFixed(1) || '...'}</span></td>
