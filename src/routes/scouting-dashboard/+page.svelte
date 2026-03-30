@@ -839,6 +839,7 @@
 			case 'Scout Eff.': return extractNumber(getVal(row, 'Scoring effectiveness?'));
 			case 'Avg Eff.': return metrics?.avgEff || 0;
 			case 'Samples': return metrics?.entryCount || 0;
+      case 'Rank': return metrics?.eventRank || 0;
 			default: return 0;
 		}
 	}
@@ -859,6 +860,7 @@
 			
 			const stats = teamStatsMap.get(teamNum) || { epa: 0 };
 			const opr = eventOprs[`frc${teamNum}`] || 0;
+      const eventRank = eventRankings.find(r => r.team_key === `frc${teamNum}`)?.rank || -1;
 
 			return {
 				teamNum,
@@ -866,7 +868,8 @@
 				climbRate,
 				entryCount: rows.length,
 				epa: stats.epa,
-				opr: opr
+        opr: opr,
+        eventRank
 			};
 		});
 
@@ -894,6 +897,7 @@
 		else if (sortKey === 'Climb Rate') { valA = a.climbRate; valB = b.climbRate; }
 		else if (sortKey === 'Avg Eff.') { valA = a.avgEff; valB = b.avgEff; }
 		else if (sortKey === 'Samples') { valA = a.entryCount; valB = b.entryCount; }
+    else if (sortKey === 'Rank') { valA = a.eventRank; valB = b.eventRank; }
 		else { valA = 0; valB = 0; }
 
 		if (valA < valB) return -1 * sortOrder;
@@ -1966,6 +1970,7 @@
 								<th class="p-8 border-b-2 border-zinc-800 text-center">Cross Off</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('EPA')}>EPA (Statbotics) {sortKey === 'EPA' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('OPR')}>OPR (TBA) {sortKey === 'OPR' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
+								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Rank')}>Event Rank {sortKey === 'Rank' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Avg Eff.')}>Avg Eff. {sortKey === 'Avg Eff.' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Climb Rate')}>Climb Rate {sortKey === 'Climb Rate' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
 								<th class="p-8 border-b-2 border-zinc-800 cursor-pointer hover:text-white text-center" on:click={() => handleSort('Samples')}>Samples {sortKey === 'Samples' ? (sortOrder === 1 ? '↑' : '↓') : ''}</th>
@@ -1997,6 +2002,7 @@
 									</td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]">{m.epa.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-zinc-300">{m.opr.toFixed(1)}</span></td>
+									<td class="p-8 text-center"><span class="text-3xl font-black text-zinc-300">{m.eventRank}</span></td>
 									<td class="p-8 text-center"><span class="text-3xl font-black text-orange-400">{m.avgEff.toFixed(1)}</span></td>
 									<td class="p-8 text-center"><span class="text-2xl font-black {m.climbRate > 0.7 ? 'text-purple-400' : 'text-zinc-600'}">{(m.climbRate * 100).toFixed(0)}%</span></td>
 									<td class="p-8 text-center"><span class="text-xs font-black text-zinc-500 uppercase tracking-widest">{m.entryCount} matches</span></td>
