@@ -33,7 +33,8 @@
 		eventTeams: false,
 		teamStats: false,
 		teamColors: false,
-		teamDetails: false
+		teamDetails: false,
+		rankings: false
 	};
 	let currentStep = '';
 	let error = null;
@@ -44,6 +45,7 @@
 	let teamColorsMap = new Map();
 	let teamDetailsMap = new Map();
 	let matchResultsMap = new Map();
+	let eventRankings = [];
 	let eventOprs = {}; 
 	let teamStats = null; 
 	let statsLoading = false;
@@ -53,10 +55,109 @@
 	let overviewMode = false;
 	let selectionSearchTerm = '';
 	let defenseMode = false;
+	let scoutLeadMode = false;
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 	let overviewTeam = '1757';
 	let quickLinksOpen = false;
+
+	$: scoutLeadData = schedule.map(m => {
+		const scoutedTeamsInMatch = new Set(
+			scoutingData
+				.filter(r => getVal(r, 'Match #') == m.match_number)
+				.map(r => getVal(r, 'Team #'))
+		);
+		
+		const allTeams = [
+			...m.alliances.red.team_keys.map(k => ({ team: k.replace('frc', ''), alliance: 'red' })),
+			...m.alliances.blue.team_keys.map(k => ({ team: k.replace('frc', ''), alliance: 'blue' }))
+		];
+
+		const missing = allTeams.filter(t => !scoutedTeamsInMatch.has(t.team));
+		
+		if (missing.length === 0) return null;
+
+		return {
+			match_number: m.match_number,
+			missing,
+			videos: m.videos || []
+		};
+	}).filter(Boolean);
+
+	$: allianceSimulation = (() => {
+		if (!eventRankings || eventRankings.length === 0) return [];
+		
+		const teamsWithMetricsMap = new Map(allTeamsList.map(tNum => {
+			const stats = teamStatsMap.get(tNum) || { epa: 0 };
+			const opr = eventOprs[`frc${tNum}`] || 0;
+			return [tNum, { teamNum: tNum, epa: stats.epa, opr: opr }];
+		}));
+
+		let rankingList = eventRankings.map(r => r.team_key.replace('frc', ''));
+		let picked = new Set();
+		let alliances = [];
+
+		const getBestEPAAvailable = () => {
+			return allTeamsList
+				.filter(t => !picked.has(t))
+				.sort((a, b) => (teamsWithMetricsMap.get(b)?.epa || 0) - (teamsWithMetricsMap.get(a)?.epa || 0))[0];
+		};
+
+		// Round 1: Captains and their first picks
+		for (let i = 0; i < 8; i++) {
+			// The captain is the highest ranked team remaining
+			let captain = rankingList.find(t => !picked.has(t));
+			if (!captain) break;
+
+			picked.add(captain);
+			let alliance = { captain, picks: [] };
+
+			// Captain picks the best EPA available
+			let best = getBestEPAAvailable();
+			if (best) {
+				alliance.picks.push(best);
+				picked.add(best);
+			}
+			alliances.push(alliance);
+		}
+		
+		// Round 2: Snake draft (8 back to 1)
+		for (let i = alliances.length - 1; i >= 0; i--) {
+			let best = getBestEPAAvailable();
+			if (best) {
+				alliances[i].picks.push(best);
+				picked.add(best);
+			}
+		}
+
+		return alliances;
+	})();
+
+	$: redFlagWatchlist = allTeamsList.map(tNum => {
+		const issues = getMatchesWithIssues(tNum);
+		if (issues.length === 0) return null;
+		return { teamNum: tNum, issues };
+	}).filter(Boolean).sort((a, b) => b.issues.length - a.issues.length);
+
+	$: teamMomentum = allTeamsList.map(tNum => {
+		const teamRows = scoutingData
+			.filter(r => getVal(r, 'Team #') === tNum)
+			.sort((a, b) => parseInt(getVal(a, 'Match #')) - parseInt(getVal(b, 'Match #')));
+		
+		if (teamRows.length < 2) return null;
+
+		const split = Math.max(1, Math.floor(teamRows.length / 2));
+		const early = teamRows.slice(0, split);
+		const recent = teamRows.slice(-split);
+
+		const getAvgEff = (rows) => rows.reduce((acc, r) => acc + (parseFloat(getVal(r, 'Scoring effectiveness?')) || 0), 0) / rows.length;
+		
+		const earlyEff = getAvgEff(early);
+		const recentEff = getAvgEff(recent);
+		const diff = recentEff - earlyEff;
+
+		return { teamNum: tNum, earlyEff, recentEff, diff };
+	}).filter(Boolean).sort((a, b) => b.diff - a.diff);
 
 	function clearSimulator() {
 		simRedTeams = ['', '', ''];
@@ -370,6 +471,11 @@
 			await fetchEventStats();
 			loadingSteps.eventStats = false;
 			
+			currentStep = 'rankings';
+			loadingSteps.rankings = true;
+			await fetchEventRankings();
+			loadingSteps.rankings = false;
+
 			currentStep = 'schedule';
 			loadingSteps.schedule = true;
 			await fetchSchedule();
@@ -409,6 +515,7 @@
 				data: scoutingData,
 				pit: pitData,
 				teams: eventTeams,
+				rankings: eventRankings,
 				stats: Array.from(teamStatsMap.entries()),
 				colors: Array.from(teamColorsMap.entries()),
 				details: Array.from(teamDetailsMap.entries()),
@@ -428,6 +535,20 @@
 			}
 		} catch (e) {
 			console.error('Error fetching TBA OPRs:', e);
+		}
+	}
+
+	async function fetchEventRankings() {
+		try {
+			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/rankings`, {
+				headers: { 'X-TBA-Auth-Key': TBA_KEY }
+			});
+			if (res.ok) {
+				const data = await res.json();
+				eventRankings = data.rankings || [];
+			}
+		} catch (e) {
+			console.error('Error fetching TBA rankings:', e);
 		}
 	}
 
@@ -619,13 +740,14 @@
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
 			const parsed = JSON.parse(cached);
-			const { data, pit, teams, stats, colors, details, timestamp } = parsed;
+			const { data, pit, teams, rankings, stats, colors, details, timestamp } = parsed;
 			console.log('Cache found, age:', Date.now() - timestamp);
 			if (Date.now() - timestamp < 3600000) {
 				console.log('Cache is fresh, loading from cache');
 				scoutingData = data.filter(filterByTime);
 				pitData = pit || [];
 				eventTeams = teams || [];
+				eventRankings = rankings || [];
 				if (stats) teamStatsMap = new Map(stats);
 				if (colors) teamColorsMap = new Map(colors);
 				if (details) teamDetailsMap = new Map(details);
@@ -636,6 +758,11 @@
 				loading = true;
 				fetchEventStats().then(() => {
 					loadingSteps.eventStats = false;
+					currentStep = 'rankings';
+					loadingSteps.rankings = true;
+					return fetchEventRankings();
+				}).then(() => {
+					loadingSteps.rankings = false;
 					currentStep = 'schedule';
 					loadingSteps.schedule = true;
 					return fetchSchedule();
@@ -1499,9 +1626,10 @@
 					<span class="hidden sm:inline">Selection Mode</span>
 					<span class="sm:hidden">Selection</span>
 				</button>
-				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; overviewMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
-				<button on:click={() => { overviewMode = !overviewMode; if(overviewMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; if(!overviewTeam && searchTerm) overviewTeam = searchTerm; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {overviewMode ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Overview</button>
-				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; overviewMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode && !overviewMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; overviewMode = false; scoutLeadMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
+				<button on:click={() => { overviewMode = !overviewMode; if(overviewMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; scoutLeadMode = false; if(!overviewTeam && searchTerm) overviewTeam = searchTerm; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {overviewMode ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Overview</button>
+				<button on:click={() => { scoutLeadMode = !scoutLeadMode; if(scoutLeadMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; overviewMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {scoutLeadMode ? 'bg-yellow-600 border-yellow-500 text-white shadow-[0_0_20px_rgba(234,179,8,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Scout Lead</button>
+				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; overviewMode = false; scoutLeadMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode && !overviewMode && !scoutLeadMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
 					<span class="hidden sm:inline">All Data</span>
 					<span class="sm:hidden">All</span>
 				</button>
@@ -2018,7 +2146,266 @@
 					</div>
 				{/if}
 			</div>
-		{:else if overviewMode}
+		{:else if scoutLeadMode}
+			<div class="animate-in fade-in slide-in-from-top-4 mb-12 space-y-6">
+				<!-- 2. Field Overview (Momentum & Red Flags) -->
+				<details class="group bg-zinc-900/40 border-2 border-blue-500/20 rounded-[2.5rem] shadow-xl overflow-hidden backdrop-blur-xl">
+					<summary class="p-6 md:p-8 cursor-pointer list-none flex items-center justify-between hover:bg-blue-500/5 transition-colors">
+						<div class="flex items-center gap-6">
+							<div class="w-16 h-16 rounded-2xl bg-blue-500/10 border-2 border-blue-500/20 flex flex-col items-center justify-center">
+								<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+							</div>
+							<div>
+								<h2 class="text-xl md:text-3xl font-black text-blue-500 uppercase tracking-tighter">Field Overview</h2>
+								<p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Momentum Trends and Incident Tracking</p>
+							</div>
+						</div>
+						<svg class="w-6 h-6 text-zinc-500 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+					</summary>
+					<div class="p-6 md:p-10 pt-0 space-y-8">
+						<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+							<!-- Team Momentum Sub-Dropdown -->
+							<details class="group/sub bg-black/40 border-2 border-zinc-800 rounded-[2rem] overflow-hidden" open>
+								<summary class="p-6 cursor-pointer list-none flex items-center justify-between hover:bg-white/5 transition-colors">
+									<div class="flex items-center gap-3">
+										<div class="w-1.5 h-6 bg-blue-500 rounded-full"></div>
+										<h4 class="text-lg font-black text-white uppercase tracking-tight">Performance Momentum</h4>
+									</div>
+									<svg class="w-4 h-4 text-zinc-500 group-open/sub:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+								</summary>
+								<div class="max-h-[400px] overflow-y-auto custom-scrollbar border-t border-zinc-800/50">
+									<table class="w-full text-left border-separate border-spacing-0">
+										<thead class="sticky top-0 bg-zinc-900 z-10">
+											<tr class="text-[8px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800">
+												<th class="p-4">Team</th>
+												<th class="p-4">Trend</th>
+												<th class="p-4 text-right">Change</th>
+											</tr>
+										</thead>
+										<tbody class="divide-y divide-zinc-800/50">
+											{#each teamMomentum as m}
+												<tr class="hover:bg-white/5 transition-colors cursor-pointer group/row" on:click={() => handleRowClick({ 'Team #': m.teamNum })}>
+													<td class="p-4 font-black text-white group-hover/row:text-blue-400 transition-colors">{m.teamNum}</td>
+													<td class="p-4">
+														<div class="flex items-center gap-2">
+															<div class="flex-1 h-1.5 bg-zinc-800 rounded-full overflow-hidden min-w-[60px]">
+																<div class="h-full {m.diff > 0 ? 'bg-green-500' : 'bg-red-500'}" style="width: {Math.min(100, Math.abs(m.diff) * 20)}%"></div>
+															</div>
+														</div>
+													</td>
+													<td class="p-4 text-right">
+														<span class="font-black text-xs {m.diff > 0 ? 'text-green-500' : m.diff < 0 ? 'text-red-500' : 'text-zinc-500'}">
+															{m.diff > 0 ? '+' : ''}{m.diff.toFixed(1)}
+														</span>
+													</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							</details>
+
+							<!-- Red Flag Watchlist Sub-Dropdown -->
+							<details class="group/sub bg-black/40 border-2 border-red-500/10 rounded-[2rem] overflow-hidden" open>
+								<summary class="p-6 cursor-pointer list-none flex items-center justify-between hover:bg-white/5 transition-colors">
+									<div class="flex items-center gap-3">
+										<div class="w-1.5 h-6 bg-red-500 rounded-full"></div>
+										<h4 class="text-lg font-black text-white uppercase tracking-tight">Red Flag Watchlist</h4>
+									</div>
+									<svg class="w-4 h-4 text-zinc-500 group-open/sub:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+								</summary>
+								<div class="max-h-[400px] overflow-y-auto custom-scrollbar border-t border-red-500/10">
+									<div class="divide-y divide-red-500/10">
+										{#each redFlagWatchlist as team}
+											<div class="p-4 hover:bg-red-500/5 transition-colors cursor-pointer group/row" on:click={() => handleRowClick({ 'Team #': team.teamNum })}>
+												<div class="flex items-center justify-between mb-3">
+													<p class="text-xl font-black text-white group-hover/row:text-red-400 transition-colors">{team.teamNum}</p>
+													<span class="text-[10px] font-black text-red-500 uppercase">{team.issues.length} incidents</span>
+												</div>
+												<div class="flex flex-wrap gap-2">
+													{#each team.issues as issue}
+														<div class="flex items-center gap-1.5 bg-red-950/40 border border-red-500/20 px-2 py-1 rounded-lg">
+															<span class="text-[9px] font-black text-red-300">M{issue.matchNum}</span>
+															<div class="flex gap-1">
+																{#if issue.hasMechanical}<span title="Mechanical">⚙️</span>{/if}
+																{#if issue.hasTipped}<span title="Tipped">⚠️</span>{/if}
+																{#if issue.hasDied}<span title="Died">💀</span>{/if}
+																{#if issue.hasCard}<span title="Card">🟡</span>{/if}
+															</div>
+														</div>
+													{/each}
+												</div>
+											</div>
+										{/each}
+										{#if redFlagWatchlist.length === 0}
+											<div class="p-12 text-center">
+												<p class="text-zinc-600 font-black uppercase tracking-widest">No red flags detected</p>
+											</div>
+										{/if}
+									</div>
+								</div>
+							</details>
+						</div>
+					</div>
+				</details>
+
+				<!-- 3. Missing Scouting Entries -->
+				<details class="group bg-zinc-900/40 border-2 border-yellow-500/20 rounded-[2.5rem] shadow-xl overflow-hidden backdrop-blur-xl">
+					<summary class="p-6 md:p-8 cursor-pointer list-none flex items-center justify-between hover:bg-yellow-500/5 transition-colors">
+						<div class="flex items-center gap-6">
+							<div class="w-16 h-16 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex flex-col items-center justify-center">
+								<svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+							</div>
+							<div>
+								<h2 class="text-xl md:text-3xl font-black text-yellow-500 uppercase tracking-tighter">Missing Matches</h2>
+								<p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Identified Missing Scouting Entries by Match</p>
+							</div>
+						</div>
+						<div class="flex items-center gap-4">
+							<span class="text-[10px] font-black text-yellow-500/60 uppercase tracking-[0.2em] hidden md:block">{scoutLeadData.length} matches remaining</span>
+							<svg class="w-6 h-6 text-zinc-500 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+						</div>
+					</summary>
+					<div class="p-6 md:p-10 pt-0 space-y-4">
+						{#each scoutLeadData as m}
+							<details class="group/match bg-black/40 border-2 border-zinc-800 rounded-[2rem] overflow-hidden backdrop-blur-sm">
+								<summary class="p-6 md:p-8 cursor-pointer list-none flex items-center justify-between hover:bg-yellow-500/5 transition-colors">
+									<div class="flex items-center gap-6">
+										<div class="w-16 h-16 rounded-2xl bg-yellow-500/10 border-2 border-yellow-500/20 flex flex-col items-center justify-center">
+											<p class="text-[8px] font-black text-yellow-500 uppercase">Match</p>
+											<p class="text-2xl font-black text-white">{m.match_number}</p>
+										</div>
+										<div>
+											<p class="text-xl font-black text-white">{m.missing.length} Teams Missing</p>
+											<p class="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-1">Click to expand details</p>
+										</div>
+									</div>
+									<div class="flex items-center gap-4">
+										<div class="flex gap-2 mr-4">
+											{#each m.videos as video}
+												{#if video.type === 'youtube'}
+													<a href="https://youtube.com/watch?v={video.key}" target="_blank" rel="noopener noreferrer" class="bg-zinc-800 hover:bg-red-600 text-white p-2 rounded-lg transition" on:click|stopPropagation>
+														<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+													</a>
+												{/if}
+											{/each}
+										</div>
+										<svg class="w-6 h-6 text-zinc-500 group-open/match:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+									</div>
+								</summary>
+								<div class="p-8 border-t-2 border-zinc-800 bg-black/20">
+									<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+										<!-- Red Alliance -->
+										<div>
+											<p class="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+												<span class="w-2 h-2 rounded-full bg-red-500"></span> Red Alliance
+											</p>
+											<div class="space-y-3">
+												{#each m.missing.filter(t => t.alliance === 'red') as t}
+													<div class="flex items-center justify-between p-4 bg-zinc-900/60 border border-zinc-800 rounded-2xl">
+														<p class="text-2xl font-black text-white">{t.team}</p>
+														<button on:click={() => handleRowClick({ 'Team #': t.team })} class="bg-zinc-800 hover:bg-yellow-600 text-white text-[9px] font-black px-4 py-2 rounded-lg transition uppercase tracking-widest">View Team</button>
+													</div>
+												{/each}
+												{#if m.missing.filter(t => t.alliance === 'red').length === 0}
+													<p class="text-xs font-black text-zinc-700 uppercase italic">All scouted</p>
+												{/if}
+											</div>
+										</div>
+										<!-- Blue Alliance -->
+										<div>
+											<p class="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+												<span class="w-2 h-2 rounded-full bg-blue-500"></span> Blue Alliance
+											</p>
+											<div class="space-y-3">
+												{#each m.missing.filter(t => t.alliance === 'blue') as t}
+													<div class="flex items-center justify-between p-4 bg-zinc-900/60 border border-zinc-800 rounded-2xl">
+														<p class="text-2xl font-black text-white">{t.team}</p>
+														<button on:click={() => handleRowClick({ 'Team #': t.team })} class="bg-zinc-800 hover:bg-yellow-600 text-white text-[9px] font-black px-4 py-2 rounded-lg transition uppercase tracking-widest">View Team</button>
+													</div>
+												{/each}
+												{#if m.missing.filter(t => t.alliance === 'blue').length === 0}
+													<p class="text-xs font-black text-zinc-700 uppercase italic">All scouted</p>
+												{/if}
+											</div>
+										</div>
+									</div>
+								</div>
+							</details>
+						{/each}
+
+						{#if scoutLeadData.length === 0}
+							<div class="text-center py-20 text-zinc-600 font-black uppercase tracking-widest bg-zinc-900/20 rounded-[2.5rem] border-2 border-zinc-800 border-dashed">
+								<p class="text-2xl mb-2">Full Coverage Achieved</p>
+								<p class="text-sm text-zinc-700">All scheduled matches have been scouted</p>
+							</div>
+						{/if}
+					</div>
+				</details>
+				<!-- 1. Alliance Selection Predictions -->
+				<details class="group bg-zinc-900/40 border-2 border-orange-500/20 rounded-[2.5rem] shadow-xl overflow-hidden backdrop-blur-xl">
+					<summary class="p-6 md:p-8 cursor-pointer list-none flex items-center justify-between hover:bg-orange-500/5 transition-colors">
+						<div class="flex items-center gap-6">
+							<div class="w-16 h-16 rounded-2xl bg-orange-500/10 border-2 border-yellow-500/20 flex flex-col items-center justify-center">
+								<p class="text-3xl font-black text-orange-500">!</p>
+							</div>
+							<div>
+								<h2 class="text-xl md:text-3xl font-black text-orange-500 uppercase tracking-tighter">Alliance Predictions</h2>
+								<p class="text-xs font-bold text-red-500 uppercase tracking-widest mt-1">ONLY for scouting lead and drive coach. Restricted Information.</p>
+							</div>
+						</div>
+						<svg class="w-6 h-6 text-zinc-500 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+					</summary>
+					<div class="p-6 md:p-10 pt-0">
+						{#if allianceSimulation.length > 0}
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+								{#each allianceSimulation as alliance, i}
+									<div class="bg-black/40 border-2 border-zinc-800 rounded-2xl p-4 hover:border-orange-500/20 transition-all group">
+										<div class="flex items-center justify-between mb-4 pb-2 border-b border-zinc-800">
+											<p class="text-[10px] font-black text-orange-500 uppercase">Alliance {i+1}</p>
+											<p class="text-[8px] font-black text-zinc-600 uppercase">Total EPA: {( (teamStatsMap.get(alliance.captain)?.epa || 0) + alliance.picks.reduce((acc, p) => acc + (teamStatsMap.get(p)?.epa || 0), 0) ).toFixed(1)}</p>
+										</div>
+										<div class="space-y-3">
+											<!-- Captain -->
+											<div class="flex items-center justify-between group/team cursor-pointer" on:click={() => handleRowClick({ 'Team #': alliance.captain })}>
+												<div>
+													<p class="text-[8px] font-black text-zinc-500 uppercase mb-0.5">Captain</p>
+													<p class="text-xl font-black text-white group-hover/team:text-orange-500 transition-colors">{alliance.captain}</p>
+												</div>
+												<div class="text-right">
+													<p class="text-[8px] font-black text-zinc-600 uppercase">EPA</p>
+													<p class="text-xs font-black text-zinc-400">{teamStatsMap.get(alliance.captain)?.epa.toFixed(1) || 'N/A'}</p>
+												</div>
+											</div>
+											<!-- Picks -->
+											{#each alliance.picks as pickNum, pickIdx}
+												<div class="flex items-center justify-between group/team cursor-pointer" on:click={() => handleRowClick({ 'Team #': pickNum })}>
+													<div>
+														<p class="text-[8px] font-black text-zinc-500 uppercase mb-0.5">Pick {pickIdx + 1}</p>
+														<p class="text-lg font-black text-zinc-300 group-hover/team:text-orange-500 transition-colors">{pickNum}</p>
+													</div>
+													<div class="text-right">
+														<p class="text-[8px] font-black text-zinc-600 uppercase">EPA</p>
+														<p class="text-xs font-black text-zinc-400">{teamStatsMap.get(pickNum)?.epa.toFixed(1) || 'N/A'}</p>
+													</div>
+												</div>
+											{/each}
+										</div>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<div class="p-12 text-center bg-black/20 rounded-[2rem] border-2 border-zinc-800 border-dashed">
+								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">Rankings data required for simulation</p>
+							</div>
+						{/if}
+					</div>
+				</details>
+
+			</div>
+
+
+    {:else if overviewMode}
 			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
 				<div class="flex flex-col md:flex-row gap-8">
 					<!-- Team Selector & Info -->
