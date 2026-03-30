@@ -1777,7 +1777,12 @@
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 mb-12 animate-in fade-in slide-in-from-top-4">
 				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
 					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
-						<h2 class="text-2xl md:text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
+						<div>
+							<h2 class="text-2xl md:text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
+							<p class="text-zinc-500 font-bold text-xs md:text-sm tracking-widest mt-1">
+								{simRedTeams.filter(t => t).join(' • ') || 'No Teams Selected'}
+							</p>
+						</div>
 						<div class="flex gap-4 md:gap-6">
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.red.epa.toFixed(1)}</p></div>
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.red.opr.toFixed(1)}</p></div>
@@ -1803,7 +1808,12 @@
 				</div>
 				<div class="bg-blue-950/10 border-2 border-blue-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
 					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
-						<h2 class="text-2xl md:text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
+						<div>
+							<h2 class="text-2xl md:text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
+							<p class="text-zinc-500 font-bold text-xs md:text-sm tracking-widest mt-1">
+								{simBlueTeams.filter(t => t).join(' • ') || 'No Teams Selected'}
+							</p>
+						</div>
 						<div class="flex gap-4 md:gap-6">
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.blue.epa.toFixed(1)}</p></div>
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.blue.opr.toFixed(1)}</p></div>
