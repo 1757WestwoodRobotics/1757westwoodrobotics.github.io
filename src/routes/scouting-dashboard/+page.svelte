@@ -61,6 +61,17 @@
 	let overviewTeam = '1757';
 	let quickLinksOpen = false;
 
+	const posMap = {
+		'OT': 'Outpost Trench',
+		'OBFT': 'Outpost Bump Favoring Trench',
+		'OBFH': 'Outpost Bump Favoring Hub',
+		'H': 'Hub',
+		'DBFH': 'Depot Bump Favoring Hub',
+		'DBFT': 'Depot Bump Favoring Trench',
+		'DT': 'Depot Trench',
+		'NS': 'No Show'
+	};
+
 	$: scoutLeadData = schedule.map(m => {
 		const scoutedTeamsInMatch = new Set(
 			scoutingData
@@ -158,6 +169,14 @@
 
 		return { teamNum: tNum, earlyEff, recentEff, diff };
 	}).filter(Boolean).sort((a, b) => b.diff - a.diff);
+
+	$: autoStartDistribution = selectedTeamMatches.reduce((acc, m) => {
+		const pos = getVal(m, 'Starting position?');
+		if (pos && pos !== 'N/A') {
+			acc[pos] = (acc[pos] || 0) + 1;
+		}
+		return acc;
+	}, {});
 
 	function clearSimulator() {
 		simRedTeams = ['', '', ''];
@@ -2640,6 +2659,45 @@
 			
 			<!-- Content -->
 			<div class="p-3 md:p-10 space-y-6 md:space-y-12">
+				<!-- Comments Dropdown -->
+				<details class="group/comments bg-zinc-900/40 border-2 border-zinc-800 rounded-[2rem] overflow-hidden shadow-xl">
+					<summary class="p-6 md:p-8 cursor-pointer list-none flex items-center justify-between hover:bg-white/5 transition-colors">
+						<div class="flex items-center gap-4">
+							<div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+								<svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>
+							</div>
+							<h3 class="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">Field Observations</h3>
+						</div>
+						<svg class="w-6 h-6 text-zinc-500 group-open/comments:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
+					</summary>
+					<div class="p-6 md:p-8 border-t border-zinc-800/50 space-y-4">
+						{#each selectedTeamMatches as matchRow}
+							{@const comment = getVal(matchRow, 'comments')}
+							{#if comment && comment !== 'N/A'}
+								<div class="bg-zinc-900/60 p-4 md:p-6 rounded-2xl border-l-4 border-blue-600 shadow-xl backdrop-blur-sm group hover:border-blue-500 transition-all">
+									<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
+										<div class="flex items-center gap-3">
+											<span class="text-[10px] font-black text-blue-500 uppercase tracking-widest bg-blue-500/10 px-3 py-1 rounded-lg border border-blue-500/20">Match {getVal(matchRow, 'Match #')}</span>
+											<span class="text-[8px] font-black text-zinc-600 uppercase">Scout: {getVal(matchRow, 'Scouter initials')}</span>
+										</div>
+										<button 
+											on:click={() => selectTeamMatch(matchRow)}
+											class="text-[8px] font-black uppercase tracking-widest bg-zinc-800 hover:bg-blue-600 text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg transition active:scale-95">
+											Jump to Match
+										</button>
+									</div>
+									<p class="font-black text-zinc-200 text-base md:text-lg leading-relaxed italic tracking-tight italic">"{comment}"</p>
+								</div>
+							{/if}
+						{/each}
+						{#if selectedTeamMatches.filter(m => getVal(m, 'comments') && getVal(m, 'comments') !== 'N/A').length === 0}
+							<div class="py-12 text-center">
+								<p class="text-zinc-600 font-black uppercase tracking-widest italic">No direct observations recorded.</p>
+							</div>
+						{/if}
+					</div>
+				</details>
+
 				{#if teamStats?.pit && getDriveDirectLink(getVal(teamStats.pit, 'Bot pic'))}
 					<div class="w-full h-40 md:h-64 rounded-2xl md:rounded-[3rem] overflow-hidden border-2 border-zinc-800 shadow-2xl relative group bg-black/40 cursor-zoom-in hover:border-blue-500 transition-colors"
 						role="button"
@@ -2882,6 +2940,26 @@
 							<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Tactical Specs</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
 							<div class="bg-zinc-900/40 p-8 rounded-[2.5rem] border-2 border-zinc-900 space-y-6 shadow-xl"><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Start Vector</span> <span class="font-black text-white bg-zinc-800 px-5 py-2 rounded-2xl border border-zinc-700">{getVal(selectedRow, 'Starting position?')}</span></div><div class="flex justify-between items-center"><span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Auto Ascension</span> <span class="font-black text-blue-400 bg-blue-400/10 px-5 py-2 rounded-2xl border border-blue-500/20">{getVal(selectedRow, 'Auto climb?')}</span></div></div>
 						</section>
+						<section>
+							<div class="flex items-center gap-6 mb-6"><h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.5em]">Auto Start Distribution</h3><div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div></div>
+							<div class="bg-zinc-900/40 p-8 rounded-[2.5rem] border-2 border-zinc-900 space-y-4 shadow-xl">
+								{#each Object.entries(autoStartDistribution).sort((a,b) => b[1] - a[1]) as [pos, count]}
+									{@const percentage = (count / selectedTeamMatches.length) * 100}
+									{@const label = posMap[pos] || pos}
+									<div class="space-y-1.5">
+										<div class="flex justify-between items-center">
+											<span class="text-[10px] font-black text-white uppercase tracking-widest">{label}</span>
+											<span class="text-[10px] font-black text-zinc-500">{count} matches ({percentage.toFixed(0)}%)</span>
+										</div>
+										<div class="w-full h-2 bg-black/40 rounded-full overflow-hidden border border-white/5">
+											<div class="h-full bg-blue-500 rounded-full transition-all duration-1000" style="width: {percentage}%"></div>
+										</div>
+									</div>
+								{:else}
+									<p class="text-[10px] font-black text-zinc-600 uppercase italic text-center py-4">No Auto Positioning Data Recorded</p>
+								{/each}
+							</div>
+						</section>
 					</div>
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
 						<section>
@@ -2897,36 +2975,6 @@
 							</div>
 						</section>
 					</div>
-					<section>
-						<div class="flex items-center gap-3 md:gap-6 mb-4 md:mb-6">
-							<h3 class="text-xs font-black text-zinc-500 uppercase tracking-[0.2em] md:tracking-[0.5em] whitespace-nowrap">Field Observations</h3>
-							<div class="h-0.5 flex-1 bg-gradient-to-r from-zinc-800 to-transparent"></div>
-						</div>
-						<div class="space-y-3 md:space-y-6">
-							{#each selectedTeamMatches as matchRow}
-								{@const comment = getVal(matchRow, 'comments')}
-								{#if comment && comment !== 'N/A'}
-									<div class="bg-zinc-900/60 p-3 md:p-8 rounded-lg md:rounded-[2.5rem] border-l-4 md:border-l-8 border-blue-600 shadow-2xl backdrop-blur-sm group hover:border-blue-500 transition-all">
-										<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-2 md:mb-4">
-											<div class="flex flex-wrap items-center gap-2 md:gap-4">
-												<span class="text-[8px] md:text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] md:tracking-[0.3em] bg-blue-500/10 px-2 md:px-4 py-1 md:py-2 rounded-lg md:rounded-xl border border-blue-500/20">Match {getVal(matchRow, 'Match #')}</span>
-												<span class="text-[7px] md:text-[8px] font-black text-zinc-600 uppercase tracking-widest">Scout: {getVal(matchRow, 'Scouter initials')}</span>
-											</div>
-											<button 
-												on:click={() => selectTeamMatch(matchRow)}
-												class="text-[7px] md:text-[8px] font-black uppercase tracking-widest bg-zinc-800 hover:bg-blue-600 text-zinc-400 hover:text-white px-2 md:px-3 py-1 md:py-1.5 rounded-lg transition active:scale-95 w-fit">
-												View Details
-											</button>
-										</div>
-										<p class="font-black text-zinc-200 text-sm md:text-lg leading-relaxed italic tracking-tight break-words">"{comment}"</p>
-									</div>
-								{/if}
-							{/each}
-							{#if selectedTeamMatches.filter(m => getVal(m, 'comments') && getVal(m, 'comments') !== 'N/A').length === 0}
-								<div class="bg-zinc-900/60 p-6 md:p-10 rounded-lg md:rounded-[3rem] border-l-4 md:border-l-8 border-zinc-800 font-black text-zinc-600 text-sm md:text-xl leading-relaxed shadow-2xl italic tracking-tight backdrop-blur-sm text-center">DIRECT OBSERVATIONS UNAVAILABLE.</div>
-							{/if}
-						</div>
-					</section>
 				{/if}
 			</div>
 		</div>
