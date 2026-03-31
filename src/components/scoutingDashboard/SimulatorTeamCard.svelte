@@ -10,6 +10,7 @@
 	export let onImageClick;
 	export let getDriveDirectLink;
 	export let getVal;
+	export let allTeamsList = [];
 
 	$: summary = getTeamSummary(team);
 	$: colors = teamColorsMap?.get(team) || { primary: alliance === 'red' ? '#ef4444' : '#3b82f6', secondary: alliance === 'red' ? '#991b1b' : '#1e3a8a' };
@@ -17,7 +18,31 @@
 	const borderColor = alliance === 'red' ? 'border-red-500/30' : 'border-blue-500/30';
 	const hoverBorder = alliance === 'red' ? 'hover:border-red-500' : 'hover:border-blue-500';
 
-	let showDetails = false;
+	let inputValue = team || '';
+	let showSuggestions = false;
+
+	$: suggestions = inputValue.length > 0 
+		? allTeamsList
+			.map(t => ({ num: t, nickname: teamDetailsMap?.get(t)?.nickname || '' }))
+			.filter(t => t.num.includes(inputValue) || t.nickname.toLowerCase().includes(inputValue.toLowerCase()))
+			.slice(0, 5)
+		: [];
+
+	function selectTeam(tNum) {
+		onTeamInput(teamIndex, tNum);
+		inputValue = tNum;
+		showSuggestions = false;
+	}
+
+	function handleKeydown(e) {
+		if (e.key === 'Enter') {
+			if (suggestions.length > 0 && inputValue !== suggestions[0].num) {
+				selectTeam(suggestions[0].num);
+			} else {
+				selectTeam(inputValue);
+			}
+		}
+	}
 </script>
 
 {#if summary}
@@ -31,8 +56,10 @@
   <!-- clear team button -->
   <button
     class="absolute top-1 right-1 w-12 h-12 rounded-full bg-black/50 text-white text-lg flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity z-20"
-    on:click|stopPropagation={() => onTeamInput(teamIndex, '')}
-    on:keydown={(e) => e.key === 'Enter' && onTeamInput(teamIndex, '')}
+    on:click|stopPropagation={() => { 
+    onTeamInput(teamIndex, ''); inputValue = ''; 
+    }}
+    on:keydown={(e) => {if(e.key === 'Enter'){ onTeamInput(teamIndex, ''); inputValue = ''; }}}
     aria-label="Clear team selection">
     &times;
   </button>
@@ -131,13 +158,42 @@
 		<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{team}</div>
 	</div>
 {:else}
-	<input
-		type="text"
-		value={team}
-		on:input={(e) => onTeamInput(teamIndex, e.target.value)}
-		placeholder="Team #"
-		class="w-full bg-black/60 border-2 {alliance === 'red'
-			? 'border-red-500/30 focus:border-red-500'
-			: 'border-blue-500/30 focus:border-blue-500'} rounded-xl p-3 text-center font-black text-base md:text-lg outline-none transition"
-	/>
+	<div class="relative w-full">
+		<div class="flex gap-2">
+			<input
+				type="text"
+				bind:value={inputValue}
+				on:keydown={handleKeydown}
+				on:focus={() => showSuggestions = true}
+				on:blur={() => setTimeout(() => showSuggestions = false, 200)}
+				placeholder="Team # or Name"
+				class="w-full bg-black/60 border-2 {alliance === 'red'
+					? 'border-red-500/30 focus:border-red-500'
+					: 'border-blue-500/30 focus:border-blue-500'} rounded-xl p-3 text-center font-black text-base md:text-lg outline-none transition"
+			/>
+			<button 
+				on:click={() => selectTeam(inputValue)}
+				class="px-4 rounded-xl font-black uppercase tracking-widest transition border-2 {alliance === 'red' ? 'bg-red-600 border-red-500 hover:bg-red-500' : 'bg-blue-600 border-blue-500 hover:bg-blue-500'} text-white shadow-lg active:scale-95">
+				Select
+			</button>
+		</div>
+
+		{#if showSuggestions && suggestions.length > 0}
+			<div class="absolute top-full left-0 right-0 mt-2 bg-zinc-900 border-2 border-zinc-800 rounded-xl shadow-2xl z-[100] overflow-hidden">
+				{#each suggestions as suggestion}
+					<button 
+						on:click|preventDefault={() => selectTeam(suggestion.num)}
+						class="w-full p-3 text-left hover:bg-white/5 transition flex justify-between items-center border-b border-zinc-800 last:border-0">
+						<div>
+							<span class="font-black text-white mr-2">{suggestion.num}</span>
+							<span class="text-[10px] font-bold text-zinc-500 uppercase">{suggestion.nickname}</span>
+						</div>
+						<svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
+						</svg>
+					</button>
+				{/each}
+			</div>
+		{/if}
+	</div>
 {/if}

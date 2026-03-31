@@ -146,11 +146,6 @@
 		return alliances;
 	})();
 
-  const getWinProb = (epa1, epa2) => {
-    const score_sd = yearStats?.score_sd || 20;
-    const diff = epa1 - epa2;
-    return 1 / (1 + Math.pow(10, (-5/8 * diff) / score_sd));
-  };
 
 	$: bracketSimulation = (() => {
 		if (allianceSimulation.length < 8) return null;
@@ -165,7 +160,8 @@
 		const predictMatch = (a1, a2, label) => {
 			const epa1 = getAllianceEPA(a1);
 			const epa2 = getAllianceEPA(a2);
-      const winProb = getWinProb(epa1, epa2);
+      const diff = epa1 - epa2;
+      const winProb = getWinProb(diff);
 			return { 
 				label, a1, a2, epa1, epa2, winProb, 
 				winner: winProb > 0.5 ? a1 : a2,
@@ -215,6 +211,20 @@
 			],
       matches: [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14],
 			finals: m14
+		};
+	})();
+
+	function getWinProb(scoreDiff) {
+		const score_sd = yearStats?.score_sd || 20;
+		return 1 / (1 + Math.pow(10, (-5/8 * scoreDiff) / score_sd));
+	}
+
+	$: simWinProbs = (() => {
+		const epaDiff = simAggregates.red.epa - simAggregates.blue.epa;
+		const oprDiff = simAggregates.red.opr - simAggregates.blue.opr;
+		return {
+			epa: getWinProb(epaDiff),
+			opr: getWinProb(oprDiff)
 		};
 	})();
 
@@ -1169,6 +1179,7 @@
 	}
 
 	function getTeamSummary(teamNum) {
+		if (!teamNum || !teamMetrics) return null;
 		const metrics = teamMetrics.find(m => m.teamNum === teamNum);
 		if (!metrics) return null;
 		const rows = scoutingData.filter(r => getVal(r, 'Team #') === teamNum);
@@ -1895,6 +1906,53 @@
 				</div>
 			</div>
 		{:else if simulatorMode}
+			<!-- Prediction Header -->
+			<div class="mb-8 bg-zinc-900/40 border-2 border-zinc-800 rounded-[2.5rem] p-6 md:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden group">
+				<div class="absolute -right-10 -top-10 text-9xl opacity-5 group-hover:rotate-12 transition-transform duration-700">⚔️</div>
+				<div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+					<div class="text-center md:text-left">
+						<h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter mb-2 italic">Match Prediction</h2>
+						<p class="text-[10px] md:text-xs font-black text-zinc-500 uppercase tracking-[0.4em]">Simulated Outcome Analysis</p>
+					</div>
+					
+					<div class="flex items-center gap-12 md:gap-20">
+						<div class="text-center">
+							<p class="text-[9px] md:text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">EPA Probability</p>
+							<div class="flex items-center justify-center gap-4">
+								<div class="text-right">
+									<p class="text-[8px] font-black text-red-500 uppercase">Red</p>
+									<p class="text-xl md:text-3xl font-black text-white">{simWinProbs.epa.toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+								<div class="w-[2px] h-10 bg-zinc-800 rounded-full"></div>
+								<div class="text-left">
+									<p class="text-[8px] font-black text-blue-500 uppercase">Blue</p>
+									<p class="text-xl md:text-3xl font-black text-white">{(1 - simWinProbs.epa).toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+							</div>
+						</div>
+						<div class="text-center">
+							<p class="text-[9px] md:text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">OPR Probability</p>
+							<div class="flex items-center justify-center gap-4">
+								<div class="text-right">
+									<p class="text-[8px] font-black text-red-500 uppercase">Red</p>
+									<p class="text-xl md:text-3xl font-black text-white">{simWinProbs.opr.toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+								<div class="w-[2px] h-10 bg-zinc-800 rounded-full"></div>
+								<div class="text-left">
+									<p class="text-[8px] font-black text-blue-500 uppercase">Blue</p>
+									<p class="text-xl md:text-3xl font-black text-white">{(1 - simWinProbs.opr).toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="w-full md:w-64 h-3 bg-zinc-800 rounded-full overflow-hidden flex">
+						<div class="bg-red-500 h-full transition-all duration-1000 ease-out" style="width: {simWinProbs.epa * 100}%"></div>
+						<div class="bg-blue-500 h-full transition-all duration-1000 ease-out" style="width: {(1 - simWinProbs.epa) * 100}%"></div>
+					</div>
+				</div>
+			</div>
+
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 mb-12 animate-in fade-in slide-in-from-top-4">
 				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
 					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
@@ -1918,11 +1976,12 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
-								onTeamInput={(idx, val) => { simRedTeams[idx] = val; fetchTeamColors(val); }}
+								onTeamInput={(idx, val) => { simRedTeams[idx] = val; simRedTeams = [...simRedTeams]; fetchTeamColors(val); }}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
 								{getDriveDirectLink}
 								{getVal}
+								{allTeamsList}
 							/>
 						{/each}
 					</div>
@@ -1949,11 +2008,12 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
-								onTeamInput={(idx, val) => { simBlueTeams[idx] = val; fetchTeamColors(val); }}
+								onTeamInput={(idx, val) => { simBlueTeams[idx] = val; simBlueTeams = [...simBlueTeams]; fetchTeamColors(val); }}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
 								{getDriveDirectLink}
 								{getVal}
+								{allTeamsList}
 							/>
 						{/each}
 					</div>
