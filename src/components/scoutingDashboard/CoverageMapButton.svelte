@@ -6,6 +6,7 @@
 	export let teamIsInMatch;
 	export let searchTerm;
 	export let onMatchClick;
+	export let onMatchLongPress;
 	export let onMatchContextMenu;
 	export let onMatchHover;
 	export let onMatchHoverEnd;
@@ -13,6 +14,31 @@
 	$: searchTeamNum = searchTerm.trim() ? parseInt(searchTerm.trim()) : null;
 	$: count = getScouterCount(match.match_number);
 	$: teamInMatch = searchTeamNum && teamIsInMatch(searchTeamNum, match);
+
+	let pressTimer;
+	let longPressTriggered = false;
+
+	function startPress() {
+		longPressTriggered = false;
+		pressTimer = setTimeout(() => {
+			longPressTriggered = true;
+			onMatchLongPress();
+			// Provide haptic feedback if supported
+			if (window.navigator && window.navigator.vibrate) {
+				window.navigator.vibrate(50);
+			}
+		}, 600);
+	}
+
+	function endPress() {
+		clearTimeout(pressTimer);
+	}
+
+	function handleClick() {
+		if (!longPressTriggered) {
+			onMatchClick();
+		}
+	}
 </script>
 
 <button
@@ -27,7 +53,12 @@
 	on:mouseleave={() => onMatchHoverEnd()}
 	on:focus={() => onMatchHover(match)}
 	on:blur={() => onMatchHoverEnd()}
-	on:click={() => onMatchClick(match)}
+	on:mousedown={startPress}
+	on:mouseup={endPress}
+	on:mouseleave={endPress}
+	on:touchstart={startPress}
+	on:touchend={endPress}
+	on:click={handleClick}
 	on:contextmenu={(e) => {
 		e.preventDefault();
 		onMatchContextMenu(e, match);

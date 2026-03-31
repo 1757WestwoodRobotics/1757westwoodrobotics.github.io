@@ -1805,6 +1805,7 @@
 			{getMatchBreakdown}
 			{teamIsInMatch}
 			onMatchClick={(match) => selectedMatchPopup = match}
+			onMatchLongPress={(match) => loadMatchIntoSimulator(match)}
 			onMatchContextMenu={(e, match) => {
 				e.preventDefault();
 				contextMenu = { x: e.clientX, y: e.clientY };

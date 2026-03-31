@@ -8,6 +8,7 @@
 	export let getMatchBreakdown;
 	export let teamIsInMatch;
 	export let onMatchClick;
+	export let onMatchLongPress;
 	export let onMatchContextMenu;
 	export let onMatchHover;
 	export let onMatchHoverEnd;
@@ -32,6 +33,7 @@
 				{teamIsInMatch}
 				{searchTerm}
 				onMatchClick={() => onMatchClick(match)}
+				onMatchLongPress={() => onMatchLongPress(match)}
 				onMatchContextMenu={(e) => onMatchContextMenu(e, match)}
 				onMatchHover={() => onMatchHover(match)}
 				onMatchHoverEnd={() => onMatchHoverEnd()}
