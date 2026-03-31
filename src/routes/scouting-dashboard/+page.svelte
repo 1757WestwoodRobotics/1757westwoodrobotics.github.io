@@ -34,7 +34,8 @@
 		teamStats: false,
 		teamColors: false,
 		teamDetails: false,
-		rankings: false
+		rankings: false,
+		yearStats: false
 	};
 	let currentStep = '';
 	let error = null;
@@ -48,6 +49,7 @@
 	let eventRankings = [];
 	let eventOprs = {}; 
 	let teamStats = null; 
+	let yearStats = null;
 	let statsLoading = false;
 	let pitMode = false;
 	let simulatorMode = false;
@@ -142,6 +144,78 @@
 		}
 
 		return alliances;
+	})();
+
+  const getWinProb = (epa1, epa2) => {
+    const score_sd = yearStats?.score_sd || 20;
+    const diff = epa1 - epa2;
+    return 1 / (1 + Math.pow(10, (-5/8 * diff) / score_sd));
+  };
+
+	$: bracketSimulation = (() => {
+		if (allianceSimulation.length < 8) return null;
+		
+		const score_sd = yearStats?.score_sd || 20;
+		const getAllianceEPA = (alliance) => {
+			if (!alliance) return 0;
+			return (teamStatsMap.get(alliance.captain)?.epa || 0) + 
+				   alliance.picks.reduce((acc, p) => acc + (teamStatsMap.get(p)?.epa || 0), 0);
+		};
+
+		const predictMatch = (a1, a2, label) => {
+			const epa1 = getAllianceEPA(a1);
+			const epa2 = getAllianceEPA(a2);
+      const winProb = getWinProb(epa1, epa2);
+			return { 
+				label, a1, a2, epa1, epa2, winProb, 
+				winner: winProb > 0.5 ? a1 : a2,
+				loser: winProb > 0.5 ? a2 : a1
+			};
+		};
+
+		const alliances = allianceSimulation.slice(0, 8);
+		
+		// Round 1
+		const m1 = predictMatch(alliances[0], alliances[7], 'M1');
+		const m2 = predictMatch(alliances[3], alliances[4], 'M2');
+		const m3 = predictMatch(alliances[1], alliances[6], 'M3');
+		const m4 = predictMatch(alliances[2], alliances[5], 'M4');
+
+		// Round 2
+		const m5 = predictMatch(m1.loser, m2.loser, 'M5');
+		const m6 = predictMatch(m3.loser, m4.loser, 'M6');
+		const m7 = predictMatch(m1.winner, m2.winner, 'M7');
+		const m8 = predictMatch(m3.winner, m4.winner, 'M8');
+
+		// Round 3
+		const m9 = predictMatch(m8.loser, m5.winner, 'M9');
+		const m10 = predictMatch(m7.loser, m6.winner, 'M10');
+		const m11 = predictMatch(m7.winner, m8.winner, 'M11');
+
+		// Round 4
+		const m12 = predictMatch(m9.winner, m10.winner, 'M12');
+
+		// Round 5
+		const m13 = predictMatch(m11.loser, m12.winner, 'M13');
+
+		// Finals
+		const m14 = predictMatch(m11.winner, m13.winner, 'M14');
+
+		return {
+			upper: [
+				{ name: 'Round 1', matches: [m1, m2, m3, m4] },
+				{ name: 'Round 2', matches: [m7, m8] },
+				{ name: 'Round 3', matches: [m11] }
+			],
+			lower: [
+				{ name: 'Lower R2', matches: [m5, m6] },
+				{ name: 'Lower R3', matches: [m9, m10] },
+				{ name: 'Lower R4', matches: [m12] },
+				{ name: 'Lower R5', matches: [m13] }
+			],
+      matches: [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14],
+			finals: m14
+		};
 	})();
 
 	$: redFlagWatchlist = allTeamsList.map(tNum => {
@@ -317,6 +391,7 @@
 	const EVENT_KEY = import.meta.env.VITE_EVENT_KEY || '2026rikin';
 	const FILTER_TIME = import.meta.env.VITE_FILTER_TIME || '';
 	const PIT_SCOUTING_FORM_URL = import.meta.env.VITE_PIT_SCOUTING_FORM_URL;
+	const CURRENT_YEAR = 2026;
 
 	async function fetchTeamColors(teamNumber) {
 		if (!teamNumber || teamColorsMap.has(teamNumber)) return teamColorsMap.get(teamNumber);
@@ -519,6 +594,11 @@
 			loadingSteps.teamDetails = true;
 			await fetchAllTeamDetails();
 			loadingSteps.teamDetails = false;
+
+			currentStep = 'yearStats';
+			loadingSteps.yearStats = true;
+			await fetchYearStats();
+			loadingSteps.yearStats = false;
 		} catch (e) {
 			error = e.message;
 			console.error('Load error:', e);
@@ -538,8 +618,21 @@
 				stats: Array.from(teamStatsMap.entries()),
 				colors: Array.from(teamColorsMap.entries()),
 				details: Array.from(teamDetailsMap.entries()),
+				yearStats: yearStats,
 				timestamp: Date.now()
 			}));
+		}
+	}
+
+	async function fetchYearStats() {
+		try {
+			const res = await fetch(`https://api.statbotics.io/v3/year/${CURRENT_YEAR}`);
+			if (res.ok) {
+				yearStats = await res.json();
+				saveCache();
+			}
+		} catch (e) {
+			console.error('Error fetching year stats:', e);
 		}
 	}
 
@@ -604,7 +697,6 @@
 
 	async function fetchAllTeamStats() {
 		const uniqueTeams = allTeamsList;
-		const currentYear = 2026;
 		
 		// Filter out teams we already have cached
 		const teamsToFetch = uniqueTeams.filter(t => !teamStatsMap.has(t));
@@ -614,7 +706,7 @@
 		try {
 			// Fetch all teams concurrently
 			const promises = teamsToFetch.map(teamNum =>
-				fetch(`https://api.statbotics.io/v3/team_year/${teamNum}/${currentYear}`)
+				fetch(`https://api.statbotics.io/v3/team_year/${teamNum}/${CURRENT_YEAR}`)
 					.then(res => res.ok ? res.json().then(data => ({ teamNum, data })) : { teamNum, data: null })
 					.catch(e => {
 						console.error(`Error fetching stats for ${teamNum}:`, e);
@@ -759,7 +851,7 @@
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
 			const parsed = JSON.parse(cached);
-			const { data, pit, teams, rankings, stats, colors, details, timestamp } = parsed;
+			const { data, pit, teams, rankings, stats, colors, details, yearStats: cachedYearStats, timestamp } = parsed;
 			console.log('Cache found, age:', Date.now() - timestamp);
 			if (Date.now() - timestamp < 3600000) {
 				console.log('Cache is fresh, loading from cache');
@@ -770,6 +862,7 @@
 				if (stats) teamStatsMap = new Map(stats);
 				if (colors) teamColorsMap = new Map(colors);
 				if (details) teamDetailsMap = new Map(details);
+				if (cachedYearStats) yearStats = cachedYearStats;
 				
 				// Still show loading while fetching fresh data
 				currentStep = 'eventStats';
@@ -797,6 +890,11 @@
 					return fetchAllTeamStats();
 				}).then(() => {
 					loadingSteps.teamStats = false;
+					currentStep = 'yearStats';
+					loadingSteps.yearStats = true;
+					return fetchYearStats();
+				}).then(() => {
+					loadingSteps.yearStats = false;
 					loading = false;
 					currentStep = '';
 					console.log('All tasks complete, loading:', loading);
@@ -2429,6 +2527,102 @@
 									</div>
 								{/each}
 							</div>
+
+							{#if bracketSimulation}
+								<div class="mt-12 animate-in fade-in slide-in-from-bottom-4">
+									<h3 class="text-xl md:text-2xl font-black text-orange-400 uppercase tracking-tighter mb-6 flex items-center gap-3">
+										<span class="bg-orange-500/10 p-2 rounded-lg border border-orange-500/20">🏆</span>
+										Predicted Bracket Outcome
+									</h3>
+									
+									<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+										<!-- R1 -->
+										<div class="space-y-4">
+											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Round 1</p>
+											{#each bracketSimulation.matches.slice(0, 4) as m, i}
+												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
+													<div class="flex justify-between items-center mb-1">
+														<span class="text-zinc-500 font-bold">M{i+1}</span>
+														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+													</div>
+													<div class="space-y-1">
+														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
+															<span>{m.epa1.toFixed(0)}</span>
+														</div>
+														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
+															<span>{m.epa2.toFixed(0)}</span>
+														</div>
+													</div>
+												</div>
+											{/each}
+										</div>
+
+										<!-- Semis / Lr Semis -->
+										<div class="space-y-4">
+											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Winners R2</p>
+											{#each bracketSimulation.matches.slice(6, 8) as m, i}
+												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
+													<div class="flex justify-between items-center mb-1">
+														<span class="text-zinc-500 font-bold">M{i+7}</span>
+														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+													</div>
+													<div class="space-y-1">
+														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
+															<span>{m.epa1.toFixed(0)}</span>
+														</div>
+														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
+															<span>{m.epa2.toFixed(0)}</span>
+														</div>
+													</div>
+												</div>
+											{/each}
+										</div>
+
+										<!-- Finals Qualifier -->
+										<div class="space-y-4">
+											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Finals Qualifiers</p>
+											{#each [bracketSimulation.matches[10], bracketSimulation.matches[12]] as m, i}
+												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
+													<div class="flex justify-between items-center mb-1">
+														<span class="text-zinc-500 font-bold">M{i === 0 ? 11 : 13}</span>
+														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+													</div>
+													<div class="space-y-1">
+														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
+															<span>{m.epa1.toFixed(0)}</span>
+														</div>
+														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
+															<span>{m.epa2.toFixed(0)}</span>
+														</div>
+													</div>
+												</div>
+											{/each}
+										</div>
+
+										<!-- Champion -->
+										<div class="space-y-4">
+											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Grand Finals</p>
+											<div class="bg-orange-500/10 border-2 border-orange-500/40 rounded-2xl p-6 text-center shadow-[0_0_30px_rgba(249,115,22,0.1)] relative overflow-hidden group">
+												<div class="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-110 transition-transform duration-700">🏆</div>
+												<p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Predicted Champion</p>
+												<h4 class="text-4xl font-black text-white mb-1">Alliance {allianceSimulation.indexOf(bracketSimulation.finals.winner) + 1}</h4>
+												<p class="text-xs font-bold text-zinc-400">{(bracketSimulation.finals.winProb > 0.5 ? bracketSimulation.finals.winProb : 1-bracketSimulation.finals.winProb).toLocaleString(undefined, {style: 'percent'})} confidence</p>
+												
+												<div class="mt-4 pt-4 border-t border-orange-500/20 flex justify-between items-center text-[10px] font-black">
+													<span class="text-zinc-500 uppercase">Opponent</span>
+													<span class="text-white">Alliance {allianceSimulation.indexOf(bracketSimulation.finals.loser) + 1}</span>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{/if}
 						{:else}
 							<div class="p-12 text-center bg-black/20 rounded-[2rem] border-2 border-zinc-800 border-dashed">
 								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">Rankings data required for simulation</p>
