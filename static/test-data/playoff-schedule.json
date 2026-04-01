@@ -1,0 +1,156 @@
+[
+  {
+    "key": "2026rikin_sf1_1",
+    "comp_level": "sf",
+    "set_number": 1,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc78", "frc6620", "frc1757"], "score": 185 },
+      "blue": { "team_keys": ["frc1699", "frc10063", "frc2079"], "score": 142 }
+    },
+    "winning_alliance": "red"
+  },
+  {
+    "key": "2026rikin_sf2_1",
+    "comp_level": "sf",
+    "set_number": 2,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc6324", "frc6367", "frc10254"], "score": 171 },
+      "blue": { "team_keys": ["frc10973", "frc5112", "frc6333"], "score": 158 }
+    },
+    "winning_alliance": "red"
+  },
+  {
+    "key": "2026rikin_sf3_1",
+    "comp_level": "sf",
+    "set_number": 3,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc2168", "frc1768", "frc5000"], "score": 192 },
+      "blue": { "team_keys": ["frc3623", "frc1153", "frc1735"], "score": 134 }
+    },
+    "winning_alliance": "red"
+  },
+  {
+    "key": "2026rikin_sf4_1",
+    "comp_level": "sf",
+    "set_number": 4,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc3719", "frc4176", "frc663"], "score": 145 },
+      "blue": { "team_keys": ["frc10066", "frc1350", "frc61"], "score": 162 }
+    },
+    "winning_alliance": "blue"
+  },
+  {
+    "key": "2026rikin_sf5_1",
+    "comp_level": "sf",
+    "set_number": 5,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc1699", "frc10063", "frc2079"], "score": 131 },
+      "blue": { "team_keys": ["frc10973", "frc5112", "frc6333"], "score": 148 }
+    },
+    "winning_alliance": "blue"
+  },
+  {
+    "key": "2026rikin_sf6_1",
+    "comp_level": "sf",
+    "set_number": 6,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc3623", "frc1153", "frc1735"], "score": 139 },
+      "blue": { "team_keys": ["frc3719", "frc4176", "frc663"], "score": 156 }
+    },
+    "winning_alliance": "blue"
+  },
+  {
+    "key": "2026rikin_sf7_1",
+    "comp_level": "sf",
+    "set_number": 7,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc78", "frc6620", "frc1757"], "score": 201 },
+      "blue": { "team_keys": ["frc6324", "frc6367", "frc10254"], "score": 167 }
+    },
+    "winning_alliance": "red"
+  },
+  {
+    "key": "2026rikin_sf8_1",
+    "comp_level": "sf",
+    "set_number": 8,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc2168", "frc1768", "frc5000"], "score": 178 },
+      "blue": { "team_keys": ["frc10066", "frc1350", "frc61"], "score": 155 }
+    },
+    "winning_alliance": "red"
+  },
+  {
+    "key": "2026rikin_sf9_1",
+    "comp_level": "sf",
+    "set_number": 9,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc10066", "frc1350", "frc61"], "score": -1 },
+      "blue": { "team_keys": ["frc10973", "frc5112", "frc6333"], "score": -1 }
+    },
+    "winning_alliance": ""
+  },
+  {
+    "key": "2026rikin_sf10_1",
+    "comp_level": "sf",
+    "set_number": 10,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc6324", "frc6367", "frc10254"], "score": -1 },
+      "blue": { "team_keys": ["frc3719", "frc4176", "frc663"], "score": -1 }
+    },
+    "winning_alliance": ""
+  },
+  {
+    "key": "2026rikin_sf11_1",
+    "comp_level": "sf",
+    "set_number": 11,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": ["frc78", "frc6620", "frc1757"], "score": -1 },
+      "blue": { "team_keys": ["frc2168", "frc1768", "frc5000"], "score": -1 }
+    },
+    "winning_alliance": ""
+  },
+  {
+    "key": "2026rikin_sf12_1",
+    "comp_level": "sf",
+    "set_number": 12,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": [], "score": -1 },
+      "blue": { "team_keys": [], "score": -1 }
+    },
+    "winning_alliance": ""
+  },
+  {
+    "key": "2026rikin_sf13_1",
+    "comp_level": "sf",
+    "set_number": 13,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": [], "score": -1 },
+      "blue": { "team_keys": [], "score": -1 }
+    },
+    "winning_alliance": ""
+  },
+  {
+    "key": "2026rikin_f1_1",
+    "comp_level": "f",
+    "set_number": 1,
+    "match_number": 1,
+    "alliances": {
+      "red": { "team_keys": [], "score": -1 },
+      "blue": { "team_keys": [], "score": -1 }
+    },
+    "winning_alliance": ""
+  }
+]
