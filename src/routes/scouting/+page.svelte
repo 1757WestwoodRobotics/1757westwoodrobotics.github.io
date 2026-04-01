@@ -219,6 +219,9 @@
 					<a href="/scouting-dashboard" class="px-4 py-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg font-bold text-xs flex items-center">
 						DASHBOARD
 					</a>
+					<a href="/scouting-assignments" class="px-4 py-2 bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 rounded-lg font-bold text-xs flex items-center">
+						ASSIGNMENTS
+					</a>
 				</div>
 			</div>
 			{#if timeline.length > 0}

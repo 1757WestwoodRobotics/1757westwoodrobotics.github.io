@@ -688,6 +688,12 @@
 				</p>
 			</div>
 			<div class="flex gap-4">
+				<a href="/scouting" class="px-4 py-2 bg-green-600/20 text-green-400 hover:bg-green-600/30 rounded-lg font-semibold transition">
+					Go back to Scouting!
+				</a>
+				<a href="/scouting-dashboard" class="px-4 py-2 bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 rounded-lg font-semibold transition">
+					Dashboard
+				</a>
 				<button
 					on:click={() => loadData(true)}
 					class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition"
