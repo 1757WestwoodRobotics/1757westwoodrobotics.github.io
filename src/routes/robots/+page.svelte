@@ -1,140 +1,46 @@
 <script>
-	import RobotPage from '../../components/robotPage.svelte';
+	import { robots } from '$lib/data/robots';
+	import RobotCard from '../../components/RobotCard.svelte';
 	import Navbar from '../../components/navbar.svelte';
 	import Footer from '../../components/footer.svelte';
-
-	let robots = [
-		{
-			name: 'Perseus',
-			year: '2025',
-			image: '/img/robots/2025reefscape.png',
-			desc: 'Learning from the previous year\'s design mistakes, we set out to build a more robust and higher performing robot. Named after the Greek hero who slew Medusa, this bot is designed to be a versatile and reliable performer on the field. With a focus on durability and ease of maintenance, Perseus is built to withstand the rigors of competition while delivering consistent performance.',
-			techbinder: '/2025techbinder.pdf',
-			videos: [
-				{name: 'Robot Reveal', id: '8KiZ2uVPwyY'},
-				{name: 'WPI Recap', id: '9QMI3LTphhM'}
-			]
-		},
-		{
-			name: 'Proteus',
-			year: '2024',
-			image: '/img/robots/2024crescendo.png',
-			desc: 'Desiring and stretching to move further, team 1757 designed and built its most ambitious robot to date. Named after the Greek sea god who could change his shape at will, this bot is designed to be a versatile and adaptable performer on the field. Tragically this robot was never able to compete at its highest level due to time and resource constraints.',
-			techbinder: '/2024techbinder.pdf',
-			videos: [
-				{name: 'Behind The Bumpers', id: '9nz4GVGqrWM'},
-				{name: 'Riverrage Recap', id: 'S-tVF1yQD2U&t=3s'}
-			]
-		},
-		{
-			name: 'Luxo',
-			year: '2023',
-			image: '/img/robots/2023chargedup.png',
-			desc: 'Building off the success of last year, we aimed to once again build the even greater performing robot than ever before. Named after the Pixar Lamp, this fast and elegant industrial arm on wheels is build with robustness in mind and precise control implemented. The first bot in team history to win any event, and taking home a total of 3 blue banners. In addition, Luxo took home the Excelence in Engineering award and a team award, the Engineering Inspiration award.',
-			techbinder: '/2023techbinder.pdf',
-			videos: [
-				{ name: 'Season Recap', id: 'HeokAZa2hfo' },
-				{ name: 'WPI winning match', id: 'DxJ9BWuwGyI' },
-				{ name: 'NEDCMP Wilson winning match', id: 'DczqfwSpFsQ' },
-				{ name: 'NEDCMP grand finals winning match', id: '0g_Gj0Xq1gw' }
-			]
-		},
-		{
-			name: 'Skadi',
-			year: '2022',
-			image: '/img/robots/2022rapidreact.png',
-			desc: 'After a long pandemic hibernation we dusted off the tools, warmed up the laser cutter, repaired the 3D printer, refilled the coffee pot and set off to build our highest performing robot to date. Named for the Norse God of Archery, this fast and nimble sniper was quick to grab balls and precisely put them on target with its Computer-Vision assisted aiming. In addition to securing playoff berths at every event it competed in - including NE Championship - Skadi took home the judges awards for both Innovation in Controls and overall Quality.',
-			techbinder: '/2022techbinder.pdf',
-			videos: [
-				{ name: 'Season Recap', id: 's1iLbVFduqE' },
-				{ name: 'Highest scoring match', id: 'xDQo_OFQs5Q' },
-				{ name: 'WPI point high score', id: 'P2qm6jk8zN8 ' }
-			]
-		},
-		{
-			name: 'T Shirt Cannon',
-			year: '2022',
-			image: '/img/robots/2022tshirtcannon.png',
-			desc: 'This off season learning robot restarted our tradition of creating a t-shirt cannon for the school and town events. With 120psi of pressure in two tanks, it could fire a t-shirt shell far into the crowd of the bleachers.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: 'Mrk. XV',
-			year: '2020',
-			image: '/img/robots/2020infiniterecharge.png',
-			desc: 'Our 15th Competition robot, while its season was cut short due to the outbreak of SARs-COVID 19 this bot was set to be a contender. With a long range turreted shooter this bot was designed to lurk in the backfield firing balls over the opponents head all match long.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: 'Rampothy',
-			year: '2019',
-			image: '/img/robots/2019deepspace_compressed.png',
-			desc: 'Designed to be the most accommodating Ramp Bot in FRC that year, this hunchbacked robot flew of the starting platform and spent most of the game fitting hatch panels to the cargo ship. When the 30 second warning bell rang it unfolded into one of the widest ramps in FRC: a feature which helped it to secure an elusive and entertaining double ramp bot climb at the Manchester District Event.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: '',
-			year: '2018',
-			image: '/img/robots/2018firstpowerup_compressed.png',
-			desc: 'This crate stacking behemouth could extend to almost 10 feet tall!',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: '',
-			year: '2017',
-			image: '/img/robots/2017steamworks_compressed.png',
-			desc: 'A fast and agile Mecanum drive coupled with robust scoring mechanism and a fast climb made this bot a serious contender on the field.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: 'The Tank',
-			year: '2016',
-			image: '/img/robots/2016stronghold_compressed.png',
-			desc: 'Inspired by prototype drive systems for the US Military, this robots custom designed fully gear-driven all wheel drive system was capable of quickly fording any obstacle on the field.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: '',
-			year: '2015',
-			image: '/img/robots/2015recyclerush_compressed.png',
-			desc: 'This tote stacker parks itself at the human terminal and stacks up boxes sky high with its claw arms that lift for another to slide into place.',
-			techbinder: '',
-			videos: []
-		},
-		{
-			name: 'T-shirt Cannon',
-			year: '2015',
-			image: '/img/robots/2015tshirtcannon_compressed.png',
-			desc: 'This Magazine fed, shell ejecting T-shirt cannon mounted to an experimental Mecanum drive test bed was a fun learning opportunity for new team members and was a hit with local school and town events. Capable of a 3 round per minute rate of fire and the ability to drive sideways as it strafed the crowd of pep rallies and sporting events.',
-			techbinder: '',
-			videos: []
-		}
-	];
 </script>
 
 <svelte:head>
-	<title>Past Robots</title>
-	<meta name="description" content="Team 1757's past robots" />
-	<meta name="keywords" content="FRC, FIRST, Robotics" />
-	<meta name="author" content="Westwood Robotics" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<meta property="og:title" content="1757 Past Robots" />
-	<meta property="og:description" content="a brief summary of all of the team's past robots" />
-	<meta property="og:image" content="https://whsrobotics.org/img/robots/2022rapidreact.png" />
+	<title>Past Robots | Westwood Robotics</title>
+	<meta name="description" content="Explore every robot Team 1757 Westwood Robotics has built since 2015" />
+	<meta property="og:title" content="Past Robots | Team 1757" />
+	<meta property="og:description" content="Explore every robot Team 1757 Westwood Robotics has built since 2015" />
+	<meta property="og:image" content="https://whsrobotics.org/img/robots/2023chargedup.png" />
 </svelte:head>
 
 <Navbar />
-<div class="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-	{#each robots as { name, year, image, desc, videos, techbinder }}
-		<RobotPage {name} {year} {image} {desc} {videos} {techbinder} />
-	{/each}
-</div>
+
+<main class="min-h-screen">
+	<section class="max-w-5xl mx-auto px-4 pt-12 pb-8 text-center">
+		<h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Our Robots</h1>
+		<p class="text-gray-400 text-lg max-w-2xl mx-auto">
+			From our earliest builds to our most advanced competition robots, explore the machines that have represented Team 1757 on the field.
+		</p>
+	</section>
+
+	<section class="max-w-5xl mx-auto px-4 pb-16">
+		<div class="relative">
+			<div class="hidden md:block absolute left-8 top-0 bottom-0 w-0.5 bg-gray-700"></div>
+
+			<div class="space-y-6">
+				{#each robots as robot}
+					<div class="relative md:pl-20">
+						<div class="hidden md:flex absolute left-5 top-6 w-7 h-7 bg-blue-600 rounded-full items-center justify-center z-10">
+							<span class="text-white text-xs font-bold">{String(robot.year).slice(-2)}</span>
+						</div>
+						<RobotCard {robot} />
+					</div>
+				{/each}
+			</div>
+		</div>
+	</section>
+</main>
+
 <Footer />
 
 <style>
