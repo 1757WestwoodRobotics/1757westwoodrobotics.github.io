@@ -38,6 +38,7 @@ jobs:
           VITE_SCOUTING_CSV_URL: ${{ secrets.SCOUTING_CSV_URL }}
           VITE_PIT_CSV_URL: ${{ secrets.PIT_CSV_URL }}
           VITE_PIT_SCOUTING_FORM_URL: ${{ secrets.PIT_SCOUTING_FORM_URL }}
+          VITE_SCOUTS_CSV_URL: ${{ secrets.SCOUTS_CSV_URL }}
         run: npm run build
       
       - name: Upload artifact
