@@ -340,6 +340,23 @@
 		return false;
 	}
 
+	function getMinBreakTimeBetweenBatches(scoutName, assignedBatches) {
+		if (assignedBatches.length <= 1) return Infinity;
+		
+		// Sort batches by their first match number
+		const sorted = [...assignedBatches].sort((a, b) => a[0].match_number - b[0].match_number);
+		
+		let minBreak = Infinity;
+		for (let i = 1; i < sorted.length; i++) {
+			const prevBatch = sorted[i - 1];
+			const currBatch = sorted[i];
+			const breakMatches = currBatch[0].match_number - prevBatch[prevBatch.length - 1].match_number - 1;
+			minBreak = Math.min(minBreak, breakMatches);
+		}
+		
+		return minBreak;
+	}
+
 	function generateAssignments() {
 		if (scouts.length === 0 || schedule.length === 0) {
 			error = 'Need both scouts and schedule to generate assignments';
@@ -347,11 +364,10 @@
 		}
 
 		const newAssignments = [];
-		const scoutAssignmentCounts = new Map();
-
-		// Initialize assignment counts for each scout
+		// Track which batches each scout is assigned to
+		const scoutBatchAssignments = new Map();
 		scouts.forEach(scout => {
-			scoutAssignmentCounts.set(scout.name, 0);
+			scoutBatchAssignments.set(scout.name, []);
 		});
 
     const batchSize = 5; // Process matches in batches to give scouts longer breaks
@@ -360,7 +376,7 @@
       batches.push(schedule.slice(i, i + batchSize));
     }
     console.log(batches)
-    batches.forEach(batch => {
+    batches.forEach((batch, batchIdx) => {
 
       const matchNums = batch.map(m => m.match_number);
 
@@ -402,15 +418,31 @@
         return windows.length > 0;
       });
 
-      // Assign scouts to positions in this batch using round-robin based on counts
+      // Track scouts already assigned to this batch
+      const scoutsAssignedToBatch = new Set();
+
+      // Assign scouts to positions in this batch, prioritizing break time
       allPositions.forEach((pos, posIdx) => {
         if (availableScouts.length === 0) return;
 
-        // Pick scout with fewest assignments
-        const assignedScout = availableScouts.reduce((least, scout) => {
-          const leastCount = scoutAssignmentCounts.get(least.name) || 0;
-          const scoutCount = scoutAssignmentCounts.get(scout.name) || 0;
-          return scoutCount < leastCount ? scout : least;
+        // Filter out scouts already assigned to this batch
+        const remainingScouts = availableScouts.filter(scout => !scoutsAssignedToBatch.has(scout.name));
+        if (remainingScouts.length === 0) return;
+
+        // Pick scout with the best break time (largest minimum gap between assignments)
+        const assignedScout = remainingScouts.reduce((best, scout) => {
+          const bestMinBreak = getMinBreakTimeBetweenBatches(best.name, scoutBatchAssignments.get(best.name));
+          const scoutMinBreak = getMinBreakTimeBetweenBatches(scout.name, scoutBatchAssignments.get(scout.name));
+          
+          // Prioritize scouts with larger minimum breaks
+          if (scoutMinBreak !== bestMinBreak) {
+            return scoutMinBreak > bestMinBreak ? scout : best;
+          }
+          
+          // If breaks are equal, prioritize scouts with fewer total assignments
+          const bestCount = scoutBatchAssignments.get(best.name).length;
+          const scoutCount = scoutBatchAssignments.get(scout.name).length;
+          return scoutCount < bestCount ? scout : best;
         });
 
         if (assignedScout) {
@@ -425,9 +457,14 @@
             });
           });
 
-          // Update count for this scout
-          scoutAssignmentCounts.set(assignedScout.name, (scoutAssignmentCounts.get(assignedScout.name) || 0) + batch.length);
+          // Mark scout as assigned to this batch
+          scoutsAssignedToBatch.add(assignedScout.name);
         }
+      });
+
+      // Add batches to scout assignments (only once per scout per batch)
+      scoutsAssignedToBatch.forEach(scoutName => {
+        scoutBatchAssignments.get(scoutName).push(batch);
       });
 
     });
@@ -509,6 +546,44 @@
 		const hours = String(matchDate.getHours()).padStart(2, '0');
 		const minutes = String(matchDate.getMinutes()).padStart(2, '0');
 		return `${hours}:${minutes}`;
+	}
+
+	function getScoutAssignmentTimeline(scoutName) {
+		// Get all unique match numbers this scout is assigned to, sorted
+		const scoutAssignments = assignments.filter(a => a.scout === scoutName);
+		const uniqueMatches = [...new Set(scoutAssignments.map(a => a.matchNum))].sort((a, b) => a - b);
+		
+		if (uniqueMatches.length === 0) return [];
+		
+		const timeline = [];
+		
+		// Add each match
+		for (let i = 0; i < uniqueMatches.length; i++) {
+			timeline.push({
+				type: 'match',
+				matchNum: uniqueMatches[i],
+				assignments: scoutAssignments.filter(a => a.matchNum === uniqueMatches[i])
+			});
+			
+			// Add break after this match if there's a gap before the next match
+			if (i < uniqueMatches.length - 1) {
+				const currMatch = uniqueMatches[i];
+				const nextMatch = uniqueMatches[i + 1];
+				const breakSize = nextMatch - currMatch - 1;
+				
+				if (breakSize > 0) {
+					timeline.push({
+						type: 'break',
+						breakSize: breakSize,
+						breakMatches: Array.from({length: breakSize}, (_, idx) => currMatch + idx + 1),
+						afterMatch: currMatch,
+						beforeMatch: nextMatch
+					});
+				}
+			}
+		}
+		
+		return timeline;
 	}
 
 	function selectScout(scoutName) {
@@ -636,32 +711,44 @@
 						<div class="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mb-6">
 							<h2 class="text-xl font-bold mb-4">{selectedScout}'s Assignments</h2>
 							<div class="overflow-x-auto">
-								<table class="w-full text-sm">
-									<thead class="text-gray-400 border-b border-zinc-700">
-										<tr>
-											<th class="text-left px-3 py-2">Match</th>
-											<th class="text-left px-3 py-2">Time</th>
-											<th class="text-left px-3 py-2">Team</th>
-											<th class="text-left px-3 py-2">Alliance</th>
-											<th class="text-left px-3 py-2">Position</th>
-										</tr>
-									</thead>
-									<tbody class="divide-y divide-zinc-700">
-										{#each scoutMatches as assignment (assignment.matchNum + assignment.teamNum)}
-											<tr class="hover:bg-zinc-800">
-												<td class="px-3 py-2 font-semibold">M{assignment.matchNum}</td>
-												<td class="px-3 py-2 text-gray-300">{getMatchTime(assignment.matchNum)}</td>
-												<td class="px-3 py-2">{assignment.teamNum}</td>
-												<td class="px-3 py-2">
-													<span class={`px-2 py-1 rounded font-semibold ${assignment.alliance === 'red' ? 'bg-red-900 bg-opacity-40 text-red-300' : 'bg-blue-900 bg-opacity-40 text-blue-300'}`}>
-														{assignment.alliance.toUpperCase()}
+								<div class="space-y-3">
+									{#each getScoutAssignmentTimeline(selectedScout) as item (item.type === 'match' ? `match-${item.matchNum}` : `break-${item.afterMatch}-${item.beforeMatch}`)}
+										{#if item.type === 'match'}
+											{#each item.assignments as assignment (assignment.matchNum + assignment.teamNum)}
+												<div class="border border-zinc-700 rounded-lg p-3 hover:bg-zinc-800 transition">
+													<div class="flex justify-between items-center mb-2">
+														<span class="font-semibold">Match {assignment.matchNum}</span>
+														<span class="text-gray-400 text-sm">{getMatchTime(assignment.matchNum)}</span>
+													</div>
+													<div class="flex gap-4 text-sm">
+														<div class="flex-1">
+															<span class="text-gray-400">Team:</span> {assignment.teamNum}
+														</div>
+														<div class="flex-1">
+															<span class={`px-2 py-1 rounded font-semibold text-xs ${assignment.alliance === 'red' ? 'bg-red-900 bg-opacity-40 text-red-300' : 'bg-blue-900 bg-opacity-40 text-blue-300'}`}>
+																{assignment.alliance.toUpperCase()} {assignment.position}
+															</span>
+														</div>
+													</div>
+												</div>
+											{/each}
+										{:else if item.type === 'break'}
+											<div class="bg-zinc-800 rounded-lg p-3 border-2 border-yellow-600 border-dashed">
+												<div class="flex justify-between items-center mb-2">
+													<span class="text-sm font-semibold text-yellow-400">
+														🕐 Break: {item.breakSize} match{item.breakSize !== 1 ? 'es' : ''}
 													</span>
-												</td>
-												<td class="px-3 py-2">{assignment.position}</td>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
+													<span class="text-xs text-gray-400">
+														After M{item.afterMatch}, Before M{item.beforeMatch}
+													</span>
+												</div>
+												<div class="text-xs text-gray-400">
+													Free for match{item.breakSize !== 1 ? 'es' : ''}: {item.breakMatches.join(', ')}
+												</div>
+											</div>
+										{/if}
+									{/each}
+								</div>
 							</div>
 						</div>
 					{:else}
