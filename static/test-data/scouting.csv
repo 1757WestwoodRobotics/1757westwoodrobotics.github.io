@@ -1,0 +1,182 @@
+FRC Scouting Data - Test Event,,,,,,,,,,,
+Timestamp,Match #,Team #,Starting position?,Scoring effectiveness?,feeding score?,defense skill,climb level,won auto,Score how?,actions,comments
+2026-03-28T9:07:00,1,1474,DBFT,1,1,3,Level 1,No,Hub,,
+2026-03-28T9:10:00,1,61,DBFT,5,1,5,Level 1,Yes,Hub,,
+2026-03-28T9:13:00,1,6324,OBFT,2,5,5,None,No,Hub,,
+2026-03-28T9:16:00,1,1699,DBFT,5,4,2,Level 1,No,Hub,,
+2026-03-28T9:19:00,1,10973,DT,2,4,3,Level 1,No,Hub,,
+2026-03-28T9:22:00,1,8544,OT,1,4,1,Level 1,Yes,Mixed,,mechanical issue noted
+2026-03-28T9:14:00,2,1153,DT,1,4,5,None,Yes,Hub,,
+2026-03-28T9:17:00,2,4176,OBFH,5,3,5,Level 1,Yes,Hub,,
+2026-03-28T9:20:00,2,2168,DT,3,1,2,Level 3,Yes,Depot,,mechanical issue noted
+2026-03-28T9:23:00,2,78,H,3,2,3,Level 1,No,Hub,,mechanical issue noted
+2026-03-28T9:26:00,2,61,DBFT,1,5,2,Level 2,No,Hub,,died mid match
+2026-03-28T9:29:00,2,348,H,3,5,2,Level 2,Yes,Hub,,
+2026-03-28T9:21:00,3,78,DT,1,3,4,Level 1,Yes,Hub,,yellow card
+2026-03-28T9:24:00,3,3719,DBFT,3,2,4,Level 1,Yes,Hub,,mechanical issue noted
+2026-03-28T9:27:00,3,1350,OBFT,2,5,5,Level 1,No,Depot,,yellow card
+2026-03-28T9:30:00,3,5687,H,3,2,2,Level 2,Yes,Hub,,
+2026-03-28T9:33:00,3,5112,DT,1,2,2,Level 3,Yes,Mixed,,
+2026-03-28T9:36:00,3,10063,H,4,5,4,Level 2,Yes,Mixed,,
+2026-03-28T10:28:00,4,10063,DBFT,1,5,3,Level 3,Yes,Hub,,robot tipped once
+2026-03-28T10:31:00,4,4176,H,2,4,1,Level 2,Yes,Mixed,,
+2026-03-28T10:34:00,4,1699,DBFH,1,3,5,Level 2,No,Hub,,
+2026-03-28T10:37:00,4,6367,DT,2,5,5,None,No,Hub,,
+2026-03-28T10:40:00,4,8544,OT,1,3,3,Level 1,Yes,Hub,,yellow card
+2026-03-28T10:43:00,4,61,OT,1,4,1,Level 3,No,Hub,,
+2026-03-28T10:35:00,5,5494,DBFT,4,5,2,Level 1,No,Mixed,,
+2026-03-28T10:38:00,5,1699,OBFT,5,2,3,Level 1,Yes,Depot,,
+2026-03-28T10:41:00,5,1119,H,1,2,2,None,Yes,Hub,,yellow card
+2026-03-28T10:44:00,5,1350,DBFH,2,5,2,None,Yes,Hub,,
+2026-03-28T10:47:00,5,6333,OT,2,1,1,Level 3,Yes,Hub,,
+2026-03-28T10:50:00,5,1757,OBFT,3,4,2,Level 2,No,Hub,,yellow card
+2026-03-28T10:42:00,6,6333,DBFH,4,2,4,Level 3,Yes,Hub,,
+2026-03-28T10:45:00,6,663,OT,4,3,4,Level 1,Yes,Hub,,
+2026-03-28T10:48:00,6,1768,DBFT,1,1,4,Level 2,Yes,Hub,,
+2026-03-28T10:51:00,6,8544,OBFT,2,5,4,Level 1,Yes,Hub,,mechanical issue noted
+2026-03-28T10:54:00,6,10066,H,2,1,4,Level 3,No,Hub,,
+2026-03-28T10:57:00,6,5000,DBFT,5,1,1,Level 3,No,Hub,,
+2026-03-28T10:49:00,7,10066,H,4,2,4,None,No,Depot,,
+2026-03-28T10:52:00,7,3719,H,3,4,3,Level 1,No,Hub,,
+2026-03-28T10:55:00,7,663,OBFT,2,3,2,None,No,Hub,,
+2026-03-28T10:58:00,7,2079,OT,3,1,1,Level 2,Yes,Mixed,,
+2026-03-28T10:01:00,7,348,OBFT,1,5,1,Level 3,No,Hub,,
+2026-03-28T10:04:00,7,10254,OT,2,4,1,Level 2,No,Mixed,,
+2026-03-28T11:56:00,8,2079,OT,5,1,4,Level 2,No,Mixed,,
+2026-03-28T11:59:00,8,5687,OBFH,3,2,3,Level 1,Yes,Depot,,
+2026-03-28T11:02:00,8,348,DBFT,3,4,3,Level 3,Yes,Hub,,died mid match
+2026-03-28T11:05:00,8,78,DBFH,5,1,1,Level 2,No,Mixed,,mechanical issue noted
+2026-03-28T11:08:00,8,5494,OBFT,3,1,2,Level 1,Yes,Hub,,died mid match
+2026-03-28T11:11:00,8,1474,DT,5,3,5,Level 3,No,Hub,,
+2026-03-28T11:03:00,9,2262,OBFH,1,2,3,None,Yes,Hub,,
+2026-03-28T11:06:00,9,8544,OBFT,3,3,5,Level 1,Yes,Hub,,
+2026-03-28T11:09:00,9,663,DT,3,5,4,Level 1,Yes,Hub,,
+2026-03-28T11:12:00,9,2079,H,3,1,1,Level 1,No,Hub,,mechanical issue noted
+2026-03-28T11:15:00,9,1699,OBFT,4,5,4,Level 2,Yes,Hub,,
+2026-03-28T11:18:00,9,10973,DBFT,2,5,1,Level 3,Yes,Mixed,,
+2026-03-28T11:10:00,10,6324,OBFT,4,2,1,Level 1,Yes,Hub,,
+2026-03-28T11:13:00,10,1768,OBFT,2,1,3,Level 3,No,Depot,,
+2026-03-28T11:16:00,10,1350,DBFT,2,2,2,Level 3,No,Depot,,
+2026-03-28T11:19:00,10,5494,OBFT,3,4,2,Level 1,No,Hub,,
+2026-03-28T11:22:00,10,1699,H,1,4,2,Level 1,Yes,Hub,,robot tipped once
+2026-03-28T11:25:00,10,5687,DT,2,2,1,Level 2,No,Depot,,
+2026-03-28T11:17:00,11,3464,OBFH,1,3,3,Level 2,No,Depot,,
+2026-03-28T11:20:00,11,1153,OBFH,1,1,3,Level 1,No,Hub,,
+2026-03-28T11:23:00,11,2262,OT,5,4,3,Level 2,Yes,Depot,,
+2026-03-28T11:26:00,11,2079,DBFH,1,4,5,Level 1,Yes,Hub,,
+2026-03-28T11:29:00,11,1699,OT,5,5,2,Level 1,Yes,Hub,,
+2026-03-28T11:32:00,11,5112,DBFH,3,1,3,Level 2,Yes,Hub,,
+2026-03-28T12:24:00,12,663,OBFH,4,3,5,Level 1,No,Depot,,
+2026-03-28T12:27:00,12,1474,DBFT,2,5,5,Level 1,Yes,Mixed,,
+2026-03-28T12:30:00,12,6620,OBFH,3,2,4,Level 3,No,Mixed,,
+2026-03-28T12:33:00,12,78,OBFH,4,4,4,Level 2,No,Mixed,,
+2026-03-28T12:36:00,12,6367,DT,2,1,3,Level 2,No,Hub,,
+2026-03-28T12:39:00,12,1757,DT,2,3,2,Level 3,No,Hub,,
+2026-03-28T12:31:00,13,1119,OT,2,4,5,Level 3,Yes,Depot,,
+2026-03-28T12:34:00,13,1350,DBFT,5,2,4,Level 1,Yes,Hub,,
+2026-03-28T12:37:00,13,10066,DBFT,1,1,4,Level 1,No,Hub,,
+2026-03-28T12:40:00,13,4176,H,1,5,2,Level 3,Yes,Depot,,
+2026-03-28T12:43:00,13,5687,DT,4,5,5,Level 2,Yes,Depot,,
+2026-03-28T12:46:00,13,1757,DT,5,4,5,Level 1,No,Hub,,
+2026-03-28T12:38:00,14,6367,H,3,2,3,Level 3,No,Depot,,
+2026-03-28T12:41:00,14,10063,OBFT,3,4,1,Level 2,Yes,Hub,,mechanical issue noted
+2026-03-28T12:44:00,14,10066,OBFH,3,5,1,Level 1,No,Hub,,
+2026-03-28T12:47:00,14,5112,DBFT,2,2,1,Level 1,Yes,Hub,,
+2026-03-28T12:50:00,14,2262,H,4,1,2,Level 3,Yes,Depot,,yellow card
+2026-03-28T12:53:00,14,1119,DBFT,1,5,4,Level 1,Yes,Hub,,robot tipped once
+2026-03-28T12:45:00,15,3464,DT,4,4,5,Level 2,No,Mixed,,
+2026-03-28T12:48:00,15,6324,H,2,3,4,Level 1,Yes,Depot,,
+2026-03-28T12:51:00,15,3719,DBFT,4,2,4,Level 1,No,Mixed,,
+2026-03-28T12:54:00,15,10066,H,5,5,1,None,Yes,Hub,,died mid match
+2026-03-28T12:57:00,15,1699,OBFT,1,3,4,Level 1,No,Depot,,
+2026-03-28T12:00:00,15,10254,OBFH,4,3,4,Level 1,Yes,Depot,,
+2026-03-28T13:52:00,16,6324,DBFT,5,1,3,Level 1,Yes,Hub,,
+2026-03-28T13:55:00,16,1474,DT,1,2,2,Level 3,Yes,Mixed,,
+2026-03-28T13:58:00,16,1119,OBFT,2,4,1,Level 2,No,Depot,,mechanical issue noted
+2026-03-28T13:01:00,16,3623,DT,3,2,5,Level 2,Yes,Hub,,robot tipped once
+2026-03-28T13:04:00,16,3464,OT,5,1,3,Level 2,Yes,Depot,,
+2026-03-28T13:07:00,16,348,OT,5,2,1,Level 2,Yes,Hub,,
+2026-03-28T13:59:00,17,1735,DT,1,5,1,Level 1,No,Depot,,
+2026-03-28T13:02:00,17,5112,OT,5,3,1,Level 3,Yes,Depot,,
+2026-03-28T13:05:00,17,1153,H,3,4,2,Level 1,No,Hub,,
+2026-03-28T13:08:00,17,6367,DBFT,3,5,5,Level 3,Yes,Depot,,
+2026-03-28T13:11:00,17,5494,DT,5,3,3,Level 3,No,Hub,,mechanical issue noted
+2026-03-28T13:14:00,17,2168,H,2,4,5,Level 2,Yes,Hub,,
+2026-03-28T13:06:00,18,6333,H,3,2,4,Level 1,Yes,Hub,,
+2026-03-28T13:09:00,18,5000,OBFH,5,3,5,None,No,Hub,,
+2026-03-28T13:12:00,18,2262,OBFT,4,4,5,Level 3,No,Hub,,
+2026-03-28T13:15:00,18,3623,DBFT,4,4,1,None,Yes,Hub,,
+2026-03-28T13:18:00,18,1699,DBFT,2,3,5,Level 1,Yes,Mixed,,
+2026-03-28T13:21:00,18,3719,OBFH,4,5,3,Level 1,Yes,Hub,,robot tipped once
+2026-03-28T13:13:00,19,3719,OBFH,2,1,2,Level 1,Yes,Hub,,
+2026-03-28T13:16:00,19,6333,DT,2,2,2,Level 2,Yes,Hub,,yellow card
+2026-03-28T13:19:00,19,5112,DT,5,5,3,None,No,Hub,,
+2026-03-28T13:22:00,19,1757,OBFH,2,3,1,Level 2,No,Hub,,mechanical issue noted
+2026-03-28T13:25:00,19,663,OT,1,5,3,Level 2,No,Hub,,
+2026-03-28T13:28:00,19,1735,OT,1,5,3,Level 1,Yes,Depot,,
+2026-03-28T14:20:00,20,10066,OBFT,1,3,4,None,Yes,Depot,,
+2026-03-28T14:23:00,20,61,OT,5,1,2,Level 1,No,Hub,,
+2026-03-28T14:26:00,20,6324,OBFT,1,5,4,Level 2,No,Mixed,,
+2026-03-28T14:29:00,20,10063,DT,5,4,4,Level 1,Yes,Mixed,,
+2026-03-28T14:32:00,20,10973,OBFH,5,5,1,Level 2,Yes,Hub,,
+2026-03-28T14:35:00,20,1699,OBFT,3,1,2,Level 1,No,Mixed,,
+2026-03-28T14:27:00,21,1350,OBFT,1,4,4,Level 2,No,Depot,,robot tipped once
+2026-03-28T14:30:00,21,8544,OT,2,3,3,Level 2,Yes,Hub,,
+2026-03-28T14:33:00,21,5112,OBFH,5,2,4,None,No,Hub,,
+2026-03-28T14:36:00,21,1735,OBFT,3,2,1,None,No,Hub,,
+2026-03-28T14:39:00,21,6620,DBFT,5,3,4,None,Yes,Hub,,robot tipped once
+2026-03-28T14:42:00,21,10066,DBFT,4,3,5,Level 2,Yes,Depot,,
+2026-03-28T14:34:00,22,1735,DBFH,1,4,3,Level 2,Yes,Hub,,
+2026-03-28T14:37:00,22,1768,OBFT,5,5,1,Level 3,Yes,Mixed,,
+2026-03-28T14:40:00,22,6333,DT,2,4,5,Level 2,Yes,Hub,,
+2026-03-28T14:43:00,22,1153,DBFH,4,4,1,Level 1,Yes,Depot,,
+2026-03-28T14:46:00,22,3719,OBFH,1,2,3,Level 1,Yes,Hub,,
+2026-03-28T14:49:00,22,10066,DT,5,1,4,None,Yes,Hub,,
+2026-03-28T14:41:00,23,10973,OT,4,5,1,Level 2,No,Depot,,
+2026-03-28T14:44:00,23,61,OT,2,5,3,Level 2,Yes,Hub,,died mid match
+2026-03-28T14:47:00,23,663,DT,1,2,3,Level 2,No,Hub,,died mid match
+2026-03-28T14:50:00,23,1768,DBFT,4,1,1,Level 2,No,Hub,,
+2026-03-28T14:53:00,23,6620,OBFH,5,1,5,Level 1,Yes,Hub,,
+2026-03-28T14:56:00,23,6367,H,1,2,4,Level 2,Yes,Mixed,,mechanical issue noted
+2026-03-28T15:48:00,24,663,H,4,4,2,Level 1,No,Hub,,
+2026-03-28T15:51:00,24,1474,OBFT,5,5,2,Level 3,Yes,Hub,,
+2026-03-28T15:54:00,24,10063,OBFH,5,3,1,Level 1,Yes,Mixed,,yellow card
+2026-03-28T15:57:00,24,4176,DBFT,4,2,4,Level 2,Yes,Hub,,
+2026-03-28T15:00:00,24,348,DBFH,5,4,4,Level 1,No,Hub,,
+2026-03-28T15:03:00,24,8544,DBFH,4,2,4,None,Yes,Hub,,
+2026-03-28T15:55:00,25,1699,DBFT,4,4,2,Level 1,Yes,Hub,,
+2026-03-28T15:58:00,25,1119,DBFH,3,1,4,None,No,Depot,,
+2026-03-28T15:01:00,25,5494,DBFT,2,4,2,None,Yes,Hub,,
+2026-03-28T15:04:00,25,3464,DBFH,4,1,3,Level 3,No,Depot,,
+2026-03-28T15:07:00,25,3719,DBFT,4,5,1,Level 2,Yes,Hub,,
+2026-03-28T15:10:00,25,1153,DBFT,3,2,1,Level 1,Yes,Hub,,
+2026-03-28T15:02:00,26,8544,H,2,3,1,None,Yes,Hub,,robot tipped once
+2026-03-28T15:05:00,26,10254,OBFH,3,4,2,Level 1,No,Depot,,yellow card
+2026-03-28T15:08:00,26,1350,DBFT,2,2,2,None,No,Depot,,
+2026-03-28T15:11:00,26,3719,DBFT,2,4,5,Level 1,No,Depot,,
+2026-03-28T15:14:00,26,6333,OBFH,4,3,1,Level 3,Yes,Hub,,
+2026-03-28T15:17:00,26,6324,OBFT,1,4,3,Level 2,Yes,Hub,,
+2026-03-28T15:09:00,27,6367,DBFT,3,4,3,Level 1,Yes,Depot,,
+2026-03-28T15:12:00,27,5494,OBFT,4,5,3,Level 2,Yes,Hub,,robot tipped once
+2026-03-28T15:15:00,27,5112,OT,4,3,1,Level 2,Yes,Mixed,,
+2026-03-28T15:18:00,27,1768,DT,3,2,5,Level 3,Yes,Hub,,
+2026-03-28T15:21:00,27,2262,OBFT,5,3,2,Level 2,Yes,Hub,,
+2026-03-28T15:24:00,27,3623,OT,3,4,1,Level 2,Yes,Hub,,
+2026-03-28T16:16:00,28,3464,OT,3,3,4,Level 1,No,Hub,,
+2026-03-28T16:19:00,28,1474,OBFH,5,5,3,Level 3,No,Hub,,
+2026-03-28T16:22:00,28,348,DT,3,3,1,Level 1,Yes,Hub,,
+2026-03-28T16:25:00,28,1757,DT,4,5,3,None,Yes,Hub,,mechanical issue noted
+2026-03-28T16:28:00,28,61,DBFH,1,4,3,Level 2,Yes,Mixed,,
+2026-03-28T16:31:00,28,4176,DT,3,1,2,Level 1,Yes,Mixed,,
+2026-03-28T16:23:00,29,61,OBFH,5,2,1,Level 2,Yes,Hub,,robot tipped once
+2026-03-28T16:26:00,29,348,DBFT,4,1,2,None,Yes,Hub,,
+2026-03-28T16:29:00,29,5687,OT,1,2,5,Level 1,Yes,Depot,,
+2026-03-28T16:32:00,29,5112,DBFT,5,4,5,Level 2,No,Depot,,
+2026-03-28T16:35:00,29,78,OT,4,5,4,Level 1,Yes,Hub,,
+2026-03-28T16:38:00,29,1474,OBFT,4,4,2,Level 3,Yes,Hub,,
+2026-03-28T16:30:00,30,5494,DBFH,3,1,4,Level 1,No,Hub,,died mid match
+2026-03-28T16:33:00,30,348,OT,2,5,1,None,Yes,Hub,,
+2026-03-28T16:36:00,30,3623,DT,5,2,1,Level 3,No,Hub,,yellow card
+2026-03-28T16:39:00,30,1474,OBFT,2,3,2,Level 3,No,Hub,,mechanical issue noted
+2026-03-28T16:42:00,30,1699,DT,2,2,5,Level 1,No,Hub,,
+2026-03-28T16:45:00,30,10973,OBFT,1,3,2,Level 2,Yes,Hub,,
