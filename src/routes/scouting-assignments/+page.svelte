@@ -538,6 +538,25 @@
 		saveCache();
 	}
 
+	function formatTime(timestamp) {
+		if (!timestamp) return null;
+		const date = new Date(timestamp * 1000);
+		const hours = String(date.getHours()).padStart(2, '0');
+		const minutes = String(date.getMinutes()).padStart(2, '0');
+		return `${hours}:${minutes}`;
+	}
+
+	function getMatchTimes(matchNum) {
+		const match = schedule.find(m => m.match_number === matchNum);
+		if (!match) return { predicted: 'TBD', scheduled: null, actual: null };
+		
+		return {
+			scheduled: formatTime(match.scheduled_time),
+			predicted: formatTime(match.predicted_time),
+			actual: formatTime(match.actual_time)
+		};
+	}
+
 	function getMatchTime(matchNum) {
 		const match = schedule.find(m => m.match_number === matchNum);
 		if (!match || !match.predicted_time) return 'TBD';
@@ -546,6 +565,13 @@
 		const hours = String(matchDate.getHours()).padStart(2, '0');
 		const minutes = String(matchDate.getMinutes()).padStart(2, '0');
 		return `${hours}:${minutes}`;
+	}
+
+	function getMatchDate(matchNum) {
+		const match = schedule.find(m => m.match_number === matchNum);
+		if (!match || !match.predicted_time) return null;
+		const date = new Date(match.predicted_time * 1000);
+		return date.toDateString();
 	}
 
 	function getScoutAssignmentTimeline(scoutName) {
@@ -565,20 +591,34 @@
 				assignments: scoutAssignments.filter(a => a.matchNum === uniqueMatches[i])
 			});
 			
-			// Add break after this match if there's a gap before the next match
+			// Check if next match is on a different day
 			if (i < uniqueMatches.length - 1) {
 				const currMatch = uniqueMatches[i];
 				const nextMatch = uniqueMatches[i + 1];
-				const breakSize = nextMatch - currMatch - 1;
+				const currDate = getMatchDate(currMatch);
+				const nextDate = getMatchDate(nextMatch);
 				
-				if (breakSize > 0) {
+				// If dates differ, add end-of-day indicator
+				if (currDate && nextDate && currDate !== nextDate) {
 					timeline.push({
-						type: 'break',
-						breakSize: breakSize,
-						breakMatches: Array.from({length: breakSize}, (_, idx) => currMatch + idx + 1),
+						type: 'end-of-day',
 						afterMatch: currMatch,
-						beforeMatch: nextMatch
+						beforeMatch: nextMatch,
+						endDate: currDate,
+						startDate: nextDate
 					});
+				} else {
+					// Add regular break if there's a gap
+					const breakSize = nextMatch - currMatch - 1;
+					if (breakSize > 0) {
+						timeline.push({
+							type: 'break',
+							breakSize: breakSize,
+							breakMatches: Array.from({length: breakSize}, (_, idx) => currMatch + idx + 1),
+							afterMatch: currMatch,
+							beforeMatch: nextMatch
+						});
+					}
 				}
 			}
 		}
@@ -715,10 +755,21 @@
 									{#each getScoutAssignmentTimeline(selectedScout) as item (item.type === 'match' ? `match-${item.matchNum}` : `break-${item.afterMatch}-${item.beforeMatch}`)}
 										{#if item.type === 'match'}
 											{#each item.assignments as assignment (assignment.matchNum + assignment.teamNum)}
+												{@const times = getMatchTimes(assignment.matchNum)}
 												<div class="border border-zinc-700 rounded-lg p-3 hover:bg-zinc-800 transition">
 													<div class="flex justify-between items-center mb-2">
 														<span class="font-semibold">Match {assignment.matchNum}</span>
-														<span class="text-gray-400 text-sm">{getMatchTime(assignment.matchNum)}</span>
+														<div class="text-xs text-gray-400">
+															{#if times.actual}
+																<span class="text-green-400">Actual: {times.actual}</span>
+                              {/if}
+															{#if times.predicted}
+																<span class="text-blue-400">Predicted: {times.predicted}</span>
+                    {/if}
+																{#if times.scheduled && times.scheduled !== times.predicted}
+																	<br /><span class="text-gray-500">Scheduled: {times.scheduled}</span>
+															{/if}
+														</div>
 													</div>
 													<div class="flex gap-4 text-sm">
 														<div class="flex-1">
@@ -746,6 +797,14 @@
 													Free for match{item.breakSize !== 1 ? 'es' : ''}: {item.breakMatches.join(', ')}
 												</div>
 											</div>
+										{:else if item.type === 'end-of-day'}
+											<div class="flex items-center my-4 gap-3">
+												<div class="flex-1 h-0.5 bg-gradient-to-r from-orange-600 via-orange-500 to-transparent"></div>
+												<span class="text-sm font-bold text-orange-500 px-3 py-2 bg-zinc-800 rounded-full border border-orange-600 whitespace-nowrap">
+													🌅 END OF DAY
+												</span>
+												<div class="flex-1 h-0.5 bg-gradient-to-l from-orange-600 via-orange-500 to-transparent"></div>
+											</div>
 										{/if}
 									{/each}
 								</div>
@@ -763,8 +822,23 @@
 						<div class="space-y-4 max-h-96 overflow-y-auto">
 							{#each schedule as match (match.match_number)}
 								{@const matchAssignments = assignments.filter(a => a.matchNum === match.match_number)}
+								{@const times = getMatchTimes(match.match_number)}
 								<div class="border border-zinc-700 rounded-lg p-3">
-									<div class="font-semibold mb-2">Match {match.match_number} @ {getMatchTime(match.match_number)}</div>
+									<div class="flex justify-between items-center mb-2">
+										<span class="font-semibold">Match {match.match_number}</span>
+										<div class="text-xs text-gray-400">
+											{#if times.actual}
+												<span class="text-green-400">✓ {times.actual}</span>
+											{:else if times.predicted}
+												<span class="text-blue-400">{times.predicted}</span>
+												{#if times.scheduled && times.scheduled !== times.predicted}
+													<span class="text-gray-500 ml-1">(sched: {times.scheduled})</span>
+												{/if}
+											{:else}
+												<span>TBD</span>
+											{/if}
+										</div>
+									</div>
 									<div class="grid grid-cols-2 gap-2 text-xs">
 										<div>
 											<div class="text-red-400 font-semibold mb-1">Red Alliance</div>
