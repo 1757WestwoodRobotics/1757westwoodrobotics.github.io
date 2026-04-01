@@ -5,6 +5,8 @@
 	import SimulatorHeader from '../../components/scoutingDashboard/SimulatorHeader.svelte';
 	import SimulatorTeamCard from '../../components/scoutingDashboard/SimulatorTeamCard.svelte';
 	import ContextMenu from '../../components/scoutingDashboard/ContextMenu.svelte';
+	import RPCards from '../../components/scoutingDashboard/RPCards.svelte';
+	import EventProgressMap from '../../components/scoutingDashboard/EventProgressMap.svelte';
 	import { onMount } from 'svelte';
 	import { Line } from 'svelte-chartjs';
 	import {
@@ -63,6 +65,7 @@
 	let overviewTeam = '1757';
 	let quickLinksOpen = false;
 	let isFullscreen = false;
+	let matchOverrides = new Map();
 
 	const posMap = {
 		'OT': 'Outpost Trench',
@@ -99,15 +102,16 @@
 	}).filter(Boolean);
 
 	$: allianceSimulation = (() => {
-		if (!eventRankings || eventRankings.length === 0) return [];
-		
+		const rankings = predictedRankings || eventRankings;
+		if (!rankings || rankings.length === 0) return [];
+
 		const teamsWithMetricsMap = new Map(allTeamsList.map(tNum => {
 			const stats = teamStatsMap.get(tNum) || { epa: 0 };
 			const opr = eventOprs[`frc${tNum}`] || 0;
 			return [tNum, { teamNum: tNum, epa: stats.epa, opr: opr }];
 		}));
 
-		let rankingList = eventRankings.map(r => r.team_key.replace('frc', ''));
+		let rankingList = rankings.map(r => r.team_key.replace('frc', ''));
 		let picked = new Set();
 		let alliances = [];
 
@@ -655,9 +659,15 @@
 			if (res.ok) {
 				const data = await res.json();
 				eventOprs = data.oprs || {};
+			} else {
+				throw new Error('TBA OPR fetch failed');
 			}
 		} catch (e) {
-			console.error('Error fetching TBA OPRs:', e);
+			console.error('Error fetching TBA OPRs, trying local fallback:', e);
+			try {
+				const fallback = await fetch('/test-data/oprs.json');
+				if (fallback.ok) { const data = await fallback.json(); eventOprs = data.oprs || {}; }
+			} catch (e2) { console.error('Local fallback also failed:', e2); }
 		}
 	}
 
@@ -669,9 +679,15 @@
 			if (res.ok) {
 				const data = await res.json();
 				eventRankings = data.rankings || [];
+			} else {
+				throw new Error('TBA rankings fetch failed');
 			}
 		} catch (e) {
-			console.error('Error fetching TBA rankings:', e);
+			console.error('Error fetching TBA rankings, trying local fallback:', e);
+			try {
+				const fallback = await fetch('/test-data/rankings.json');
+				if (fallback.ok) { const data = await fallback.json(); eventRankings = data.rankings || []; }
+			} catch (e2) { console.error('Local fallback also failed:', e2); }
 		}
 	}
 
@@ -685,9 +701,20 @@
 				schedule = data
 					.filter(m => m.comp_level === 'qm')
 					.sort((a, b) => a.match_number - b.match_number);
+			} else {
+				throw new Error('TBA schedule fetch failed');
 			}
 		} catch (e) {
-			console.error('Error fetching schedule:', e);
+			console.error('Error fetching schedule, trying local fallback:', e);
+			try {
+				const fallback = await fetch('/test-data/schedule.json');
+				if (fallback.ok) {
+					const data = await fallback.json();
+					schedule = data
+						.filter(m => m.comp_level === 'qm')
+						.sort((a, b) => a.match_number - b.match_number);
+				}
+			} catch (e2) { console.error('Local fallback also failed:', e2); }
 		}
 	}
 
@@ -700,9 +727,19 @@
 				const data = await res.json();
 				eventTeams = data.map(key => key.replace('frc', '')).sort((a, b) => parseInt(a) - parseInt(b));
 				saveCache();
+			} else {
+				throw new Error('TBA event teams fetch failed');
 			}
 		} catch (e) {
-			console.error('Error fetching event teams:', e);
+			console.error('Error fetching event teams, trying local fallback:', e);
+			try {
+				const fallback = await fetch('/test-data/teams.json');
+				if (fallback.ok) {
+					const data = await fallback.json();
+					eventTeams = data.map(key => key.replace('frc', '')).sort((a, b) => parseInt(a) - parseInt(b));
+					saveCache();
+				}
+			} catch (e2) { console.error('Local fallback also failed:', e2); }
 		}
 	}
 
@@ -734,7 +771,10 @@
 					teamStatsMap.set(teamNum, {
 						epa: data?.epa?.total_points?.mean || 0,
 						rank: data?.epa?.ranks?.total?.rank || 0,
-						norm: data?.epa?.norm || 0
+						norm: data?.epa?.norm || 0,
+						rp1: data?.epa?.breakdown?.rp_1 || 0,
+						rp2: data?.epa?.breakdown?.rp_2 || 0,
+						rp3: data?.epa?.breakdown?.rp_3 || 0
 					});
 					updated = true;
 				}
@@ -1246,15 +1286,168 @@
 	let selectedMatchPopup = null;
 
 	$: simAggregates = {
-		red: { 
+		red: {
 			epa: simRedTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0),
 			opr: simRedTeams.map(t => parseInt(t) || 0).reduce((acc, t) => acc + (eventOprs[`frc${t}`] || 0), 0)
 		},
-		blue: { 
+		blue: {
 			epa: simBlueTeams.map(t => getTeamSummary(t)).filter(Boolean).reduce((acc, t) => acc + (t.epa || 0), 0),
 			opr: simBlueTeams.map(t => parseInt(t) || 0).reduce((acc, t) => acc + (eventOprs[`frc${t}`] || 0), 0)
 		}
 	};
+
+	$: simRpPredictions = (() => {
+		function getAllianceRp(teams) {
+			let rp1Sum = 0, rp2Sum = 0, rp3Sum = 0;
+			teams.forEach(t => {
+				const stats = teamStatsMap.get(t);
+				if (stats) {
+					rp1Sum += stats.rp1 || 0;
+					rp2Sum += stats.rp2 || 0;
+					rp3Sum += stats.rp3 || 0;
+				}
+			});
+			return { rp1: rp1Sum, rp2: rp2Sum, rp3: rp3Sum };
+		}
+
+		function rpState(sum) {
+			if (sum > 1.0) return 'lit';
+			if (sum > 0.8) return 'contention';
+			return 'muted';
+		}
+
+		function winRpState(allianceWinProb) {
+			if (allianceWinProb > 0.625) return 'lit';
+			if (allianceWinProb < 0.375) return 'muted';
+			return 'contention';
+		}
+
+		const redRp = getAllianceRp(simRedTeams);
+		const blueRp = getAllianceRp(simBlueTeams);
+		const redWinProb = simWinProbs.epa;
+		const blueWinProb = 1 - simWinProbs.epa;
+
+		return {
+			red: {
+				rp1: rpState(redRp.rp1),
+				rp2: rpState(redRp.rp2),
+				rp3: rpState(redRp.rp3),
+				win: winRpState(redWinProb)
+			},
+			blue: {
+				rp1: rpState(blueRp.rp1),
+				rp2: rpState(blueRp.rp2),
+				rp3: rpState(blueRp.rp3),
+				win: winRpState(blueWinProb)
+			}
+		};
+	})();
+
+	$: matchPredictions = ((overrides) => schedule.map(match => {
+		const redScore = match.alliances?.red?.score ?? -1;
+		const blueScore = match.alliances?.blue?.score ?? -1;
+		const played = redScore >= 0 && blueScore >= 0 && (redScore > 0 || blueScore > 0);
+
+		if (played) {
+			const winner = redScore > blueScore ? 'red' : blueScore > redScore ? 'blue' : 'tie';
+			return { match_number: match.match_number, played: true, winner, redScore, blueScore };
+		}
+
+		const redEpa = (match.alliances?.red?.team_keys || []).reduce((sum, k) =>
+			sum + (teamStatsMap.get(k.replace('frc', ''))?.epa || 0), 0);
+		const blueEpa = (match.alliances?.blue?.team_keys || []).reduce((sum, k) =>
+			sum + (teamStatsMap.get(k.replace('frc', ''))?.epa || 0), 0);
+		const winProb = getWinProb(redEpa - blueEpa);
+
+		let predicted;
+		if (winProb > 0.625) predicted = 'red';
+		else if (winProb < 0.375) predicted = 'blue';
+		else predicted = 'tossup';
+
+		// Check for user override
+		const override = overrides.get(match.match_number);
+
+		const result = { match_number: match.match_number, played: false, predicted, winProb, redEpa, blueEpa, override: override || null };
+		if (override) console.log(`matchPredictions M${match.match_number}: override=${override}`, result);
+		return result;
+	}))(matchOverrides);
+
+	$: predictedRankings = (() => {
+		if (!eventRankings || eventRankings.length === 0) return eventRankings;
+
+		// Build a map of team → predicted additional RP from unplayed matches
+		const rpBonus = new Map();
+		eventRankings.forEach(r => rpBonus.set(r.team_key, 0));
+
+		matchPredictions.forEach(pred => {
+			if (pred.played) return; // Already reflected in actual rankings
+
+			const matchIdx = schedule.findIndex(m => m.match_number === pred.match_number);
+			if (matchIdx === -1) return;
+			const match = schedule[matchIdx];
+
+			// Determine effective winner for this match
+			let effectiveWinner;
+			if (pred.override) {
+				effectiveWinner = pred.override;
+			} else if (pred.predicted === 'tossup') {
+				effectiveWinner = null; // No RP bonus for toss-ups
+			} else {
+				effectiveWinner = pred.predicted;
+			}
+
+			if (effectiveWinner) {
+				// Winner gets +2 RP, loser gets 0
+				const winnerKeys = match.alliances[effectiveWinner]?.team_keys || [];
+				winnerKeys.forEach(k => {
+					const current = rpBonus.get(k) || 0;
+					rpBonus.set(k, current + 2);
+				});
+			} else {
+				// Toss-up: give each side +1 RP (tie equivalent)
+				['red', 'blue'].forEach(alliance => {
+					const keys = match.alliances[alliance]?.team_keys || [];
+					keys.forEach(k => {
+						const current = rpBonus.get(k) || 0;
+						rpBonus.set(k, current + 1);
+					});
+				});
+			}
+		});
+
+		// Sort by actual ranking points + predicted bonus
+		return [...eventRankings].sort((a, b) => {
+			const aRp = (a.sort_orders?.[0] || 0) + (rpBonus.get(a.team_key) || 0);
+			const bRp = (b.sort_orders?.[0] || 0) + (rpBonus.get(b.team_key) || 0);
+			return bRp - aRp;
+		});
+	})();
+
+	function cycleMatchOverride(match) {
+		const pred = matchPredictions.find(p => p.match_number === match.match_number);
+		if (!pred || pred.played) return; // Don't override played matches
+
+		const current = matchOverrides.get(match.match_number);
+		const defaultPredicted = pred.predicted === 'tossup' ? null : pred.predicted;
+
+		if (!current) {
+			const opposite = defaultPredicted === 'red' ? 'blue' : 'red';
+			matchOverrides.set(match.match_number, opposite);
+			console.log(`Override M${match.match_number}: set to ${opposite}`);
+		} else if (current === 'red' && defaultPredicted !== 'blue') {
+			matchOverrides.set(match.match_number, 'blue');
+			console.log(`Override M${match.match_number}: cycled to blue`);
+		} else {
+			matchOverrides.delete(match.match_number);
+			console.log(`Override M${match.match_number}: cleared`);
+		}
+		matchOverrides = new Map(matchOverrides); // Trigger reactivity
+		console.log('matchOverrides size:', matchOverrides.size, 'entries:', [...matchOverrides.entries()]);
+	}
+
+	function clearAllOverrides() {
+		matchOverrides = new Map();
+	}
 
 	function hasMatchIssues(scoutRow) {
 		const comments = (getVal(scoutRow, 'comments') || '').toLowerCase();
@@ -1994,6 +2187,7 @@
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.red.opr.toFixed(1)}</p></div>
 						</div>
 					</div>
+					<RPCards alliance="red" predictions={simRpPredictions.red} />
 					<div class="space-y-4 md:space-y-6">
 						{#each simRedTeams as team, i}
 							<SimulatorTeamCard
@@ -2026,6 +2220,7 @@
 							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.blue.opr.toFixed(1)}</p></div>
 						</div>
 					</div>
+					<RPCards alliance="blue" predictions={simRpPredictions.blue} />
 					<div class="space-y-4 md:space-y-6">
 						{#each simBlueTeams as team, i}
 							<SimulatorTeamCard
@@ -2577,6 +2772,22 @@
 						<svg class="w-6 h-6 text-zinc-500 group-open:rotate-180 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" /></svg>
 					</summary>
 					<div class="p-6 md:p-10 pt-0">
+						<EventProgressMap
+							{schedule}
+							{hoveredMatch}
+							{matchPredictions}
+							hasOverrides={matchOverrides.size > 0}
+							onMatchClick={(match) => selectedMatchPopup = match}
+							onMatchLongPress={(match) => cycleMatchOverride(match)}
+							onMatchContextMenu={(e, match) => {
+								e.preventDefault();
+								contextMenu = { x: e.clientX, y: e.clientY };
+								contextMenuMatch = match;
+							}}
+							onMatchHover={(match) => hoveredMatch = match}
+							onMatchHoverEnd={() => hoveredMatch = null}
+							onClearOverrides={clearAllOverrides}
+						/>
 						{#if allianceSimulation.length > 0}
 							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 								{#each allianceSimulation as alliance, i}
