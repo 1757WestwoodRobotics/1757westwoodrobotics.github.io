@@ -7,6 +7,7 @@
 	import ContextMenu from '../../components/scoutingDashboard/ContextMenu.svelte';
 	import RPCards from '../../components/scoutingDashboard/RPCards.svelte';
 	import EventProgressMap from '../../components/scoutingDashboard/EventProgressMap.svelte';
+	import PlayoffProgressMap from '../../components/scoutingDashboard/PlayoffProgressMap.svelte';
 	import { onMount } from 'svelte';
 	import { Line } from 'svelte-chartjs';
 	import {
@@ -66,6 +67,9 @@
 	let quickLinksOpen = false;
 	let isFullscreen = false;
 	let matchOverrides = new Map();
+	let actualAlliances = [];
+	let playoffSchedule = [];
+	let playoffOverrides = new Map();
 
 	const posMap = {
 		'OT': 'Outpost Trench',
@@ -151,73 +155,152 @@
 		return alliances;
 	})();
 
+	$: effectiveAlliances = actualAlliances.length > 0
+		? actualAlliances.map(a => {
+			const activePickKeys = a.backup
+				? a.picks.filter(p => p !== a.backup.out)
+				: a.picks;
+			return {
+				captain: activePickKeys[0]?.replace('frc', ''),
+				picks: activePickKeys.slice(1).map(p => p.replace('frc', '')),
+				allPicks: a.picks.map(p => p.replace('frc', '')),
+				backup: a.backup ? { in: a.backup.in.replace('frc', ''), out: a.backup.out.replace('frc', '') } : null
+			};
+		})
+		: allianceSimulation;
 
-	$: bracketSimulation = (() => {
-		if (allianceSimulation.length < 8) return null;
-		
-		const score_sd = yearStats?.score_sd || 20;
+	$: bracketSimulation = ((overrides) => {
+		if (effectiveAlliances.length < 8) return null;
+
 		const getAllianceEPA = (alliance) => {
 			if (!alliance) return 0;
-			return (teamStatsMap.get(alliance.captain)?.epa || 0) + 
-				   alliance.picks.reduce((acc, p) => acc + (teamStatsMap.get(p)?.epa || 0), 0);
+			return (teamStatsMap.get(alliance.captain)?.epa || 0) +
+				alliance.picks.reduce((acc, p) => acc + (teamStatsMap.get(p)?.epa || 0), 0);
 		};
 
-		const predictMatch = (a1, a2, label) => {
+		// Map set_number to playoff match for actual results lookup
+		const playoffResultMap = new Map();
+		playoffSchedule.forEach(m => {
+			playoffResultMap.set(m.set_number, m);
+		});
+		// Grand finals: comp_level 'f' maps to M14
+		playoffSchedule.forEach(m => {
+			if (m.comp_level === 'f' && m.set_number === 1 && m.match_number === 1) {
+				playoffResultMap.set(14, m);
+			}
+		});
+
+		const getAllianceNum = (alliance) => effectiveAlliances.indexOf(alliance) + 1;
+
+		const predictOrActual = (a1, a2, label) => {
+			const matchNum = parseInt(label.replace('M', ''));
+			const actual = playoffResultMap.get(matchNum);
 			const epa1 = getAllianceEPA(a1);
 			const epa2 = getAllianceEPA(a2);
-      const diff = epa1 - epa2;
-      const winProb = getWinProb(diff);
-			return { 
-				label, a1, a2, epa1, epa2, winProb, 
+
+			// Check for actual played result
+			if (actual && actual.winning_alliance) {
+				const redScore = actual.alliances?.red?.score ?? -1;
+				const blueScore = actual.alliances?.blue?.score ?? -1;
+				const winnerIsRed = actual.winning_alliance === 'red';
+				return {
+					label, a1, a2, epa1, epa2,
+					winProb: winnerIsRed ? 1 : 0,
+					winner: winnerIsRed ? a1 : a2,
+					loser: winnerIsRed ? a2 : a1,
+					played: true,
+					redScore, blueScore,
+					override: false
+				};
+			}
+
+			// Check for user override
+			const override = overrides.get(label);
+			if (override) {
+				const winner = override === 'a1' ? a1 : a2;
+				const loser = override === 'a1' ? a2 : a1;
+				const diff = epa1 - epa2;
+				const winProb = getWinProb(diff);
+				return {
+					label, a1, a2, epa1, epa2, winProb,
+					winner, loser,
+					played: false,
+					override: override
+				};
+			}
+
+			// Fall back to EPA prediction
+			const diff = epa1 - epa2;
+			const winProb = getWinProb(diff);
+			return {
+				label, a1, a2, epa1, epa2, winProb,
 				winner: winProb > 0.5 ? a1 : a2,
-				loser: winProb > 0.5 ? a2 : a1
+				loser: winProb > 0.5 ? a2 : a1,
+				played: false,
+				override: false
 			};
 		};
 
-		const alliances = allianceSimulation.slice(0, 8);
-		
-		// Round 1
-		const m1 = predictMatch(alliances[0], alliances[7], 'M1');
-		const m2 = predictMatch(alliances[3], alliances[4], 'M2');
-		const m3 = predictMatch(alliances[1], alliances[6], 'M3');
-		const m4 = predictMatch(alliances[2], alliances[5], 'M4');
+		const alliances = effectiveAlliances.slice(0, 8);
 
-		// Round 2
-		const m5 = predictMatch(m1.loser, m2.loser, 'M5');
-		const m6 = predictMatch(m3.loser, m4.loser, 'M6');
-		const m7 = predictMatch(m1.winner, m2.winner, 'M7');
-		const m8 = predictMatch(m3.winner, m4.winner, 'M8');
+		// Round 1 (Upper)
+		const m1 = predictOrActual(alliances[0], alliances[7], 'M1');
+		const m2 = predictOrActual(alliances[3], alliances[4], 'M2');
+		const m3 = predictOrActual(alliances[1], alliances[6], 'M3');
+		const m4 = predictOrActual(alliances[2], alliances[5], 'M4');
 
-		// Round 3
-		const m9 = predictMatch(m8.loser, m5.winner, 'M9');
-		const m10 = predictMatch(m7.loser, m6.winner, 'M10');
-		const m11 = predictMatch(m7.winner, m8.winner, 'M11');
+		// Lower R2
+		const m5 = predictOrActual(m1.loser, m2.loser, 'M5');
+		const m6 = predictOrActual(m3.loser, m4.loser, 'M6');
 
-		// Round 4
-		const m12 = predictMatch(m9.winner, m10.winner, 'M12');
+		// Upper R2
+		const m7 = predictOrActual(m1.winner, m2.winner, 'M7');
+		const m8 = predictOrActual(m3.winner, m4.winner, 'M8');
 
-		// Round 5
-		const m13 = predictMatch(m11.loser, m12.winner, 'M13');
+		// Lower R3
+		const m9 = predictOrActual(m8.loser, m5.winner, 'M9');
+		const m10 = predictOrActual(m7.loser, m6.winner, 'M10');
 
-		// Finals
-		const m14 = predictMatch(m11.winner, m13.winner, 'M14');
+		// Upper Final
+		const m11 = predictOrActual(m7.winner, m8.winner, 'M11');
+
+		// Lower R4
+		const m12 = predictOrActual(m9.winner, m10.winner, 'M12');
+
+		// Lower Final
+		const m13 = predictOrActual(m11.loser, m12.winner, 'M13');
+
+		// Grand Finals
+		const m14 = predictOrActual(m11.winner, m13.winner, 'M14');
+
+		// Check for tiebreaker (M15)
+		const tiebreakerActual = playoffSchedule.find(m => m.comp_level === 'f' && m.match_number === 2);
+		let m15 = null;
+		if (tiebreakerActual) {
+			m15 = predictOrActual(m14.a1, m14.a2, 'M15');
+		}
+
+		const allMatches = [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14];
+		if (m15) allMatches.push(m15);
 
 		return {
 			upper: [
 				{ name: 'Round 1', matches: [m1, m2, m3, m4] },
 				{ name: 'Round 2', matches: [m7, m8] },
-				{ name: 'Round 3', matches: [m11] }
+				{ name: 'Upper Final', matches: [m11] }
 			],
 			lower: [
 				{ name: 'Lower R2', matches: [m5, m6] },
 				{ name: 'Lower R3', matches: [m9, m10] },
 				{ name: 'Lower R4', matches: [m12] },
-				{ name: 'Lower R5', matches: [m13] }
+				{ name: 'Lower Final', matches: [m13] }
 			],
-      matches: [m1, m2, m3, m4, m5, m6, m7, m8, m9, m10, m11, m12, m13, m14],
-			finals: m14
+			matches: allMatches,
+			finals: m15 || m14,
+			tiebreaker: m15,
+			alliances: effectiveAlliances
 		};
-	})();
+	})(playoffOverrides);
 
 	function getWinProb(scoreDiff) {
 		const score_sd = yearStats?.score_sd || 20;
@@ -588,6 +671,7 @@
 			currentStep = 'schedule';
 			loadingSteps.schedule = true;
 			await fetchSchedule();
+			await fetchActualAlliances();
 			loadingSteps.schedule = false;
 
 			currentStep = 'eventTeams';
@@ -701,6 +785,9 @@
 				schedule = data
 					.filter(m => m.comp_level === 'qm')
 					.sort((a, b) => a.match_number - b.match_number);
+				playoffSchedule = data
+					.filter(m => m.comp_level !== 'qm')
+					.sort((a, b) => a.set_number - b.set_number || a.match_number - b.match_number);
 			} else {
 				throw new Error('TBA schedule fetch failed');
 			}
@@ -715,6 +802,33 @@
 						.sort((a, b) => a.match_number - b.match_number);
 				}
 			} catch (e2) { console.error('Local fallback also failed:', e2); }
+			try {
+				const fallback2 = await fetch('/test-data/playoff-schedule.json');
+				if (fallback2.ok) {
+					playoffSchedule = await fallback2.json();
+				}
+			} catch (e2) { console.error('Playoff schedule fallback also failed:', e2); }
+		}
+	}
+
+	async function fetchActualAlliances() {
+		try {
+			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/alliances`, {
+				headers: { 'X-TBA-Auth-Key': TBA_KEY }
+			});
+			if (res.ok) {
+				actualAlliances = await res.json();
+			} else {
+				throw new Error('TBA alliances fetch failed');
+			}
+		} catch (e) {
+			console.error('Error fetching alliances, trying local fallback:', e);
+			try {
+				const fallback = await fetch('/test-data/alliances.json');
+				if (fallback.ok) {
+					actualAlliances = await fallback.json();
+				}
+			} catch (e2) { console.error('Alliances fallback also failed:', e2); }
 		}
 	}
 
@@ -947,7 +1061,7 @@
 					loadingSteps.rankings = false;
 					currentStep = 'schedule';
 					loadingSteps.schedule = true;
-					return fetchSchedule();
+					return fetchSchedule().then(() => fetchActualAlliances());
 				}).then(() => {
 					loadingSteps.schedule = false;
 					currentStep = 'eventTeams';
@@ -1447,6 +1561,51 @@
 
 	function clearAllOverrides() {
 		matchOverrides = new Map();
+	}
+
+	function cyclePlayoffOverride(matchLabel) {
+		const current = playoffOverrides.get(matchLabel);
+		if (!current) {
+			// First override: flip to the opposite of predicted winner
+			const match = bracketSimulation?.matches.find(m => m.label === matchLabel);
+			if (match) {
+				const predictedIsA1 = match.winner === match.a1;
+				playoffOverrides.set(matchLabel, predictedIsA1 ? 'a2' : 'a1');
+			}
+		} else if (current === 'a1') {
+			// If currently overriding to a1, try a2 (unless that's the default — then clear)
+			const match = bracketSimulation?.matches.find(m => m.label === matchLabel);
+			const defaultIsA2 = match && match.winner !== match.a1;
+			if (defaultIsA2) {
+				playoffOverrides.delete(matchLabel);
+			} else {
+				playoffOverrides.set(matchLabel, 'a2');
+			}
+		} else {
+			// current === 'a2', try a1 (unless that's the default — then clear)
+			const match = bracketSimulation?.matches.find(m => m.label === matchLabel);
+			const defaultIsA1 = match && match.winner === match.a1;
+			if (defaultIsA1) {
+				playoffOverrides.delete(matchLabel);
+			} else {
+				playoffOverrides.set(matchLabel, 'a1');
+			}
+		}
+		playoffOverrides = new Map(playoffOverrides);
+	}
+
+	function clearPlayoffOverrides() {
+		playoffOverrides = new Map();
+	}
+
+	function loadPlayoffMatchIntoSim(match) {
+		if (!match.a1 || !match.a2) return;
+		simRedTeams = [match.a1.captain, ...(match.a1.picks || [])].slice(0, 3);
+		simBlueTeams = [match.a2.captain, ...(match.a2.picks || [])].slice(0, 3);
+		simulatorMode = true;
+		selectionMode = false;
+		pitMode = false;
+		defenseMode = false;
 	}
 
 	function hasMatchIssues(scoutRow) {
@@ -2827,96 +2986,154 @@
 							</div>
 
 							{#if bracketSimulation}
-								<div class="mt-12 animate-in fade-in slide-in-from-bottom-4">
+								<PlayoffProgressMap
+									bracketMatches={bracketSimulation.matches}
+									alliances={bracketSimulation.alliances}
+									{playoffOverrides}
+									hasOverrides={playoffOverrides.size > 0}
+									onMatchClick={(m) => loadPlayoffMatchIntoSim(m)}
+									onMatchLongPress={(m) => { if (!m.played) cyclePlayoffOverride(m.label); }}
+									onClearOverrides={clearPlayoffOverrides}
+								/>
+
+								<div class="mt-8 animate-in fade-in slide-in-from-bottom-4">
 									<h3 class="text-xl md:text-2xl font-black text-orange-400 uppercase tracking-tighter mb-6 flex items-center gap-3">
 										<span class="bg-orange-500/10 p-2 rounded-lg border border-orange-500/20">🏆</span>
-										Predicted Bracket Outcome
+										{actualAlliances.length > 0 ? 'Playoff Bracket' : 'Predicted Bracket Outcome'}
 									</h3>
-									
-									<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-										<!-- R1 -->
-										<div class="space-y-4">
-											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Round 1</p>
-											{#each bracketSimulation.matches.slice(0, 4) as m, i}
-												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
-													<div class="flex justify-between items-center mb-1">
-														<span class="text-zinc-500 font-bold">M{i+1}</span>
-														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
-													</div>
-													<div class="space-y-1">
-														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
-															<span>{m.epa1.toFixed(0)}</span>
-														</div>
-														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
-															<span>{m.epa2.toFixed(0)}</span>
-														</div>
-													</div>
+
+									<!-- UPPER BRACKET -->
+									<div class="mb-8">
+										<p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-3 pl-1">Upper Bracket</p>
+										<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+											{#each bracketSimulation.upper as round}
+												<div class="space-y-3">
+													<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">{round.name}</p>
+													{#each round.matches as m}
+														{@const a1Num = effectiveAlliances.indexOf(m.a1) + 1}
+														{@const a2Num = effectiveAlliances.indexOf(m.a2) + 1}
+														<button
+															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
+															on:click={() => loadPlayoffMatchIntoSim(m)}
+															on:contextmenu|preventDefault={() => { if (!m.played) cyclePlayoffOverride(m.label); }}
+														>
+															<div class="flex justify-between items-center mb-1.5">
+																<span class="text-zinc-500 font-bold">{m.label}</span>
+																{#if m.played}
+																	<span class="text-[9px] font-black text-green-400 uppercase">Final</span>
+																{:else if m.override}
+																	<span class="text-[9px] font-black text-yellow-400 uppercase">Override</span>
+																{:else}
+																	<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+																{/if}
+															</div>
+															<div class="space-y-1">
+																<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+																	<span>A{a1Num} <span class="text-zinc-600 font-normal">{m.a1?.captain}</span></span>
+																	<span>{m.played ? m.redScore : m.epa1.toFixed(0)}</span>
+																</div>
+																<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+																	<span>A{a2Num} <span class="text-zinc-600 font-normal">{m.a2?.captain}</span></span>
+																	<span>{m.played ? m.blueScore : m.epa2.toFixed(0)}</span>
+																</div>
+															</div>
+														</button>
+													{/each}
 												</div>
 											{/each}
 										</div>
+									</div>
 
-										<!-- Semis / Lr Semis -->
-										<div class="space-y-4">
-											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Winners R2</p>
-											{#each bracketSimulation.matches.slice(6, 8) as m, i}
-												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
-													<div class="flex justify-between items-center mb-1">
-														<span class="text-zinc-500 font-bold">M{i+7}</span>
-														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
-													</div>
-													<div class="space-y-1">
-														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
-															<span>{m.epa1.toFixed(0)}</span>
-														</div>
-														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
-															<span>{m.epa2.toFixed(0)}</span>
-														</div>
-													</div>
+									<!-- LOWER BRACKET -->
+									<div class="mb-8">
+										<p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-3 pl-1">Lower Bracket</p>
+										<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+											{#each bracketSimulation.lower as round}
+												<div class="space-y-3">
+													<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">{round.name}</p>
+													{#each round.matches as m}
+														{@const a1Num = effectiveAlliances.indexOf(m.a1) + 1}
+														{@const a2Num = effectiveAlliances.indexOf(m.a2) + 1}
+														<button
+															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
+															on:click={() => loadPlayoffMatchIntoSim(m)}
+															on:contextmenu|preventDefault={() => { if (!m.played) cyclePlayoffOverride(m.label); }}
+														>
+															<div class="flex justify-between items-center mb-1.5">
+																<span class="text-zinc-500 font-bold">{m.label}</span>
+																{#if m.played}
+																	<span class="text-[9px] font-black text-green-400 uppercase">Final</span>
+																{:else if m.override}
+																	<span class="text-[9px] font-black text-yellow-400 uppercase">Override</span>
+																{:else}
+																	<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+																{/if}
+															</div>
+															<div class="space-y-1">
+																<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+																	<span>A{a1Num} <span class="text-zinc-600 font-normal">{m.a1?.captain}</span></span>
+																	<span>{m.played ? m.redScore : m.epa1.toFixed(0)}</span>
+																</div>
+																<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+																	<span>A{a2Num} <span class="text-zinc-600 font-normal">{m.a2?.captain}</span></span>
+																	<span>{m.played ? m.blueScore : m.epa2.toFixed(0)}</span>
+																</div>
+															</div>
+														</button>
+													{/each}
 												</div>
 											{/each}
 										</div>
+									</div>
 
-										<!-- Finals Qualifier -->
-										<div class="space-y-4">
-											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Finals Qualifiers</p>
-											{#each [bracketSimulation.matches[10], bracketSimulation.matches[12]] as m, i}
-												<div class="bg-zinc-900/60 border border-zinc-800 rounded-xl p-3 text-xs">
-													<div class="flex justify-between items-center mb-1">
-														<span class="text-zinc-500 font-bold">M{i === 0 ? 11 : 13}</span>
-														<span class="text-[10px] font-black text-blue-500 uppercase">{(m.winProb > 0.5 ? m.winProb : 1-m.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+									<!-- GRAND FINALS -->
+									<div>
+										<p class="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em] mb-3 pl-1">Grand Finals</p>
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+											{#each [bracketSimulation.finals] as gf}
+												{@const gfA1 = effectiveAlliances.indexOf(gf.a1) + 1}
+												{@const gfA2 = effectiveAlliances.indexOf(gf.a2) + 1}
+												<button
+													class="w-full text-left rounded-xl p-4 text-xs transition-all duration-200 hover:scale-[1.02] {gf.played ? 'bg-zinc-900/80 border border-zinc-700' : gf.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
+													on:click={() => loadPlayoffMatchIntoSim(gf)}
+													on:contextmenu|preventDefault={() => { if (!gf.played) cyclePlayoffOverride(gf.label); }}
+												>
+													<div class="flex justify-between items-center mb-2">
+														<span class="text-zinc-500 font-bold">{gf.label}</span>
+														{#if gf.played}
+															<span class="text-[9px] font-black text-green-400 uppercase">Final</span>
+														{:else if gf.override}
+															<span class="text-[9px] font-black text-yellow-400 uppercase">Override</span>
+														{:else}
+															<span class="text-[10px] font-black text-blue-500 uppercase">{(gf.winProb > 0.5 ? gf.winProb : 1-gf.winProb).toLocaleString(undefined, {style: 'percent'})} Win</span>
+														{/if}
 													</div>
 													<div class="space-y-1">
-														<div class="flex justify-between {m.winner === m.a1 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a1) + 1}</span>
-															<span>{m.epa1.toFixed(0)}</span>
+														<div class="flex justify-between {gf.winner === gf.a1 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>A{gfA1} <span class="text-zinc-600 font-normal">{gf.a1?.captain}</span></span>
+															<span>{gf.played ? gf.redScore : gf.epa1.toFixed(0)}</span>
 														</div>
-														<div class="flex justify-between {m.winner === m.a2 ? 'text-white font-black' : 'text-zinc-500'}">
-															<span>Alliance {allianceSimulation.indexOf(m.a2) + 1}</span>
-															<span>{m.epa2.toFixed(0)}</span>
+														<div class="flex justify-between {gf.winner === gf.a2 ? 'text-white font-black' : 'text-zinc-500'}">
+															<span>A{gfA2} <span class="text-zinc-600 font-normal">{gf.a2?.captain}</span></span>
+															<span>{gf.played ? gf.blueScore : gf.epa2.toFixed(0)}</span>
 														</div>
 													</div>
+												</button>
+
+												<!-- Champion Card -->
+												<div class="bg-orange-500/10 border-2 border-orange-500/40 rounded-2xl p-6 text-center shadow-[0_0_30px_rgba(249,115,22,0.1)] relative overflow-hidden group">
+													<div class="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-110 transition-transform duration-700">🏆</div>
+													<p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">{gf.played ? 'Champion' : 'Predicted Champion'}</p>
+													<h4 class="text-4xl font-black text-white mb-1">Alliance {effectiveAlliances.indexOf(gf.winner) + 1}</h4>
+													<p class="text-sm font-bold text-zinc-400">
+														{gf.winner?.captain}{#each gf.winner?.picks || [] as p}, {p}{/each}
+														{#if gf.winner?.backup}<span class="text-yellow-400 text-[9px]"> ({gf.winner.backup.in} B)</span>{/if}
+													</p>
+													{#if !gf.played}
+														<p class="text-xs font-bold text-zinc-500 mt-1">{(gf.winProb > 0.5 ? gf.winProb : 1-gf.winProb).toLocaleString(undefined, {style: 'percent'})} confidence</p>
+													{/if}
 												</div>
 											{/each}
-										</div>
-
-										<!-- Champion -->
-										<div class="space-y-4">
-											<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-2">Grand Finals</p>
-											<div class="bg-orange-500/10 border-2 border-orange-500/40 rounded-2xl p-6 text-center shadow-[0_0_30px_rgba(249,115,22,0.1)] relative overflow-hidden group">
-												<div class="absolute -right-4 -top-4 text-6xl opacity-10 group-hover:scale-110 transition-transform duration-700">🏆</div>
-												<p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">Predicted Champion</p>
-												<h4 class="text-4xl font-black text-white mb-1">Alliance {allianceSimulation.indexOf(bracketSimulation.finals.winner) + 1}</h4>
-												<p class="text-xs font-bold text-zinc-400">{(bracketSimulation.finals.winProb > 0.5 ? bracketSimulation.finals.winProb : 1-bracketSimulation.finals.winProb).toLocaleString(undefined, {style: 'percent'})} confidence</p>
-												
-												<div class="mt-4 pt-4 border-t border-orange-500/20 flex justify-between items-center text-[10px] font-black">
-													<span class="text-zinc-500 uppercase">Opponent</span>
-													<span class="text-white">Alliance {allianceSimulation.indexOf(bracketSimulation.finals.loser) + 1}</span>
-												</div>
-											</div>
 										</div>
 									</div>
 								</div>
