@@ -19,6 +19,7 @@
 	let timerInterval;
 	let timeline = [];
 	let activeActions = new Set();
+	let isFullscreen = false;
 
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
 
@@ -49,6 +50,28 @@
       document.getElementById('scoutingForm').reset();
 		}
 	};
+
+	const toggleFullscreen = async () => {
+		try {
+			if (!document.fullscreenElement) {
+				await document.documentElement.requestFullscreen();
+				isFullscreen = true;
+			} else {
+				await document.exitFullscreen();
+				isFullscreen = false;
+			}
+		} catch (err) {
+			console.error(`Error attempting to toggle fullscreen: ${err.message}`);
+		}
+	};
+
+	onMount(() => {
+		const handleFullscreenChange = () => {
+			isFullscreen = !!document.fullscreenElement;
+		};
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+	});
 
 	const recordPointAction = (code) => {
 		if (!matchStarted) toggleTimer();
@@ -222,6 +245,9 @@
 					<a href="/scouting-assignments" class="px-4 py-2 bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 rounded-lg font-bold text-xs flex items-center">
 						ASSIGNMENTS
 					</a>
+					<button type="button" on:click={toggleFullscreen} class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-bold text-xs" title="Toggle fullscreen">
+						{isFullscreen ? '⛌' : '⛶'}
+					</button>
 				</div>
 			</div>
 			{#if timeline.length > 0}

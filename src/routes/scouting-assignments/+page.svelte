@@ -14,6 +14,7 @@
 	let cacheAge = null;
 	let eventStartTime = null;
 	let eventTimeZone = 'UTC'; // Will be set from environment or event data
+	let isFullscreen = false;
 
 	const SCOUTS_CSV_URL = import.meta.env.VITE_SCOUTS_CSV_URL;
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
@@ -663,8 +664,27 @@
 		}
 	}
 
+	const toggleFullscreen = async () => {
+		try {
+			if (!document.fullscreenElement) {
+				await document.documentElement.requestFullscreen();
+				isFullscreen = true;
+			} else {
+				await document.exitFullscreen();
+				isFullscreen = false;
+			}
+		} catch (err) {
+			console.error(`Error attempting to toggle fullscreen: ${err.message}`);
+		}
+	};
+
 	onMount(() => {
 		loadData();
+		const handleFullscreenChange = () => {
+			isFullscreen = !!document.fullscreenElement;
+		};
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
 	});
 </script>
 
@@ -699,6 +719,13 @@
 					class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition"
 				>
 					Reload Data
+				</button>
+				<button
+					on:click={toggleFullscreen}
+					class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-semibold transition"
+					title="Toggle fullscreen"
+				>
+					{isFullscreen ? '⛌' : '⛶'}
 				</button>
 			</div>
 		</div>

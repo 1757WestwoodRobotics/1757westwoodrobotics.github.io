@@ -62,6 +62,7 @@
 	let simBlueTeams = ['', '', ''];
 	let overviewTeam = '1757';
 	let quickLinksOpen = false;
+	let isFullscreen = false;
 
 	const posMap = {
 		'OT': 'Outpost Trench',
@@ -848,6 +849,20 @@
 		}
 	}
 
+	const toggleFullscreen = async () => {
+		try {
+			if (!document.fullscreenElement) {
+				await document.documentElement.requestFullscreen();
+				isFullscreen = true;
+			} else {
+				await document.exitFullscreen();
+				isFullscreen = false;
+			}
+		} catch (err) {
+			console.error(`Error attempting to toggle fullscreen: ${err.message}`);
+		}
+	};
+
 	onMount(() => {
 		const messageInterval = setInterval(() => {
 			let nextIndex;
@@ -856,6 +871,11 @@
 			} while (nextIndex === currentMessageIndex);
 			currentMessageIndex = nextIndex;
 		}, 3000);
+
+		const handleFullscreenChange = () => {
+			isFullscreen = !!document.fullscreenElement;
+		};
+		document.addEventListener('fullscreenchange', handleFullscreenChange);
 
 		console.log('onMount called, loading:', loading);
 		const cached = localStorage.getItem('scouting_cache');
@@ -1791,6 +1811,9 @@
             </div>
           {/if}
         </div>
+        <button on:click={toggleFullscreen} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-700" title="Toggle fullscreen">
+          {isFullscreen ? '⛌' : '⛶'}
+        </button>
 				{#if simulatorMode}
 					<button on:click={clearSimulator} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white shadow-[0_0_15px_rgba(239,68,68,0.2)] ml-auto">
 						Clear All
