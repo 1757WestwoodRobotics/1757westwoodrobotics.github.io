@@ -8,6 +8,7 @@
 	import RPCards from '../../components/scoutingDashboard/RPCards.svelte';
 	import EventProgressMap from '../../components/scoutingDashboard/EventProgressMap.svelte';
 	import PlayoffProgressMap from '../../components/scoutingDashboard/PlayoffProgressMap.svelte';
+	import OverrideContextMenu from '../../components/scoutingDashboard/OverrideContextMenu.svelte';
 	import { onMount } from 'svelte';
 	import { Line } from 'svelte-chartjs';
 	import {
@@ -409,6 +410,11 @@
 	// Context menu for simulator
 	let contextMenu = null;
 	let contextMenuMatch = null;
+	let overrideContextMenu = null;
+	let overrideContextMenuLabel = '';
+	let overrideContextMenuType = null;
+	let overrideContextMenuRedLabel = 'Override Red';
+	let overrideContextMenuBlueLabel = 'Override Blue';
 
 	// Image viewer
 	let viewerImageSrc = null;
@@ -1411,17 +1417,20 @@
 	};
 
 	$: simRpPredictions = (() => {
-		function getAllianceRp(teams) {
+		function getAllianceRpDetailed(teams) {
+			const details = { rp1: [], rp2: [], rp3: [] };
 			let rp1Sum = 0, rp2Sum = 0, rp3Sum = 0;
 			teams.forEach(t => {
 				const stats = teamStatsMap.get(t);
-				if (stats) {
-					rp1Sum += stats.rp1 || 0;
-					rp2Sum += stats.rp2 || 0;
-					rp3Sum += stats.rp3 || 0;
-				}
+				const v1 = stats?.rp1 || 0;
+				const v2 = stats?.rp2 || 0;
+				const v3 = stats?.rp3 || 0;
+				rp1Sum += v1; rp2Sum += v2; rp3Sum += v3;
+				details.rp1.push({ team: t, value: v1 });
+				details.rp2.push({ team: t, value: v2 });
+				details.rp3.push({ team: t, value: v3 });
 			});
-			return { rp1: rp1Sum, rp2: rp2Sum, rp3: rp3Sum };
+			return { sums: { rp1: rp1Sum, rp2: rp2Sum, rp3: rp3Sum }, details };
 		}
 
 		function rpState(sum) {
@@ -1430,29 +1439,52 @@
 			return 'muted';
 		}
 
+		function rpThresholdLabel(sum) {
+			if (sum > 1.0) return 'Likely (>1.0)';
+			if (sum > 0.8) return 'Possible (>0.8)';
+			return 'Unlikely (\u22640.8)';
+		}
+
 		function winRpState(allianceWinProb) {
 			if (allianceWinProb > 0.625) return 'lit';
 			if (allianceWinProb < 0.375) return 'muted';
 			return 'contention';
 		}
 
-		const redRp = getAllianceRp(simRedTeams);
-		const blueRp = getAllianceRp(simBlueTeams);
+		function winThresholdLabel(prob) {
+			if (prob > 0.625) return 'Likely (>62.5%)';
+			if (prob < 0.375) return 'Unlikely (<37.5%)';
+			return 'Toss-up';
+		}
+
+		const red = getAllianceRpDetailed(simRedTeams);
+		const blue = getAllianceRpDetailed(simBlueTeams);
 		const redWinProb = simWinProbs.epa;
 		const blueWinProb = 1 - simWinProbs.epa;
 
+		function buildReasons(data, winProb) {
+			return {
+				rp1: { teams: data.details.rp1, sum: data.sums.rp1, label: rpThresholdLabel(data.sums.rp1) },
+				rp2: { teams: data.details.rp2, sum: data.sums.rp2, label: rpThresholdLabel(data.sums.rp2) },
+				rp3: { teams: data.details.rp3, sum: data.sums.rp3, label: rpThresholdLabel(data.sums.rp3) },
+				win: { winProb, label: winThresholdLabel(winProb) }
+			};
+		}
+
 		return {
 			red: {
-				rp1: rpState(redRp.rp1),
-				rp2: rpState(redRp.rp2),
-				rp3: rpState(redRp.rp3),
-				win: winRpState(redWinProb)
+				rp1: rpState(red.sums.rp1),
+				rp2: rpState(red.sums.rp2),
+				rp3: rpState(red.sums.rp3),
+				win: winRpState(redWinProb),
+				reasons: buildReasons(red, redWinProb)
 			},
 			blue: {
-				rp1: rpState(blueRp.rp1),
-				rp2: rpState(blueRp.rp2),
-				rp3: rpState(blueRp.rp3),
-				win: winRpState(blueWinProb)
+				rp1: rpState(blue.sums.rp1),
+				rp2: rpState(blue.sums.rp2),
+				rp3: rpState(blue.sums.rp3),
+				win: winRpState(blueWinProb),
+				reasons: buildReasons(blue, blueWinProb)
 			}
 		};
 	})();
@@ -1596,6 +1628,58 @@
 
 	function clearPlayoffOverrides() {
 		playoffOverrides = new Map();
+	}
+
+	function openOverrideMenu(e, label, type) {
+		e.preventDefault();
+		overrideContextMenu = { x: e.clientX, y: e.clientY };
+		overrideContextMenuLabel = label;
+		overrideContextMenuType = type;
+		if (type === 'playoff' && bracketSimulation) {
+			const match = bracketSimulation.matches.find(m => m.label === label);
+			if (match) {
+				const a1Num = effectiveAlliances.indexOf(match.a1) + 1;
+				const a2Num = effectiveAlliances.indexOf(match.a2) + 1;
+				overrideContextMenuRedLabel = `Override Alliance ${a1Num}`;
+				overrideContextMenuBlueLabel = `Override Alliance ${a2Num}`;
+			}
+		} else {
+			overrideContextMenuRedLabel = 'Override Red';
+			overrideContextMenuBlueLabel = 'Override Blue';
+		}
+	}
+
+	function handleOverrideRed() {
+		if (overrideContextMenuType === 'quals') {
+			const matchNum = parseInt(overrideContextMenuLabel.replace('Match ', ''));
+			matchOverrides.set(matchNum, 'red');
+			matchOverrides = new Map(matchOverrides);
+		} else if (overrideContextMenuType === 'playoff') {
+			playoffOverrides.set(overrideContextMenuLabel, 'a1');
+			playoffOverrides = new Map(playoffOverrides);
+		}
+	}
+
+	function handleOverrideBlue() {
+		if (overrideContextMenuType === 'quals') {
+			const matchNum = parseInt(overrideContextMenuLabel.replace('Match ', ''));
+			matchOverrides.set(matchNum, 'blue');
+			matchOverrides = new Map(matchOverrides);
+		} else if (overrideContextMenuType === 'playoff') {
+			playoffOverrides.set(overrideContextMenuLabel, 'a2');
+			playoffOverrides = new Map(playoffOverrides);
+		}
+	}
+
+	function handleClearSingleOverride() {
+		if (overrideContextMenuType === 'quals') {
+			const matchNum = parseInt(overrideContextMenuLabel.replace('Match ', ''));
+			matchOverrides.delete(matchNum);
+			matchOverrides = new Map(matchOverrides);
+		} else if (overrideContextMenuType === 'playoff') {
+			playoffOverrides.delete(overrideContextMenuLabel);
+			playoffOverrides = new Map(playoffOverrides);
+		}
 	}
 
 	function loadPlayoffMatchIntoSim(match) {
@@ -2939,9 +3023,14 @@
 							onMatchClick={(match) => selectedMatchPopup = match}
 							onMatchLongPress={(match) => cycleMatchOverride(match)}
 							onMatchContextMenu={(e, match) => {
-								e.preventDefault();
-								contextMenu = { x: e.clientX, y: e.clientY };
-								contextMenuMatch = match;
+								const pred = matchPredictions.find(p => p.match_number === match.match_number);
+								if (pred && !pred.played) {
+									openOverrideMenu(e, `Match ${match.match_number}`, 'quals');
+								} else {
+									e.preventDefault();
+									contextMenu = { x: e.clientX, y: e.clientY };
+									contextMenuMatch = match;
+								}
 							}}
 							onMatchHover={(match) => hoveredMatch = match}
 							onMatchHoverEnd={() => hoveredMatch = null}
@@ -2993,6 +3082,7 @@
 									hasOverrides={playoffOverrides.size > 0}
 									onMatchClick={(m) => loadPlayoffMatchIntoSim(m)}
 									onMatchLongPress={(m) => { if (!m.played) cyclePlayoffOverride(m.label); }}
+									onMatchContextMenu={(e, m) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 									onClearOverrides={clearPlayoffOverrides}
 								/>
 
@@ -3015,7 +3105,7 @@
 														<button
 															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
 															on:click={() => loadPlayoffMatchIntoSim(m)}
-															on:contextmenu|preventDefault={() => { if (!m.played) cyclePlayoffOverride(m.label); }}
+															on:contextmenu|preventDefault={(e) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 														>
 															<div class="flex justify-between items-center mb-1.5">
 																<span class="text-zinc-500 font-bold">{m.label}</span>
@@ -3057,7 +3147,7 @@
 														<button
 															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
 															on:click={() => loadPlayoffMatchIntoSim(m)}
-															on:contextmenu|preventDefault={() => { if (!m.played) cyclePlayoffOverride(m.label); }}
+															on:contextmenu|preventDefault={(e) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 														>
 															<div class="flex justify-between items-center mb-1.5">
 																<span class="text-zinc-500 font-bold">{m.label}</span>
@@ -3096,7 +3186,7 @@
 												<button
 													class="w-full text-left rounded-xl p-4 text-xs transition-all duration-200 hover:scale-[1.02] {gf.played ? 'bg-zinc-900/80 border border-zinc-700' : gf.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
 													on:click={() => loadPlayoffMatchIntoSim(gf)}
-													on:contextmenu|preventDefault={() => { if (!gf.played) cyclePlayoffOverride(gf.label); }}
+													on:contextmenu|preventDefault={(e) => { if (!gf.played) openOverrideMenu(e, gf.label, 'playoff'); }}
 												>
 													<div class="flex justify-between items-center mb-2">
 														<span class="text-zinc-500 font-bold">{gf.label}</span>
@@ -4081,6 +4171,16 @@
 	{contextMenuMatch}
 	onLoadSimulator={(match) => loadMatchIntoSimulator(match)}
 	onClose={() => contextMenu = null}
+/>
+<OverrideContextMenu
+	contextMenu={overrideContextMenu}
+	matchLabel={overrideContextMenuLabel}
+	redLabel={overrideContextMenuRedLabel}
+	blueLabel={overrideContextMenuBlueLabel}
+	onOverrideRed={handleOverrideRed}
+	onOverrideBlue={handleOverrideBlue}
+	onClearOverride={handleClearSingleOverride}
+	onClose={() => overrideContextMenu = null}
 />
 
 <Footer />

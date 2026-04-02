@@ -57,7 +57,8 @@
 	let longPressTimer;
 	let longPressTriggered = false;
 
-	function handlePointerDown(match) {
+	function handlePointerDown(e, match) {
+		if (e.button !== 0) return; // Only left-click
 		longPressTriggered = false;
 		longPressTimer = setTimeout(() => {
 			longPressTriggered = true;
@@ -66,7 +67,8 @@
 		}, 600);
 	}
 
-	function handlePointerUp(match) {
+	function handlePointerUp(e, match) {
+		if (e.button !== 0) return; // Only left-click
 		clearTimeout(longPressTimer);
 		if (!longPressTriggered) {
 			onMatchClick(match);
@@ -106,8 +108,8 @@
 			<div class="relative">
 				<button
 					class="w-8 h-8 rounded-lg border text-[10px] font-black text-white/80 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:z-10 {cardClass} {hoveredMatch === match ? 'ring-2 ring-white/50 scale-110 z-10' : ''}"
-					on:pointerdown={() => handlePointerDown(match)}
-					on:pointerup={() => handlePointerUp(match)}
+					on:pointerdown={(e) => handlePointerDown(e, match)}
+					on:pointerup={(e) => handlePointerUp(e, match)}
 					on:pointerleave={handlePointerLeave}
 					on:contextmenu|preventDefault={(e) => onMatchContextMenu(e, match)}
 					on:mouseenter={() => onMatchHover(match)}
