@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1757 Scouting System Docs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+    }
+    nav {
+      width: 260px;
+      min-width: 260px;
+      background: #161b22;
+      border-right: 1px solid #30363d;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    nav h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8b949e;
+      margin: 20px 0 8px;
+    }
+    nav h2:first-child { margin-top: 0; }
+    nav a {
+      display: block;
+      padding: 6px 10px;
+      margin: 2px 0;
+      color: #58a6ff;
+      text-decoration: none;
+      font-size: 14px;
+      border-radius: 6px;
+      transition: background 0.15s;
+    }
+    nav a:hover { background: #1f2937; }
+    nav a.active { background: #1f6feb33; color: #79c0ff; font-weight: 600; }
+    main {
+      flex: 1;
+      max-width: 900px;
+      padding: 40px 50px;
+    }
+    .markdown-body {
+      background: transparent;
+    }
+    .markdown-body table { display: table; width: 100%; }
+    .markdown-body blockquote {
+      border-left-color: #3b82f6;
+      color: #8b949e;
+    }
+    /* GitHub-style callouts */
+    .markdown-body blockquote p:first-child {
+      font-weight: normal;
+    }
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      nav {
+        width: 100%;
+        min-width: 100%;
+        height: auto;
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 12px;
+      }
+      nav h2 { width: 100%; margin: 8px 0 4px; }
+      nav a { display: inline-block; }
+      main { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h2>Scouts & Strategy</h2>
+    <a href="#" data-page="competition-quickstart">Competition Quick Start</a>
+    <a href="#" data-page="scouting-form">Scouting Form Guide</a>
+    <a href="#" data-page="scouting-dashboard">Dashboard Guide</a>
+    <a href="#" data-page="scout-assignments">Scout Assignments</a>
+    <h2>Developers</h2>
+    <a href="#" data-page="setup-and-deployment">Setup & Deployment</a>
+    <a href="#" data-page="architecture">Architecture</a>
+    <a href="#" data-page="data-format-reference">Data Format Reference</a>
+    <h2>Everyone</h2>
+    <a href="#" data-page="troubleshooting">Troubleshooting</a>
+  </nav>
+  <main>
+    <article id="content" class="markdown-body"></article>
+  </main>
+  <script>
+    const contentEl = document.getElementById('content');
+    const links = document.querySelectorAll('nav a[data-page]');
+
+    async function loadPage(page) {
+      try {
+        const res = await fetch(page + '.md');
+        if (!res.ok) throw new Error('Not found');
+        let md = await res.text();
+        // Convert GitHub callouts to styled HTML
+        md = md.replace(/> \[!(TIP|IMPORTANT|WARNING|NOTE)\]\n>/g, (_, type) => {
+          const colors = { TIP: '#3fb950', IMPORTANT: '#a371f7', WARNING: '#d29922', NOTE: '#58a6ff' };
+          const icons = { TIP: '💡', IMPORTANT: '❗', WARNING: '⚠️', NOTE: 'ℹ️' };
+          return `> ${icons[type]} **${type}**\n>`;
+        });
+        contentEl.innerHTML = marked.parse(md);
+        // Update active link
+        links.forEach(l => l.classList.toggle('active', l.dataset.page === page));
+        // Update URL hash
+        window.location.hash = page;
+        // Scroll to top
+        window.scrollTo(0, 0);
+      } catch (e) {
+        contentEl.innerHTML = '<h1>Page not found</h1><p>Could not load ' + page + '.md</p>';
+      }
+    }
+
+    // Handle nav clicks
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        loadPage(link.dataset.page);
+      });
+    });
+
+    // Handle in-page markdown links
+    contentEl.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (!a) return;
+      const href = a.getAttribute('href');
+      if (href && href.endsWith('.md')) {
+        e.preventDefault();
+        const page = href.replace('.md', '').replace('./', '');
+        if (page === 'README') {
+          loadPage('competition-quickstart');
+        } else {
+          loadPage(page);
+        }
+      }
+    });
+
+    // Load initial page from hash or default
+    const initialPage = window.location.hash.slice(1) || 'competition-quickstart';
+    loadPage(initialPage);
+  </script>
+</body>
+</html>
