@@ -2744,6 +2744,9 @@
               <a href="https://www.statbotics.io/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
                 Statbotics
               </a>
+              <a href="/docs/index.html" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
+                Help Docs
+              </a>
               <div class="border-t border-zinc-700 my-1"></div>
               <button on:click={() => enterDebugMode('quals')} class="w-full text-left block px-4 py-2 text-sm font-bold transition {debugMode === 'quals' ? 'text-yellow-300 bg-yellow-500/20' : 'text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-300'}">
                 🧪 Debug — Quals
