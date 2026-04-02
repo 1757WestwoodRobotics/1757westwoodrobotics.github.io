@@ -2,6 +2,8 @@
 	import Navbar from '../../components/navbar.svelte';
 	import Footer from '../../components/footer.svelte';
 	import { onMount } from 'svelte';
+	import { jsPDF } from 'jspdf';
+	import html2canvas from 'html2canvas';
 
 	let scouts = [];
 	let schedule = [];
@@ -15,6 +17,8 @@
 	let eventStartTime = null;
 	let eventTimeZone = 'UTC'; // Will be set from environment or event data
 	let isFullscreen = false;
+	let pdfElement = null;
+	let scoutPdfElement = null;
 
 	const SCOUTS_CSV_URL = import.meta.env.VITE_SCOUTS_CSV_URL;
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
@@ -678,6 +682,401 @@
 		}
 	};
 
+	function exportToPDF() {
+		if (!pdfElement) return;
+		
+		// Create a hidden container for PDF content
+		const pdfContainer = document.createElement('div');
+		pdfContainer.style.position = 'absolute';
+		pdfContainer.style.left = '-9999px';
+		pdfContainer.style.top = '-9999px';
+		pdfContainer.style.width = '190mm';
+		pdfContainer.style.padding = '10mm';
+		pdfContainer.style.backgroundColor = 'white';
+		pdfContainer.style.fontFamily = 'Courier New, monospace';
+		pdfContainer.style.color = '#000';
+		pdfContainer.style.fontSize = '10px';
+		pdfContainer.style.lineHeight = '1.2';
+		
+		// Add title and metadata
+		let html = `
+			<div style="text-align: center; margin-bottom: 12px; border-bottom: 1px solid #000; padding-bottom: 8px;">
+				<h1 style="margin: 0; font-size: 18px; font-weight: bold;">SCOUTING ASSIGNMENTS</h1>
+				<p style="margin: 3px 0 0 0; font-size: 9px;">Generated: ${new Date().toLocaleString()}</p>
+			</div>
+		`;
+		
+		// Summary stats
+		html += `
+			<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 10px;">
+				<div style="border: 1px solid #000; padding: 4px; text-align: center;">
+					<div style="font-weight: bold;">${scouts.length}</div>
+					<div style="font-size: 8px;">Scouts</div>
+				</div>
+				<div style="border: 1px solid #000; padding: 4px; text-align: center;">
+					<div style="font-weight: bold;">${schedule.length}</div>
+					<div style="font-size: 8px;">Matches</div>
+				</div>
+				<div style="border: 1px solid #000; padding: 4px; text-align: center;">
+					<div style="font-weight: bold;">${assignments.length}</div>
+					<div style="font-size: 8px;">Assignments</div>
+				</div>
+			</div>
+		`;
+		
+		// All assignments by match - using table for better text rendering
+		html += `
+			<div style="margin-bottom: 20px;">
+				<h2 style="font-size: 11px; font-weight: bold; margin: 0 0 8px 0; border-bottom: 1px solid #000;">ASSIGNMENTS BY MATCH</h2>
+				<table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+					<tr style="background: #f0f0f0;">
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Match</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Time</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">RED Alliance</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">BLUE Alliance</th>
+					</tr>
+					${schedule.map((match, idx) => {
+						const matchAssignments = assignments.filter(a => a.matchNum === match.match_number);
+						const times = getMatchTimes(match.match_number);
+						const redAssigns = matchAssignments.filter(a => a.alliance === 'red').sort((a, b) => a.position - b.position);
+						const blueAssigns = matchAssignments.filter(a => a.alliance === 'blue').sort((a, b) => a.position - b.position);
+						
+						// Check if next match is on different day
+						const nextMatch = idx < schedule.length - 1 ? schedule[idx + 1] : null;
+						const currentDate = getMatchDate(match.match_number);
+						const nextDate = nextMatch ? getMatchDate(nextMatch.match_number) : null;
+						const isDayEnd = currentDate && nextDate && currentDate !== nextDate;
+						
+						// Format positions with team number and scout name
+						const formatPosition = (assign) => `
+							<div style="display: inline-block; margin-right: 4px; text-align: center; font-size: 7px; line-height: 1.1;">
+								<div style="font-weight: bold;">${assign.teamNum}</div>
+								<div style="font-size: 6px;">${assign.scout}</div>
+							</div>
+						`;
+						
+						let rowHtml = `
+							<tr>
+								<td style="border: 1px solid #ccc; padding: 3px; font-weight: bold;">M${match.match_number}</td>
+								<td style="border: 1px solid #ccc; padding: 3px; font-size: 8px;">${times.predicted || 'TBD'}</td>
+								<td style="border: 1px solid #ccc; padding: 3px; min-height: 35px; vertical-align: middle;">
+									${redAssigns.map(a => formatPosition(a)).join('')}
+								</td>
+								<td style="border: 1px solid #ccc; padding: 3px; min-height: 35px; vertical-align: middle;">
+									${blueAssigns.map(a => formatPosition(a)).join('')}
+								</td>
+							</tr>
+						`;
+						
+						// Add end-of-day marker
+						if (isDayEnd) {
+							rowHtml += `
+								<tr style="background: #ffe6e6;">
+									<td colspan="4" style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold; font-size: 8px;">
+										END OF DAY - ${currentDate}
+									</td>
+								</tr>
+							`;
+						}
+						
+						return rowHtml;
+					}).join('')}
+				</table>
+			</div>
+		`;
+		
+		// Scout assignments summary
+		html += `
+			<div style="margin-top: 20px;">
+				<h2 style="font-size: 11px; font-weight: bold; margin: 0 0 8px 0; border-bottom: 1px solid #000;">SCOUT ASSIGNMENTS</h2>
+				<table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+					<tr style="background: #f0f0f0;">
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Scout</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Matches</th>
+					</tr>
+					${scouts.map(scout => {
+						const scoutAssignments = assignments.filter(a => a.scout === scout.name);
+						if (scoutAssignments.length === 0) return '';
+						
+						const matchList = scoutAssignments
+							.sort((a, b) => a.matchNum - b.matchNum)
+							.map(a => `M${a.matchNum}:${a.teamNum}(${a.alliance[0].toUpperCase()}${a.position})`)
+							.join(' ');
+						
+						return `
+							<tr>
+								<td style="border: 1px solid #ccc; padding: 3px;">${scout.name}</td>
+								<td style="border: 1px solid #ccc; padding: 3px; font-size: 8px;">${matchList}</td>
+							</tr>
+						`;
+					}).join('')}
+				</table>
+			</div>
+		`;
+		
+		pdfContainer.innerHTML = html;
+		document.body.appendChild(pdfContainer);
+		
+		// Use html2canvas with lower scale for cleaner output
+		html2canvas(pdfContainer, {
+			scale: 1.5,
+			allowTaint: true,
+			useCORS: true,
+			backgroundColor: '#ffffff',
+			logging: false,
+			windowHeight: pdfContainer.scrollHeight
+		}).then(canvas => {
+			const pdf = new jsPDF({
+				orientation: 'portrait',
+				unit: 'mm',
+				format: 'a4'
+			});
+			
+			const pageWidth = pdf.internal.pageSize.getWidth();
+			const pageHeight = pdf.internal.pageSize.getHeight();
+			const margin = 10;
+			const contentWidth = pageWidth - (2 * margin);
+			const contentHeight = pageHeight - (2 * margin);
+			
+			// Calculate how tall the image will be when scaled to fit page width
+			const imgWidth = contentWidth;
+			const scale = imgWidth / canvas.width;
+			const totalHeight = canvas.height * scale;
+			
+			const imgData = canvas.toDataURL('image/png');
+			let currentPage = 0;
+			let remainingHeight = totalHeight;
+			let sourceY = 0;
+			
+			while (remainingHeight > 0) {
+				if (currentPage > 0) {
+					pdf.addPage();
+				}
+				
+				// Calculate how much of the source to use for this page
+				const heightForThisPage = Math.min(remainingHeight, contentHeight);
+				const sourceHeightRatio = heightForThisPage / totalHeight;
+				const sourceHeightPixels = canvas.height * sourceHeightRatio;
+				
+				// Create a temporary canvas to crop the image
+				const tempCanvas = document.createElement('canvas');
+				tempCanvas.width = canvas.width;
+				tempCanvas.height = sourceHeightPixels;
+				const tempCtx = tempCanvas.getContext('2d');
+				tempCtx.drawImage(
+					canvas,
+					0, sourceY * canvas.height / totalHeight,
+					canvas.width, sourceHeightPixels,
+					0, 0,
+					canvas.width, sourceHeightPixels
+				);
+				
+				const croppedData = tempCanvas.toDataURL('image/png');
+				pdf.addImage(croppedData, 'PNG', margin, margin, imgWidth, heightForThisPage);
+				
+				sourceY += heightForThisPage;
+				remainingHeight -= heightForThisPage;
+				currentPage++;
+			}
+			
+			const filename = `scouting-assignments-${new Date().toISOString().split('T')[0]}.pdf`;
+			pdf.save(filename);
+			
+			// Clean up
+			document.body.removeChild(pdfContainer);
+		}).catch(err => {
+			console.error('PDF export error:', err);
+			error = 'Failed to export PDF';
+			if (document.body.contains(pdfContainer)) {
+				document.body.removeChild(pdfContainer);
+			}
+		});
+	}
+
+	function exportScoutToPDF() {
+		if (!selectedScout || !scoutPdfElement) {
+			error = 'Please select a scout first';
+			return;
+		}
+		
+		// Create a new light-themed container for the scout PDF
+		const pdfContainer = document.createElement('div');
+		pdfContainer.style.position = 'absolute';
+		pdfContainer.style.left = '-9999px';
+		pdfContainer.style.top = '-9999px';
+		pdfContainer.style.width = '190mm';
+		pdfContainer.style.padding = '10mm';
+		pdfContainer.style.backgroundColor = 'white';
+		pdfContainer.style.fontFamily = 'Courier New, monospace';
+		pdfContainer.style.color = '#000';
+		pdfContainer.style.fontSize = '10px';
+		pdfContainer.style.lineHeight = '1.2';
+		
+		// Get all scout assignments
+		const scoutAssignments = assignments.filter(a => a.scout === selectedScout);
+		const uniqueMatches = [...new Set(scoutAssignments.map(a => a.matchNum))].sort((a, b) => a - b);
+		
+		// Add title
+		let html = `
+			<div style="text-align: center; margin-bottom: 12px; border-bottom: 1px solid #000; padding-bottom: 8px;">
+				<h1 style="margin: 0; font-size: 18px; font-weight: bold;">SCOUT ASSIGNMENT</h1>
+				<p style="margin: 3px 0 0 0; font-size: 10px;">${selectedScout}</p>
+				<p style="margin: 3px 0 0 0; font-size: 9px;">Generated: ${new Date().toLocaleString()}</p>
+			</div>
+		`;
+		
+		// Summary
+		html += `
+			<div style="margin-bottom: 12px; font-size: 10px;">
+				<div style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold;">
+					${uniqueMatches.length} Matches
+				</div>
+			</div>
+		`;
+		
+		// Scout timeline - using table format with breaks and end-of-day
+		html += `
+			<div style="margin-bottom: 20px;">
+				<h2 style="font-size: 11px; font-weight: bold; margin: 0 0 8px 0; border-bottom: 1px solid #000;">ASSIGNMENTS</h2>
+				<table style="width: 100%; border-collapse: collapse; font-size: 9px;">
+					<tr style="background: #f0f0f0;">
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Match</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Time</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Team</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Alliance</th>
+						<th style="border: 1px solid #000; padding: 3px; text-align: left;">Position</th>
+					</tr>
+					${uniqueMatches.map((matchNum, idx) => {
+						const matchAssigns = scoutAssignments.filter(a => a.matchNum === matchNum);
+						const times = getMatchTimes(matchNum);
+						
+						// Check if next match is on different day
+						const nextMatchNum = idx < uniqueMatches.length - 1 ? uniqueMatches[idx + 1] : null;
+						const currentDate = getMatchDate(matchNum);
+						const nextDate = nextMatchNum ? getMatchDate(nextMatchNum) : null;
+						const isDayEnd = currentDate && nextDate && currentDate !== nextDate;
+						
+						// Check if there's a break before next match
+						const breakSize = nextMatchNum ? nextMatchNum - matchNum - 1 : 0;
+						const hasBreak = breakSize > 0;
+						
+						let rowHtml = matchAssigns.map((assign, assignIdx) => `
+							<tr>
+								${assignIdx === 0 ? `<td style="border: 1px solid #ccc; padding: 3px; font-weight: bold;">M${matchNum}</td>` : '<td style="border: 1px solid #ccc; padding: 3px;"></td>'}
+								${assignIdx === 0 ? `<td style="border: 1px solid #ccc; padding: 3px; font-size: 8px;">${times.predicted || 'TBD'}</td>` : '<td style="border: 1px solid #ccc; padding: 3px;"></td>'}
+								<td style="border: 1px solid #ccc; padding: 3px; font-weight: bold;">${assign.teamNum}</td>
+								<td style="border: 1px solid #ccc; padding: 3px; font-size: 8px;">${assign.alliance.toUpperCase()}</td>
+								<td style="border: 1px solid #ccc; padding: 3px; text-align: center;">${assign.position}</td>
+							</tr>
+						`).join('');
+						
+						// Add break indicator if there's a gap
+						if (hasBreak && !isDayEnd) {
+							rowHtml += `
+								<tr style="background: #fff3cd;">
+									<td colspan="5" style="border: 1px solid #000; padding: 3px; text-align: center; font-size: 8px; font-weight: bold;">
+										BREAK: ${breakSize} match${breakSize > 1 ? 'es' : ''} (M${matchNum + 1}-M${nextMatchNum - 1})
+									</td>
+								</tr>
+							`;
+						}
+						
+						// Add end-of-day marker
+						if (isDayEnd) {
+							rowHtml += `
+								<tr style="background: #ffe6e6;">
+									<td colspan="5" style="border: 1px solid #000; padding: 4px; text-align: center; font-weight: bold; font-size: 8px;">
+										END OF DAY - ${currentDate}
+									</td>
+								</tr>
+							`;
+						}
+						
+						return rowHtml;
+					}).join('')}
+				</table>
+			</div>
+		`;
+		
+		pdfContainer.innerHTML = html;
+		document.body.appendChild(pdfContainer);
+		
+		// Use html2canvas with proper scale
+		html2canvas(pdfContainer, {
+			scale: 1.5,
+			allowTaint: true,
+			useCORS: true,
+			backgroundColor: '#ffffff',
+			logging: false,
+			windowHeight: pdfContainer.scrollHeight
+		}).then(canvas => {
+			const pdf = new jsPDF({
+				orientation: 'portrait',
+				unit: 'mm',
+				format: 'letter'
+			});
+			
+			const pageWidth = pdf.internal.pageSize.getWidth();
+			const pageHeight = pdf.internal.pageSize.getHeight();
+			const margin = 10;
+			const contentWidth = pageWidth - (2 * margin);
+			const contentHeight = pageHeight - (2 * margin);
+			
+			// Calculate how tall the image will be when scaled to fit page width
+			const imgWidth = contentWidth;
+			const scale = imgWidth / canvas.width;
+			const totalHeight = canvas.height * scale;
+			
+			const imgData = canvas.toDataURL('image/png');
+			let currentPage = 0;
+			let remainingHeight = totalHeight;
+			let sourceY = 0;
+			
+			while (remainingHeight > 0) {
+				if (currentPage > 0) {
+					pdf.addPage();
+				}
+				
+				// Calculate how much of the source to use for this page
+				const heightForThisPage = Math.min(remainingHeight, contentHeight);
+				const sourceHeightRatio = heightForThisPage / totalHeight;
+				const sourceHeightPixels = canvas.height * sourceHeightRatio;
+				
+				// Create a temporary canvas to crop the image
+				const tempCanvas = document.createElement('canvas');
+				tempCanvas.width = canvas.width;
+				tempCanvas.height = sourceHeightPixels;
+				const tempCtx = tempCanvas.getContext('2d');
+				tempCtx.drawImage(
+					canvas,
+					0, sourceY * canvas.height / totalHeight,
+					canvas.width, sourceHeightPixels,
+					0, 0,
+					canvas.width, sourceHeightPixels
+				);
+				
+				const croppedData = tempCanvas.toDataURL('image/png');
+				pdf.addImage(croppedData, 'PNG', margin, margin, imgWidth, heightForThisPage);
+				
+				sourceY += heightForThisPage;
+				remainingHeight -= heightForThisPage;
+				currentPage++;
+			}
+			
+			const filename = `${selectedScout.replace(/\s+/g, '-')}-assignments-${new Date().toISOString().split('T')[0]}.pdf`;
+			pdf.save(filename);
+			
+			// Clean up
+			document.body.removeChild(pdfContainer);
+		}).catch(err => {
+			console.error('PDF export error:', err);
+			error = 'Failed to export PDF';
+			if (document.body.contains(pdfContainer)) {
+				document.body.removeChild(pdfContainer);
+			}
+		});
+	}
+
 	onMount(() => {
 		loadData();
 		const handleFullscreenChange = () => {
@@ -721,6 +1120,13 @@
 					Reload Data
 				</button>
 				<button
+					on:click={exportToPDF}
+					class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition"
+					title="Export all assignments to PDF"
+				>
+					📄 Export PDF
+				</button>
+				<button
 					on:click={toggleFullscreen}
 					class="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 rounded-lg font-semibold transition"
 					title="Toggle fullscreen"
@@ -744,7 +1150,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-8" bind:this={pdfElement}>
 				<!-- Scouts Panel -->
 				<div class="bg-zinc-900 rounded-lg p-6 border border-zinc-800">
 					<h2 class="text-xl font-bold mb-4">Scouts</h2>
@@ -781,8 +1187,17 @@
 				<!-- Assignments Panel -->
 				<div class="lg:col-span-2">
 					{#if selectedScout}
-						<div class="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mb-6">
-							<h2 class="text-xl font-bold mb-4">{selectedScout}'s Assignments</h2>
+						<div class="bg-zinc-900 rounded-lg p-6 border border-zinc-800 mb-6" bind:this={scoutPdfElement}>
+							<div class="flex justify-between items-center mb-4">
+								<h2 class="text-xl font-bold">{selectedScout}'s Assignments</h2>
+								<button
+									on:click={exportScoutToPDF}
+									class="px-3 py-1 bg-purple-600 hover:bg-purple-700 rounded text-sm font-semibold transition"
+									title="Export this scout's assignments to PDF"
+								>
+									📄 PDF
+								</button>
+							</div>
 							<div class="overflow-x-auto">
 								<div class="space-y-3">
 									{#each getScoutAssignmentTimeline(selectedScout) as item (item.type === 'match' ? `match-${item.matchNum}` : `break-${item.afterMatch}-${item.beforeMatch}`)}
