@@ -407,6 +407,9 @@
 	let videoElement = null;
 	let videosCollapsed = false;
 
+	// Debug mode: null = live, 'quals' = test quals only, 'playoffs' = test quals + playoffs
+	let debugMode = null;
+
 	// Context menu for simulator
 	let contextMenu = null;
 	let contextMenuMatch = null;
@@ -618,7 +621,8 @@
 			if (force || scoutingData.length === 0) {
 				currentStep = 'scoutingData';
 				loadingSteps.scoutingData = true;
-				const res = await fetch(CSV_URL);
+				const csvUrl = debugMode ? '/test-data/scouting.csv' : CSV_URL;
+				const res = await fetch(csvUrl);
 				if (res.ok) {
 					const text = await res.text();
 					const rawScouting = parseCSV(text, 2);
@@ -642,7 +646,8 @@
 			if (force || pitData.length === 0) {
 				currentStep = 'pitData';
 				loadingSteps.pitData = true;
-				const resPit = await fetch(PIT_CSV_URL);
+				const pitUrl = debugMode ? '/test-data/pit.csv' : PIT_CSV_URL;
+				const resPit = await fetch(pitUrl);
 				if (resPit.ok) {
 					const textPit = await resPit.text();
 					const rawPit = parseCSV(textPit, 1);
@@ -742,6 +747,13 @@
 	}
 
 	async function fetchEventStats() {
+		if (debugMode) {
+			try {
+				const fallback = await fetch('/test-data/oprs.json');
+				if (fallback.ok) { const data = await fallback.json(); eventOprs = data.oprs || {}; }
+			} catch (e) { console.error('Debug fallback failed:', e); }
+			return;
+		}
 		try {
 			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/oprs`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
@@ -762,6 +774,13 @@
 	}
 
 	async function fetchEventRankings() {
+		if (debugMode) {
+			try {
+				const fallback = await fetch('/test-data/rankings.json');
+				if (fallback.ok) { const data = await fallback.json(); eventRankings = data.rankings || []; }
+			} catch (e) { console.error('Debug fallback failed:', e); }
+			return;
+		}
 		try {
 			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/rankings`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
@@ -782,6 +801,26 @@
 	}
 
 	async function fetchSchedule() {
+		if (debugMode) {
+			try {
+				const fallback = await fetch('/test-data/schedule.json');
+				if (fallback.ok) {
+					const data = await fallback.json();
+					schedule = data
+						.filter(m => m.comp_level === 'qm')
+						.sort((a, b) => a.match_number - b.match_number);
+				}
+			} catch (e) { console.error('Debug schedule fallback failed:', e); }
+			if (debugMode === 'playoffs') {
+				try {
+					const fallback2 = await fetch('/test-data/playoff-schedule.json');
+					if (fallback2.ok) { playoffSchedule = await fallback2.json(); }
+				} catch (e) { console.error('Debug playoff schedule fallback failed:', e); }
+			} else {
+				playoffSchedule = [];
+			}
+			return;
+		}
 		try {
 			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/matches`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
@@ -818,6 +857,17 @@
 	}
 
 	async function fetchActualAlliances() {
+		if (debugMode === 'playoffs') {
+			try {
+				const fallback = await fetch('/test-data/alliances.json');
+				if (fallback.ok) { actualAlliances = await fallback.json(); }
+			} catch (e) { console.error('Debug alliances fallback failed:', e); }
+			return;
+		}
+		if (debugMode === 'quals') {
+			actualAlliances = [];
+			return;
+		}
 		try {
 			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/alliances`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
@@ -839,6 +889,16 @@
 	}
 
 	async function fetchEventTeams() {
+		if (debugMode) {
+			try {
+				const fallback = await fetch('/test-data/teams.json');
+				if (fallback.ok) {
+					const data = await fallback.json();
+					eventTeams = data.map(key => key.replace('frc', '')).sort((a, b) => parseInt(a) - parseInt(b));
+				}
+			} catch (e) { console.error('Debug teams fallback failed:', e); }
+			return;
+		}
 		try {
 			const res = await fetch(`https://www.thebluealliance.com/api/v3/event/${EVENT_KEY}/teams/keys`, {
 				headers: { 'X-TBA-Auth-Key': TBA_KEY }
@@ -1630,6 +1690,23 @@
 		playoffOverrides = new Map();
 	}
 
+	function enterDebugMode(mode) {
+		debugMode = mode;
+		localStorage.removeItem('scouting_cache');
+		matchOverrides = new Map();
+		playoffOverrides = new Map();
+		quickLinksOpen = false;
+		fetchData(true);
+	}
+
+	function exitDebugMode() {
+		debugMode = null;
+		localStorage.removeItem('scouting_cache');
+		matchOverrides = new Map();
+		playoffOverrides = new Map();
+		fetchData(true);
+	}
+
 	function openOverrideMenu(e, label, type) {
 		e.preventDefault();
 		overrideContextMenu = { x: e.clientX, y: e.clientY };
@@ -2241,9 +2318,21 @@
               <a href="https://www.thebluealliance.com/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
                 TBA Event
               </a>
-              <a href="https://www.statbotics.io/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white last:rounded-b-lg transition">
+              <a href="https://www.statbotics.io/event/{EVENT_KEY}" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
                 Statbotics
               </a>
+              <div class="border-t border-zinc-700 my-1"></div>
+              <button on:click={() => enterDebugMode('quals')} class="w-full text-left block px-4 py-2 text-sm font-bold transition {debugMode === 'quals' ? 'text-yellow-300 bg-yellow-500/20' : 'text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-300'}">
+                🧪 Debug — Quals
+              </button>
+              <button on:click={() => enterDebugMode('playoffs')} class="w-full text-left block px-4 py-2 text-sm font-bold transition {debugMode === 'playoffs' ? 'text-yellow-300 bg-yellow-500/20' : 'text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-300'}">
+                🧪 Debug — Playoffs
+              </button>
+              {#if debugMode}
+                <button on:click={() => { exitDebugMode(); quickLinksOpen = false; }} class="w-full text-left block px-4 py-2 text-sm font-bold text-green-400 hover:bg-green-500/10 hover:text-green-300 rounded-b-lg transition">
+                  🟢 Run Live Dashboard
+                </button>
+              {/if}
             </div>
           {/if}
         </div>
@@ -2257,6 +2346,23 @@
 				{/if}
 			</div>
 		</div>
+
+		{#if debugMode}
+			<div class="mb-4 px-4 py-3 rounded-xl border-2 border-yellow-500/50 bg-yellow-500/10 flex items-center justify-between gap-3 flex-wrap">
+				<div class="flex items-center gap-2">
+					<span class="text-yellow-400 text-lg">⚠️</span>
+					<p class="text-sm font-black text-yellow-300 uppercase tracking-wide">
+						Debug Mode — Displaying test data ({debugMode === 'playoffs' ? 'Quals + Playoffs' : 'Quals only'})
+					</p>
+				</div>
+				<button
+					on:click={exitDebugMode}
+					class="px-3 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest bg-green-500/20 border border-green-500/40 text-green-400 hover:bg-green-500/30 transition-colors"
+				>
+					Return to Live Dashboard
+				</button>
+			</div>
+		{/if}
 
 		<!-- Match Coverage Map -->
 		<CoverageMap
