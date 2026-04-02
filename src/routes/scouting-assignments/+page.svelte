@@ -20,6 +20,11 @@
 	let pdfElement = null;
 	let scoutPdfElement = null;
 
+	$: unassignedMatches = schedule.filter(match => {
+		const assignedCount = assignments.filter(a => a.matchNum === match.match_number).length;
+		return assignedCount < 6;
+	}).map(m => m.match_number);
+
 	const SCOUTS_CSV_URL = import.meta.env.VITE_SCOUTS_CSV_URL;
 	const TBA_KEY = import.meta.env.VITE_TBA_KEY;
 	const EVENT_KEY = import.meta.env.VITE_EVENT_KEY || '2026rikin';
@@ -540,6 +545,7 @@
 
 		assignments = newAssignments;
 		console.log('Generated', assignments.length, 'assignments');
+		
 		saveCache();
 	}
 
@@ -1311,6 +1317,16 @@
 					</div>
 				</div>
 			</div>
+
+			{#if unassignedMatches.length > 0}
+				<div class="bg-yellow-900 bg-opacity-20 border border-yellow-500 rounded-lg p-4 mt-6 text-yellow-200">
+					<div class="font-semibold mb-2">⚠️ Unassigned Matches Detected</div>
+					<div class="text-sm">The following matches have incomplete scout assignments:</div>
+					<div class="mt-2 font-mono text-xs bg-black bg-opacity-30 p-2 rounded">
+						{unassignedMatches.join(', ')}
+					</div>
+				</div>
+			{/if}
 
 			<!-- Summary Stats -->
 			<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
