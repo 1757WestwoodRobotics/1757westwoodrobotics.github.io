@@ -5,6 +5,7 @@
 	export let hasOverrides = false;
 	export let onMatchClick = () => {};
 	export let onMatchLongPress = () => {};
+	export let onMatchContextMenu = () => {};
 	export let onClearOverrides = () => {};
 
 	let hoveredMatch = null;
@@ -54,7 +55,8 @@
 	let longPressTimer;
 	let longPressTriggered = false;
 
-	function handlePointerDown(m) {
+	function handlePointerDown(e, m) {
+		if (e.button !== 0) return; // Only left-click
 		longPressTriggered = false;
 		longPressTimer = setTimeout(() => {
 			longPressTriggered = true;
@@ -63,7 +65,8 @@
 		}, 600);
 	}
 
-	function handlePointerUp(m) {
+	function handlePointerUp(e, m) {
+		if (e.button !== 0) return; // Only left-click
 		clearTimeout(longPressTimer);
 		if (!longPressTriggered) {
 			onMatchClick(m);
@@ -103,10 +106,10 @@
 			<div class="relative">
 				<button
 					class="w-8 h-8 rounded-lg border text-[10px] font-black text-white/80 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:z-10 {cardClass} {hoveredMatch === m ? 'ring-2 ring-white/50 scale-110 z-10' : ''}"
-					on:pointerdown={() => handlePointerDown(m)}
-					on:pointerup={() => handlePointerUp(m)}
+					on:pointerdown={(e) => handlePointerDown(e, m)}
+					on:pointerup={(e) => handlePointerUp(e, m)}
 					on:pointerleave={handlePointerLeave}
-					on:contextmenu|preventDefault={() => { if (!m.played) onMatchLongPress(m); }}
+					on:contextmenu|preventDefault={(e) => { if (!m.played) onMatchContextMenu(e, m); }}
 					on:mouseenter={() => hoveredMatch = m}
 					on:mouseleave={() => hoveredMatch = null}
 				>
