@@ -1844,6 +1844,192 @@
 		);
 	}
 
+	function getOverviewTrendData(teamNum) {
+		if (!teamNum || schedule.length === 0) return null;
+
+		// Get played matches for this team in match order
+		const teamMatches = schedule
+			.filter(m => teamIsInMatch(teamNum, m))
+			.sort((a, b) => a.match_number - b.match_number);
+
+		const playedMatches = teamMatches.filter(m => {
+			const rs = m.alliances?.red?.score ?? -1;
+			const bs = m.alliances?.blue?.score ?? -1;
+			return rs >= 0 && bs >= 0 && (rs > 0 || bs > 0);
+		});
+
+		if (playedMatches.length < 2) return null;
+
+		const labels = playedMatches.map(m => `M${m.match_number}`);
+
+		// --- Line 1: Match Score (team's alliance score per match) ---
+		const matchScores = playedMatches.map(m => {
+			const isRed = m.alliances.red.team_keys.includes(`frc${teamNum}`);
+			return isRed ? (m.alliances.red.score || 0) : (m.alliances.blue.score || 0);
+		});
+
+		// --- Line 2: Scout Score (scoring effectiveness per match, 0-5 scale) ---
+		const scoutScores = playedMatches.map(m => {
+			const row = scoutingData.find(r => getVal(r, 'Team #') === teamNum && getVal(r, 'Match #') == m.match_number);
+			return row ? (parseFloat(getVal(row, 'Scoring effectiveness?')) || 0) : null;
+		});
+
+		// --- Line 3: Rank Over Time (computed from cumulative RP for ALL teams) ---
+		const playedSchedule = schedule.filter(m => {
+			const rs = m.alliances?.red?.score ?? -1;
+			const bs = m.alliances?.blue?.score ?? -1;
+			return rs >= 0 && bs >= 0 && (rs > 0 || bs > 0);
+		}).sort((a, b) => a.match_number - b.match_number);
+
+		// Track cumulative RP for all teams
+		const teamRPs = new Map();
+		const teamWins = new Map();
+		const allTeams = new Set();
+		schedule.forEach(m => {
+			if (!m.alliances) return;
+			m.alliances.red.team_keys.forEach(k => allTeams.add(k.replace('frc', '')));
+			m.alliances.blue.team_keys.forEach(k => allTeams.add(k.replace('frc', '')));
+		});
+		allTeams.forEach(t => { teamRPs.set(t, 0); teamWins.set(t, 0); });
+
+		// Build rank snapshots at each match the focused team played
+		const rankOverTime = [];
+		let nextTeamMatchIdx = 0;
+		const teamPlayedNums = new Set(playedMatches.map(m => m.match_number));
+
+		playedSchedule.forEach(m => {
+			const rs = m.alliances.red.score || 0;
+			const bs = m.alliances.blue.score || 0;
+			const redWon = rs > bs;
+			const blueWon = bs > rs;
+
+			// Award 2 RP for win, 1 for tie
+			m.alliances.red.team_keys.forEach(k => {
+				const t = k.replace('frc', '');
+				teamRPs.set(t, (teamRPs.get(t) || 0) + (redWon ? 2 : blueWon ? 0 : 1));
+				if (redWon) teamWins.set(t, (teamWins.get(t) || 0) + 1);
+			});
+			m.alliances.blue.team_keys.forEach(k => {
+				const t = k.replace('frc', '');
+				teamRPs.set(t, (teamRPs.get(t) || 0) + (blueWon ? 2 : redWon ? 0 : 1));
+				if (blueWon) teamWins.set(t, (teamWins.get(t) || 0) + 1);
+			});
+
+			// If this is a match our team played, snapshot the rank
+			if (teamPlayedNums.has(m.match_number)) {
+				// Sort all teams by RP desc, then wins desc
+				const sorted = [...allTeams].sort((a, b) => {
+					const rpDiff = (teamRPs.get(b) || 0) - (teamRPs.get(a) || 0);
+					if (rpDiff !== 0) return rpDiff;
+					return (teamWins.get(b) || 0) - (teamWins.get(a) || 0);
+				});
+				const rank = sorted.indexOf(teamNum) + 1;
+				rankOverTime.push(rank);
+			}
+		});
+
+		// Determine scales
+		const maxScore = Math.max(...matchScores, 100);
+		const maxRank = allTeams.size;
+
+		return {
+			labels,
+			datasets: [
+				{
+					label: 'Alliance Score',
+					data: matchScores,
+					borderColor: '#8b5cf6',
+					backgroundColor: 'rgba(139, 92, 246, 0.1)',
+					tension: 0.3,
+					pointBackgroundColor: '#8b5cf6',
+					pointRadius: 3,
+					borderWidth: 2,
+					yAxisID: 'yScore'
+				},
+				{
+					label: 'Scout Score (0-5)',
+					data: scoutScores,
+					borderColor: '#3b82f6',
+					backgroundColor: 'rgba(59, 130, 246, 0.1)',
+					tension: 0.3,
+					pointBackgroundColor: '#3b82f6',
+					pointRadius: 3,
+					borderWidth: 2,
+					spanGaps: true,
+					yAxisID: 'yScout'
+				},
+				{
+					label: 'Event Rank',
+					data: rankOverTime,
+					borderColor: '#f59e0b',
+					backgroundColor: 'rgba(245, 158, 11, 0.1)',
+					tension: 0.3,
+					pointBackgroundColor: '#f59e0b',
+					pointRadius: 3,
+					borderWidth: 2,
+					borderDash: [4, 4],
+					yAxisID: 'yRank'
+				}
+			],
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: { mode: 'index', intersect: false },
+				scales: {
+					yScore: {
+						type: 'linear',
+						position: 'left',
+						min: 0,
+						max: Math.ceil(maxScore / 50) * 50,
+						ticks: { color: '#8b5cf6', font: { weight: 'bold', size: 8 } },
+						grid: { color: '#18181b' },
+						title: { display: true, text: 'Score', color: '#8b5cf6', font: { size: 8, weight: 'bold' } }
+					},
+					yScout: {
+						type: 'linear',
+						position: 'right',
+						min: 0,
+						max: 5,
+						ticks: { color: '#3b82f6', font: { weight: 'bold', size: 8 } },
+						grid: { display: false },
+						title: { display: true, text: 'Scout', color: '#3b82f6', font: { size: 8, weight: 'bold' } }
+					},
+					yRank: {
+						type: 'linear',
+						position: 'right',
+						min: 1,
+						max: maxRank,
+						reverse: true,
+						ticks: { color: '#f59e0b', font: { weight: 'bold', size: 8 }, stepSize: Math.ceil(maxRank / 5) },
+						grid: { display: false },
+						title: { display: true, text: 'Rank', color: '#f59e0b', font: { size: 8, weight: 'bold' } }
+					},
+					x: {
+						ticks: { color: '#3f3f46', font: { weight: 'bold', size: 8 } },
+						grid: { display: false }
+					}
+				},
+				plugins: {
+					legend: {
+						position: 'top',
+						align: 'end',
+						labels: { color: '#71717a', font: { weight: 'bold', size: 8 }, usePointStyle: true, padding: 10 }
+					},
+					tooltip: {
+						callbacks: {
+							label: (ctx) => {
+								const val = ctx.parsed.y;
+								if (ctx.dataset.label === 'Event Rank') return `Rank: #${val}`;
+								if (ctx.dataset.label === 'Scout Score (0-5)') return `Scout: ${val?.toFixed(1) ?? '—'}/5`;
+								return `Score: ${val}`;
+							}
+						}
+					}
+				}
+			}
+		};
+	}
+
 	function enterDebugMode(mode) {
 		debugMode = mode;
 		localStorage.removeItem('scouting_cache');
@@ -3588,6 +3774,16 @@
 															{#if teamWarn.diedCount > 0}<p>Died in {teamWarn.diedCount} match{teamWarn.diedCount > 1 ? 'es' : ''}</p>{/if}
 															{#if teamWarn.mechCount > 0}<p>Mech issue in {teamWarn.mechCount} match{teamWarn.mechCount > 1 ? 'es' : ''}</p>{/if}
 															{#if teamWarn.tippedCount > 0}<p>Tipped in {teamWarn.tippedCount} match{teamWarn.tippedCount > 1 ? 'es' : ''}</p>{/if}
+														</div>
+													</div>
+												{/if}
+											{/each}
+											{#each [getOverviewTrendData(overviewTeam)] as trendData}
+												{#if trendData}
+													<div class="p-3 bg-zinc-800/50 border border-zinc-700 rounded-xl">
+														<p class="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-2">Performance Trends</p>
+														<div class="h-48">
+															<Line data={{ labels: trendData.labels, datasets: trendData.datasets }} options={trendData.options} />
 														</div>
 													</div>
 												{/if}
