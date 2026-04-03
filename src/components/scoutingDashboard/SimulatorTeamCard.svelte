@@ -11,6 +11,7 @@
 	export let getDriveDirectLink;
 	export let getVal;
 	export let allTeamsList = [];
+	export let readOnly = false;
 
 	$: summary = getTeamSummary(team);
 	$: colors = teamColorsMap?.get(team) || { primary: alliance === 'red' ? '#ef4444' : '#3b82f6', secondary: alliance === 'red' ? '#991b1b' : '#1e3a8a' };
@@ -54,15 +55,17 @@
 		on:click={() => onTeamClick(team)}
 		on:keydown={(e) => e.key === 'Enter' && onTeamClick(team)}>
   <!-- clear team button -->
+  {#if !readOnly}
   <button
     class="absolute top-1 right-1 w-12 h-12 rounded-full bg-black/50 text-white text-lg flex items-center justify-center opacity-80 group-hover:opacity-100 transition-opacity z-20"
-    on:click|stopPropagation={() => { 
-    onTeamInput(teamIndex, ''); inputValue = ''; 
+    on:click|stopPropagation={() => {
+    onTeamInput(teamIndex, ''); inputValue = '';
     }}
     on:keydown={(e) => {if(e.key === 'Enter'){ onTeamInput(teamIndex, ''); inputValue = ''; }}}
     aria-label="Clear team selection">
     &times;
   </button>
+  {/if}
 
 		<!-- Header: Team number and nickname -->
 		<div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-3 relative z-10">
@@ -157,7 +160,7 @@
 
 		<div class="absolute -right-2 -bottom-2 opacity-5 pointer-events-none text-2xl md:text-6xl font-black italic">{team}</div>
 	</div>
-{:else}
+{:else if !readOnly}
 	<div class="relative w-full">
 		<div class="flex gap-2">
 			<input

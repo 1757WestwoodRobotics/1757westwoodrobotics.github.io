@@ -64,6 +64,8 @@
 	let scoutLeadMode = false;
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
+	let matchSimModal = null;
+	let savedSimTeams = null;
 	let overviewTeam = '1757';
 	let overviewDataView = false;
 	let showSosLeaderboard = false;
@@ -2192,6 +2194,34 @@
 		defenseMode = false;
 	}
 
+	function openMatchSimModal(match) {
+		if (!match || !match.alliances) return;
+		savedSimTeams = { red: [...simRedTeams], blue: [...simBlueTeams] };
+		simRedTeams = match.alliances.red.team_keys.map(k => k.replace('frc', ''));
+		simBlueTeams = match.alliances.blue.team_keys.map(k => k.replace('frc', ''));
+		const label = match.comp_level === 'qm'
+			? `Qual ${match.match_number}`
+			: `${match.comp_level.toUpperCase()} ${match.set_number}-${match.match_number}`;
+		matchSimModal = { label, match };
+	}
+
+	function openPlayoffSimModal(match) {
+		if (!match.a1 || !match.a2) return;
+		savedSimTeams = { red: [...simRedTeams], blue: [...simBlueTeams] };
+		simRedTeams = [match.a1.captain, ...(match.a1.picks || [])].slice(0, 3);
+		simBlueTeams = [match.a2.captain, ...(match.a2.picks || [])].slice(0, 3);
+		matchSimModal = { label: match.label || 'Playoff Match' };
+	}
+
+	function closeMatchSimModal() {
+		if (savedSimTeams) {
+			simRedTeams = savedSimTeams.red;
+			simBlueTeams = savedSimTeams.blue;
+			savedSimTeams = null;
+		}
+		matchSimModal = null;
+	}
+
 	function hasMatchIssues(scoutRow) {
 		const comments = (getVal(scoutRow, 'comments') || '').toLowerCase();
 		const hasMechanical = comments.includes('mechanical') || comments.includes('broke') || comments.includes('died');
@@ -2746,6 +2776,9 @@
               </a>
               <a href="/docs/index.html" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
                 Help Docs
+              </a>
+              <a href="https://www.frcmanual.com/2026/introduction" target="_blank" rel="noopener noreferrer" class="block px-4 py-2 text-sm text-zinc-100 hover:bg-zinc-800 hover:text-white transition">
+                FRC Manual
               </a>
               <div class="border-t border-zinc-700 my-1"></div>
               <button on:click={() => enterDebugMode('quals')} class="w-full text-left block px-4 py-2 text-sm font-bold transition {debugMode === 'quals' ? 'text-yellow-300 bg-yellow-500/20' : 'text-yellow-500 hover:bg-yellow-500/10 hover:text-yellow-300'}">
@@ -3552,7 +3585,7 @@
 							{hoveredMatch}
 							{matchPredictions}
 							hasOverrides={matchOverrides.size > 0}
-							onMatchClick={(match) => selectedMatchPopup = match}
+							onMatchClick={(match) => openMatchSimModal(match)}
 							onMatchLongPress={(match) => cycleMatchOverride(match)}
 							onMatchContextMenu={(e, match) => {
 								const pred = matchPredictions.find(p => p.match_number === match.match_number);
@@ -3612,7 +3645,7 @@
 									alliances={bracketSimulation.alliances}
 									{playoffOverrides}
 									hasOverrides={playoffOverrides.size > 0}
-									onMatchClick={(m) => loadPlayoffMatchIntoSim(m)}
+									onMatchClick={(m) => openPlayoffSimModal(m)}
 									onMatchLongPress={(m) => { if (!m.played) cyclePlayoffOverride(m.label); }}
 									onMatchContextMenu={(e, m) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 									onClearOverrides={clearPlayoffOverrides}
@@ -3622,6 +3655,14 @@
 									<h3 class="text-xl md:text-2xl font-black text-orange-400 uppercase tracking-tighter mb-6 flex items-center gap-3">
 										<span class="bg-orange-500/10 p-2 rounded-lg border border-orange-500/20">🏆</span>
 										{actualAlliances.length > 0 ? 'Playoff Bracket' : 'Predicted Bracket Outcome'}
+										<button
+											class="ml-2 w-7 h-7 flex items-center justify-center rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-orange-500/40 transition-all text-zinc-400 hover:text-orange-400"
+											title="View FRC Playoff Bracket Reference"
+											on:click|stopPropagation={() => openImageViewer('/img/scouting/playoff-bracket-ref.png')}>
+											<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+											</svg>
+										</button>
 									</h3>
 
 									<!-- UPPER BRACKET -->
@@ -3636,7 +3677,7 @@
 														{@const a2Num = effectiveAlliances.indexOf(m.a2) + 1}
 														<button
 															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
-															on:click={() => loadPlayoffMatchIntoSim(m)}
+															on:click={() => openPlayoffSimModal(m)}
 															on:contextmenu|preventDefault={(e) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 														>
 															<div class="flex justify-between items-center mb-1.5">
@@ -3678,7 +3719,7 @@
 														{@const a2Num = effectiveAlliances.indexOf(m.a2) + 1}
 														<button
 															class="w-full text-left rounded-xl p-3 text-xs transition-all duration-200 hover:scale-[1.02] {m.played ? 'bg-zinc-900/80 border border-zinc-700' : m.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
-															on:click={() => loadPlayoffMatchIntoSim(m)}
+															on:click={() => openPlayoffSimModal(m)}
 															on:contextmenu|preventDefault={(e) => { if (!m.played) openOverrideMenu(e, m.label, 'playoff'); }}
 														>
 															<div class="flex justify-between items-center mb-1.5">
@@ -3717,7 +3758,7 @@
 												{@const gfA2 = effectiveAlliances.indexOf(gf.a2) + 1}
 												<button
 													class="w-full text-left rounded-xl p-4 text-xs transition-all duration-200 hover:scale-[1.02] {gf.played ? 'bg-zinc-900/80 border border-zinc-700' : gf.override ? 'bg-zinc-900/60 border-2 border-yellow-400 ring-1 ring-yellow-400/40 shadow-md shadow-yellow-400/20' : 'bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700'}"
-													on:click={() => loadPlayoffMatchIntoSim(gf)}
+													on:click={() => openPlayoffSimModal(gf)}
 													on:contextmenu|preventDefault={(e) => { if (!gf.played) openOverrideMenu(e, gf.label, 'playoff'); }}
 												>
 													<div class="flex justify-between items-center mb-2">
@@ -4852,6 +4893,249 @@
 				</section>
 
 			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Match Simulator Modal -->
+{#if matchSimModal}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-[130] bg-black/90 backdrop-blur-2xl flex items-start justify-center overflow-y-auto p-4 md:p-8"
+		on:click|self={closeMatchSimModal}
+		on:keydown={(e) => { if (e.key === 'Escape') closeMatchSimModal(); }}
+		tabindex="-1">
+		<div class="w-full max-w-6xl animate-in fade-in slide-in-from-bottom-4">
+
+			<!-- Modal Header -->
+			<div class="flex items-center justify-between mb-6">
+				<div>
+					<h2 class="text-2xl md:text-4xl font-black text-white uppercase tracking-tighter italic">
+						{matchSimModal.label}
+					</h2>
+					<p class="text-[10px] font-black text-zinc-500 uppercase tracking-[0.3em]">Match Preview</p>
+				</div>
+				<div class="flex items-center gap-3">
+					{#if matchSimModal.match}
+						<button class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-xl text-xs font-black text-zinc-300 uppercase tracking-wider transition-all"
+								on:click={() => { selectedMatchPopup = matchSimModal.match; closeMatchSimModal(); }}>
+							Scouting Data
+						</button>
+					{/if}
+					<button class="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-xl text-xs font-black text-zinc-300 uppercase tracking-wider transition-all"
+							on:click={() => { const teams = { red: [...simRedTeams], blue: [...simBlueTeams] }; matchSimModal = null; savedSimTeams = null; simRedTeams = teams.red; simBlueTeams = teams.blue; simulatorMode = true; selectionMode = false; pitMode = false; defenseMode = false; }}>
+						Open in Simulator
+					</button>
+					<button class="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-all"
+							on:click={closeMatchSimModal}>
+						<svg class="w-5 h-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Prediction Header -->
+			<div class="mb-8 bg-zinc-900/40 border-2 border-zinc-800 rounded-[2.5rem] p-6 md:p-10 shadow-2xl backdrop-blur-xl relative overflow-hidden group">
+				<div class="absolute -right-10 -top-10 text-9xl opacity-5 group-hover:rotate-12 transition-transform duration-700">⚔️</div>
+				<div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+					<div class="text-center md:text-left">
+						<h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter mb-2 italic">Match Prediction</h2>
+						<p class="text-[10px] md:text-xs font-black text-zinc-500 uppercase tracking-[0.4em]">Simulated Outcome Analysis</p>
+					</div>
+
+					<div class="flex items-center gap-12 md:gap-20">
+						<div class="text-center">
+							<p class="text-[9px] md:text-[10px] font-black text-blue-500 uppercase tracking-widest mb-2">EPA Probability</p>
+							<div class="flex items-center justify-center gap-4">
+								<div class="text-right">
+									<p class="text-[8px] font-black text-red-500 uppercase">Red</p>
+									<p class="text-xl md:text-3xl font-black text-white">{simWinProbs.epa.toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+								<div class="w-[2px] h-10 bg-zinc-800 rounded-full"></div>
+								<div class="text-left">
+									<p class="text-[8px] font-black text-blue-500 uppercase">Blue</p>
+									<p class="text-xl md:text-3xl font-black text-white">{(1 - simWinProbs.epa).toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+							</div>
+						</div>
+						<div class="text-center">
+							<p class="text-[9px] md:text-[10px] font-black text-orange-500 uppercase tracking-widest mb-2">OPR Probability</p>
+							<div class="flex items-center justify-center gap-4">
+								<div class="text-right">
+									<p class="text-[8px] font-black text-red-500 uppercase">Red</p>
+									<p class="text-xl md:text-3xl font-black text-white">{simWinProbs.opr.toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+								<div class="w-[2px] h-10 bg-zinc-800 rounded-full"></div>
+								<div class="text-left">
+									<p class="text-[8px] font-black text-blue-500 uppercase">Blue</p>
+									<p class="text-xl md:text-3xl font-black text-white">{(1 - simWinProbs.opr).toLocaleString(undefined, {style: 'percent'})}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="w-full md:w-64 h-3 bg-zinc-800 rounded-full overflow-hidden flex">
+						<div class="bg-red-500 h-full transition-all duration-1000 ease-out" style="width: {simWinProbs.epa * 100}%"></div>
+						<div class="bg-blue-500 h-full transition-all duration-1000 ease-out" style="width: {(1 - simWinProbs.epa) * 100}%"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Alliance Cards -->
+			<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 mb-12">
+				<div class="bg-red-950/10 border-2 border-red-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
+					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
+						<div>
+							<h2 class="text-2xl md:text-3xl font-black text-red-500 uppercase italic tracking-tighter">Red Alliance</h2>
+							<p class="text-zinc-500 font-bold text-xs md:text-sm tracking-widest mt-1">
+								{simRedTeams.filter(t => t).join(' • ') || 'No Teams Selected'}
+							</p>
+						</div>
+						<div class="flex gap-4 md:gap-6">
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.red.epa.toFixed(1)}</p></div>
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-red-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.red.opr.toFixed(1)}</p></div>
+						</div>
+					</div>
+					<RPCards alliance="red" predictions={simRpPredictions.red} />
+					<div class="space-y-4 md:space-y-6">
+						{#each simRedTeams as team, i}
+							<SimulatorTeamCard
+								{team}
+								teamIndex={i}
+								alliance="red"
+								readOnly={true}
+								{getTeamSummary}
+								{teamColorsMap}
+								{teamDetailsMap}
+								onTeamInput={() => {}}
+								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
+								onImageClick={(url) => openImageViewer(url)}
+								{getDriveDirectLink}
+								{getVal}
+								{allTeamsList}
+							/>
+						{/each}
+					</div>
+				</div>
+				<div class="bg-blue-950/10 border-2 border-blue-500/20 rounded-2xl md:rounded-[2rem] p-4 md:p-8 shadow-2xl backdrop-blur-sm">
+					<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 md:mb-8">
+						<div>
+							<h2 class="text-2xl md:text-3xl font-black text-blue-500 uppercase italic tracking-tighter">Blue Alliance</h2>
+							<p class="text-zinc-500 font-bold text-xs md:text-sm tracking-widest mt-1">
+								{simBlueTeams.filter(t => t).join(' • ') || 'No Teams Selected'}
+							</p>
+						</div>
+						<div class="flex gap-4 md:gap-6">
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">EPA</p><p class="text-2xl md:text-4xl font-black text-white">{simAggregates.blue.epa.toFixed(1)}</p></div>
+							<div class="text-right"><p class="text-[8px] md:text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">OPR</p><p class="text-2xl md:text-4xl font-black text-orange-400">{simAggregates.blue.opr.toFixed(1)}</p></div>
+						</div>
+					</div>
+					<RPCards alliance="blue" predictions={simRpPredictions.blue} />
+					<div class="space-y-4 md:space-y-6">
+						{#each simBlueTeams as team, i}
+							<SimulatorTeamCard
+								{team}
+								teamIndex={i}
+								alliance="blue"
+								readOnly={true}
+								{getTeamSummary}
+								{teamColorsMap}
+								{teamDetailsMap}
+								onTeamInput={() => {}}
+								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
+								onImageClick={(url) => openImageViewer(url)}
+								{getDriveDirectLink}
+								{getVal}
+								{allTeamsList}
+							/>
+						{/each}
+					</div>
+				</div>
+			</div>
+
+			<!-- Strategic Recommendations -->
+			<div class="mb-8">
+				<div class="bg-gradient-to-r from-purple-950/30 via-black/40 to-purple-950/30 border-2 border-purple-500/30 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-sm">
+					<h3 class="text-2xl md:text-3xl font-black text-purple-400 uppercase italic tracking-tighter mb-6">Match Strategy</h3>
+
+					<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+						<!-- Red Alliance Strategy -->
+						{#if simRedTeams.some(t => t)}
+							{@const redStrategy = getAllianceStrategy(simRedTeams.filter(t => t))}
+							{#if redStrategy}
+								<div class="bg-red-950/20 border-2 border-red-500/20 rounded-2xl p-5 md:p-6">
+									<div class="flex items-center gap-2 mb-4">
+										<div class="w-3 h-3 rounded-full bg-red-500"></div>
+										<h4 class="text-lg md:text-xl font-black text-red-400 uppercase">Red Strategy</h4>
+										<span class="text-[10px] md:text-xs font-black text-red-500/60 uppercase ml-auto">{redStrategy.recommendations.length} Teams</span>
+									</div>
+
+									<p class="text-sm md:text-base font-bold text-red-300/80 mb-5 italic">{redStrategy.strategy}</p>
+
+									<div class="space-y-3">
+										{#each redStrategy.recommendations as rec (rec.teamNum)}
+											<div class="bg-black/40 border border-red-500/20 rounded-xl p-3 hover:border-red-500/40 transition">
+												<div class="flex items-start justify-between gap-2 mb-2">
+													<div>
+														<p class="text-[10px] font-black text-red-400 uppercase tracking-tight">Team {rec.teamNum}</p>
+														<p class="text-sm md:text-base font-black text-white">{rec.role}</p>
+													</div>
+													<div class="text-right text-[8px] md:text-[9px]">
+														<p class="font-black text-zinc-400">EPA {rec.stats.epa.toFixed(1)}</p>
+														<p class="font-black text-zinc-400">Eff {rec.stats.avgEff.toFixed(1)}</p>
+													</div>
+												</div>
+												<p class="text-[8px] md:text-xs text-zinc-300 line-clamp-2">{rec.recommendation}</p>
+												{#if rec.issues.length > 0}
+													<p class="text-[7px] md:text-[8px] text-red-400/70 mt-2">⚠️ Issues: {rec.issues.join(', ')}</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						{/if}
+
+						<!-- Blue Alliance Strategy -->
+						{#if simBlueTeams.some(t => t)}
+							{@const blueStrategy = getAllianceStrategy(simBlueTeams.filter(t => t))}
+							{#if blueStrategy}
+								<div class="bg-blue-950/20 border-2 border-blue-500/20 rounded-2xl p-5 md:p-6">
+									<div class="flex items-center gap-2 mb-4">
+										<div class="w-3 h-3 rounded-full bg-blue-500"></div>
+										<h4 class="text-lg md:text-xl font-black text-blue-400 uppercase">Blue Strategy</h4>
+										<span class="text-[10px] md:text-xs font-black text-blue-500/60 uppercase ml-auto">{blueStrategy.recommendations.length} Teams</span>
+									</div>
+
+									<p class="text-sm md:text-base font-bold text-blue-300/80 mb-5 italic">{blueStrategy.strategy}</p>
+
+									<div class="space-y-3">
+										{#each blueStrategy.recommendations as rec (rec.teamNum)}
+											<div class="bg-black/40 border border-blue-500/20 rounded-xl p-3 hover:border-blue-500/40 transition">
+												<div class="flex items-start justify-between gap-2 mb-2">
+													<div>
+														<p class="text-[10px] font-black text-blue-400 uppercase tracking-tight">Team {rec.teamNum}</p>
+														<p class="text-sm md:text-base font-black text-white">{rec.role}</p>
+													</div>
+													<div class="text-right text-[8px] md:text-[9px]">
+														<p class="font-black text-zinc-400">EPA {rec.stats.epa.toFixed(1)}</p>
+														<p class="font-black text-zinc-400">Eff {rec.stats.avgEff.toFixed(1)}</p>
+													</div>
+												</div>
+												<p class="text-[8px] md:text-xs text-zinc-300 line-clamp-2">{rec.recommendation}</p>
+												{#if rec.issues.length > 0}
+													<p class="text-[7px] md:text-[8px] text-blue-400/70 mt-2">⚠️ Issues: {rec.issues.join(', ')}</p>
+												{/if}
+											</div>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						{/if}
+					</div>
+				</div>
+			</div>
+
 		</div>
 	</div>
 {/if}
