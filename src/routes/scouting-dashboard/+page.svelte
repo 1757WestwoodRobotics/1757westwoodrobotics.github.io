@@ -75,6 +75,9 @@
 	let actualAlliances = [];
 	let playoffSchedule = [];
 	let playoffOverrides = new Map();
+	let now = Date.now();
+	let countdownInterval = null;
+	let showBreakWindowsModal = false;
 
 	const posMap = {
 		'OT': 'Outpost Trench',
@@ -1098,6 +1101,8 @@
 			currentMessageIndex = nextIndex;
 		}, 3000);
 
+		countdownInterval = setInterval(() => { now = Date.now(); }, 1000);
+
 		const handleFullscreenChange = () => {
 			isFullscreen = !!document.fullscreenElement;
 		};
@@ -1155,13 +1160,13 @@
 					currentStep = '';
 					console.log('All tasks complete, loading:', loading);
 				});
-				return () => clearInterval(messageInterval);
+				return () => { clearInterval(messageInterval); clearInterval(countdownInterval); };
 			}
 		}
 		console.log('No cache or cache expired, fetching fresh data');
 		fetchData();
 
-		return () => clearInterval(messageInterval);
+		return () => { clearInterval(messageInterval); clearInterval(countdownInterval); };
 	});
 
 	function handleSort(key) {
@@ -1310,6 +1315,60 @@
 		}
 
 		return [...teamQuals, ...playoffMatches];
+	})();
+
+	$: nextMatch = overviewTeam && overviewTeamSchedule.length
+		? overviewTeamSchedule.find(m => !m.isPlayed) : null;
+
+	$: matchAfterNext = (() => {
+		if (!nextMatch) return null;
+		const idx = overviewTeamSchedule.indexOf(nextMatch);
+		return overviewTeamSchedule.slice(idx + 1).find(m => !m.isPlayed) || null;
+	})();
+
+	$: alliancePartners = (() => {
+		if (!nextMatch || !nextMatch.alliance || !overviewTeam) return [];
+		const teams = nextMatch.alliances[nextMatch.alliance].team_keys
+			.map(k => k.replace('frc', '')).filter(t => t !== overviewTeam);
+		return teams.map(t => {
+			const pit = pitData.find(p => getVal(p, 'Team number') === t);
+			return {
+				teamNum: t,
+				nickname: teamDetailsMap.get(t)?.nickname || 'Unknown',
+				driveCoach: pit ? (getVal(pit, 'Drive Coach') || 'N/A') : 'N/A'
+			};
+		});
+	})();
+
+	$: nextMatchTime = nextMatch ? (nextMatch.predicted_time || nextMatch.time || null) : null;
+
+	$: breakMinutes = (() => {
+		if (!nextMatch || !matchAfterNext) return null;
+		const t1 = nextMatch.predicted_time || nextMatch.time;
+		const t2 = matchAfterNext.predicted_time || matchAfterNext.time;
+		if (!t1 || !t2) return null;
+		return Math.round((t2 - t1) / 60);
+	})();
+
+	$: allBreakWindows = (() => {
+		if (!overviewTeam || !overviewTeamSchedule.length) return [];
+		const matches = overviewTeamSchedule.filter(m => !m.isPlayed);
+		const windows = [];
+		for (let i = 0; i < matches.length - 1; i++) {
+			const t1 = matches[i].predicted_time || matches[i].time;
+			const t2 = matches[i+1].predicted_time || matches[i+1].time;
+			if (t1 && t2) {
+				const matchLabel = (m) => m.isPlayoff ? (m.playoffLabel || m.match_number) : `Q${m.match_number}`;
+				windows.push({
+					fromLabel: matchLabel(matches[i]),
+					toLabel: matchLabel(matches[i+1]),
+					fromTime: t1,
+					toTime: t2,
+					minutes: Math.round((t2 - t1) / 60)
+				});
+			}
+		}
+		return windows;
 	})();
 
 	$: sortedLeaderboard = [...teamMetrics].sort((a, b) => {
@@ -1771,6 +1830,17 @@
 		const day = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 		const time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 		return `${day} ${time}`;
+	}
+
+	function formatCountdown(targetUnixSeconds, nowMs) {
+		const diff = targetUnixSeconds * 1000 - nowMs;
+		if (diff <= 0) return 'Starting now';
+		const h = Math.floor(diff / 3600000);
+		const m = Math.floor((diff % 3600000) / 60000);
+		const s = Math.floor((diff % 60000) / 1000);
+		if (h > 0) return `${h}h ${m}m ${s}s`;
+		if (m > 0) return `${m}m ${s}s`;
+		return `${s}s`;
 	}
 
 	function getOverviewMatchPrediction(match) {
@@ -3959,6 +4029,74 @@
 							{#if !overviewTeam}
 								<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Full Event Schedule ({overviewTeamSchedule.length} matches)</p>
 							{/if}
+							{#if overviewTeam && nextMatch}
+								<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
+									<!-- Next Match -->
+									<div class="bg-zinc-900/60 border-2 border-purple-500/20 rounded-2xl p-4 backdrop-blur-xl">
+										<p class="text-[8px] font-black text-purple-400 uppercase tracking-widest mb-1">Next Match</p>
+										<p class="text-3xl font-black text-white">
+											{nextMatch.isPlayoff ? (nextMatch.playoffLabel || nextMatch.match_number) : nextMatch.match_number}
+										</p>
+										<p class="text-[10px] font-bold {nextMatch.alliance === 'red' ? 'text-red-400' : 'text-blue-400'} mt-1 uppercase">
+											{nextMatch.alliance === 'red' ? 'Red' : 'Blue'} Alliance
+										</p>
+									</div>
+
+									<!-- Alliance Partners -->
+									<div class="bg-zinc-900/60 border-2 border-cyan-500/20 rounded-2xl p-4 backdrop-blur-xl">
+										<p class="text-[8px] font-black text-cyan-400 uppercase tracking-widest mb-2">Alliance Partners</p>
+										{#each alliancePartners as partner}
+											<div class="flex items-center justify-between mb-1.5 last:mb-0">
+												<div class="flex items-center gap-2">
+													<span class="text-sm font-black text-white">{partner.teamNum}</span>
+													<span class="text-[9px] font-bold text-zinc-500 truncate max-w-[80px]">{partner.nickname}</span>
+												</div>
+												<span class="text-[9px] font-bold text-zinc-400 truncate max-w-[100px]">
+													{partner.driveCoach}
+												</span>
+											</div>
+										{/each}
+									</div>
+
+									<!-- Time Until Next Match -->
+									<div class="bg-zinc-900/60 border-2 border-green-500/20 rounded-2xl p-4 backdrop-blur-xl">
+										<p class="text-[8px] font-black text-green-400 uppercase tracking-widest mb-1">Time Until Match</p>
+										{#if nextMatchTime}
+											<p class="text-2xl font-black text-white tabular-nums">
+												{formatCountdown(nextMatchTime, now)}
+											</p>
+											<div class="text-[9px] text-zinc-500 mt-1 space-y-0.5">
+												{#if nextMatch.time}
+													<p><span class="font-bold">Sched:</span> {formatMatchTime(nextMatch.time)}</p>
+												{/if}
+												{#if nextMatch.predicted_time && nextMatch.predicted_time !== nextMatch.time}
+													<p class="{nextMatch.predicted_time > nextMatch.time ? 'text-yellow-500/70' : ''}">
+														<span class="font-bold">Pred:</span> {formatMatchTime(nextMatch.predicted_time)}
+													</p>
+												{/if}
+											</div>
+										{:else}
+											<p class="text-sm text-zinc-500 italic">No time data</p>
+										{/if}
+									</div>
+
+									<!-- Break After Match -->
+									<button
+										class="bg-zinc-900/60 border-2 border-orange-500/20 rounded-2xl p-4 backdrop-blur-xl text-left hover:border-orange-500/40 transition-all cursor-pointer group"
+										on:click={() => showBreakWindowsModal = true}>
+										<p class="text-[8px] font-black text-orange-400 uppercase tracking-widest mb-1">Break After Match</p>
+										{#if breakMinutes !== null}
+											<p class="text-2xl font-black text-white">{breakMinutes} min</p>
+											<p class="text-[9px] text-zinc-500 mt-1">
+												Until match {matchAfterNext.isPlayoff ? (matchAfterNext.playoffLabel || matchAfterNext.match_number) : matchAfterNext.match_number}
+											</p>
+										{:else}
+											<p class="text-sm text-zinc-500 italic">Last match</p>
+										{/if}
+										<p class="text-[8px] text-orange-400/50 font-bold mt-2 uppercase tracking-widest group-hover:text-orange-400/80 transition-colors">View all breaks &rarr;</p>
+									</button>
+								</div>
+							{/if}
 							<div class="grid grid-cols-1 gap-4">
 								{#each overviewTeamSchedule as m}
 									{@const pred = overviewDataView ? getOverviewMatchPrediction(m) : null}
@@ -5135,7 +5273,60 @@
 					</div>
 				</div>
 			</div>
-
+		</div>
+	</div>
+{/if}
+<!-- Break Windows Modal -->
+{#if showBreakWindowsModal}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-[125] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200"
+		role="dialog"
+		aria-modal="true"
+		on:click|self={() => showBreakWindowsModal = false}
+		on:keydown={(e) => e.key === 'Escape' && (showBreakWindowsModal = false)}
+		tabindex="-1">
+		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden shadow-[0_0_150px_rgba(0,0,0,1)] flex flex-col">
+			<div class="p-6 border-b-2 border-zinc-800 flex justify-between items-center flex-shrink-0">
+				<div>
+					<h2 class="text-xl font-black text-orange-400 uppercase tracking-tighter">Break Windows</h2>
+					<p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
+						All breaks between Team {overviewTeam}'s matches
+					</p>
+				</div>
+				<button on:click={() => showBreakWindowsModal = false}
+					class="w-10 h-10 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-xl transition text-zinc-400 hover:text-white">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+			<div class="overflow-y-auto flex-1 p-4">
+				<div class="space-y-2">
+					{#each allBreakWindows as bw, idx}
+						{@const isNext = idx === 0}
+						<div class="flex items-center justify-between px-4 py-3 rounded-xl {isNext ? 'bg-orange-500/10 border border-orange-500/20' : 'bg-zinc-900/50 border border-zinc-800'}">
+							<div class="flex items-center gap-3">
+								<span class="text-sm font-black text-white">{bw.fromLabel}</span>
+								<svg class="w-4 h-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+								</svg>
+								<span class="text-sm font-black text-white">{bw.toLabel}</span>
+							</div>
+							<div class="flex items-center gap-2">
+								<span class="text-lg font-black {bw.minutes >= 30 ? 'text-green-400' : bw.minutes >= 15 ? 'text-yellow-400' : 'text-red-400'}">
+									{bw.minutes} min
+								</span>
+								{#if isNext}
+									<span class="text-[8px] font-black text-orange-400 uppercase tracking-widest">Next</span>
+								{/if}
+							</div>
+						</div>
+					{/each}
+					{#if allBreakWindows.length === 0}
+						<p class="text-center text-zinc-500 py-8 italic">No break data available</p>
+					{/if}
+				</div>
+			</div>
 		</div>
 	</div>
 {/if}
