@@ -66,6 +66,7 @@
 	let simBlueTeams = ['', '', ''];
 	let overviewTeam = '1757';
 	let overviewDataView = false;
+	let showSosLeaderboard = false;
 	let quickLinksOpen = false;
 	let isFullscreen = false;
 	let matchOverrides = new Map();
@@ -1842,6 +1843,88 @@
 		return effectiveAlliances.findIndex(a =>
 			a.captain === teamNum || (a.picks && a.picks.includes(teamNum)) || (a.allPicks && a.allPicks.includes(teamNum))
 		);
+	}
+
+	function computeEventSOS() {
+		if (schedule.length === 0 || teamStatsMap.size === 0) return new Map();
+
+		const playedMatches = schedule.filter(m => {
+			const rs = m.alliances?.red?.score ?? -1;
+			const bs = m.alliances?.blue?.score ?? -1;
+			return rs >= 0 && bs >= 0 && (rs > 0 || bs > 0);
+		});
+
+		if (playedMatches.length === 0) return new Map();
+
+		// Collect all teams
+		const allTeams = new Set();
+		schedule.forEach(m => {
+			if (!m.alliances) return;
+			m.alliances.red.team_keys.forEach(k => allTeams.add(k.replace('frc', '')));
+			m.alliances.blue.team_keys.forEach(k => allTeams.add(k.replace('frc', '')));
+		});
+
+		// Compute average EPA across all event teams for normalization
+		let totalEpa = 0, epaCount = 0;
+		allTeams.forEach(t => {
+			const epa = teamStatsMap.get(t)?.epa || 0;
+			totalEpa += epa;
+			epaCount++;
+		});
+		const avgEventEpa = epaCount > 0 ? totalEpa / epaCount : 0;
+
+		// For each team, compute avg opponent EPA and avg partner EPA
+		const sosRaw = new Map();
+		allTeams.forEach(teamNum => {
+			let oppEpaSum = 0, oppCount = 0;
+			let partnerEpaSum = 0, partnerCount = 0;
+
+			playedMatches.forEach(m => {
+				const redKeys = m.alliances.red.team_keys.map(k => k.replace('frc', ''));
+				const blueKeys = m.alliances.blue.team_keys.map(k => k.replace('frc', ''));
+				const isRed = redKeys.includes(teamNum);
+				const isBlue = blueKeys.includes(teamNum);
+				if (!isRed && !isBlue) return;
+
+				const partners = isRed ? redKeys : blueKeys;
+				const opponents = isRed ? blueKeys : redKeys;
+
+				opponents.forEach(t => {
+					oppEpaSum += teamStatsMap.get(t)?.epa || 0;
+					oppCount++;
+				});
+				partners.forEach(t => {
+					if (t !== teamNum) {
+						partnerEpaSum += teamStatsMap.get(t)?.epa || 0;
+						partnerCount++;
+					}
+				});
+			});
+
+			const avgOppEpa = oppCount > 0 ? oppEpaSum / oppCount : 0;
+			const avgPartnerEpa = partnerCount > 0 ? partnerEpaSum / partnerCount : 0;
+
+			// SOS = how hard was the schedule
+			// Higher opponent EPA = harder, Lower partner EPA = harder
+			// Normalize: (avgOpp - eventAvg) - (avgPartner - eventAvg) = avgOpp - avgPartner
+			// Then shift so positive = harder schedule
+			const sosValue = (avgOppEpa - avgPartnerEpa);
+
+			sosRaw.set(teamNum, {
+				avgOppEpa,
+				avgPartnerEpa,
+				sosValue,
+				rank: 0 // filled below
+			});
+		});
+
+		// Rank by SOS (highest = hardest schedule = rank 1)
+		const sorted = [...sosRaw.entries()].sort((a, b) => b[1].sosValue - a[1].sosValue);
+		sorted.forEach(([team, data], idx) => {
+			data.rank = idx + 1;
+		});
+
+		return sosRaw;
 	}
 
 	function getOverviewTrendData(teamNum) {
@@ -3765,6 +3848,33 @@
 													</div>
 												</div>
 											</div>
+											{#each [computeEventSOS()] as sosMap}
+												{#if sosMap.size > 0 && sosMap.has(overviewTeam)}
+													{@const sos = sosMap.get(overviewTeam)}
+													<button
+														on:click={() => showSosLeaderboard = true}
+														class="w-full p-3 bg-cyan-500/5 border border-cyan-500/20 rounded-xl text-left hover:border-cyan-500/40 transition-all group">
+														<div class="flex items-center justify-between mb-1">
+															<p class="text-[8px] font-black text-cyan-400 uppercase tracking-widest">Strength of Schedule</p>
+															<span class="text-[7px] font-bold text-zinc-600 group-hover:text-cyan-400 transition">View All →</span>
+														</div>
+														<div class="flex items-baseline gap-2">
+															<p class="text-xl font-black text-white">{sos.sosValue >= 0 ? '+' : ''}{sos.sosValue.toFixed(1)}</p>
+															<p class="text-[10px] font-bold text-cyan-400/70">{sos.rank}{sos.rank === 1 ? 'st' : sos.rank === 2 ? 'nd' : sos.rank === 3 ? 'rd' : 'th'} hardest of {sosMap.size}</p>
+														</div>
+														<div class="grid grid-cols-2 gap-2 mt-2 text-center">
+															<div>
+																<p class="text-[10px] font-black text-white">{sos.avgOppEpa.toFixed(1)}</p>
+																<p class="text-[7px] text-zinc-500 font-bold">Avg Opp EPA</p>
+															</div>
+															<div>
+																<p class="text-[10px] font-black text-white">{sos.avgPartnerEpa.toFixed(1)}</p>
+																<p class="text-[7px] text-zinc-500 font-bold">Avg Partner EPA</p>
+															</div>
+														</div>
+													</button>
+												{/if}
+											{/each}
 											{#each [getTeamWarnings(overviewTeam)] as teamWarn}
 												{#if teamWarn.cardCount > 0 || teamWarn.diedCount > 0 || teamWarn.mechCount > 0 || teamWarn.tippedCount > 0}
 													<div class="p-3 bg-red-500/5 border border-red-500/20 rounded-xl">
@@ -4387,6 +4497,48 @@
 						</section>
 					</div>
 				{/if}
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- SOS Leaderboard Modal -->
+{#if showSosLeaderboard}
+	{@const sosMap = computeEventSOS()}
+	{@const sosList = [...sosMap.entries()].sort((a, b) => b[1].sosValue - a[1].sosValue)}
+	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200"
+		role="dialog"
+		aria-modal="true"
+		on:click|self={() => showSosLeaderboard = false}
+		on:keydown={(e) => e.key === 'Escape' && (showSosLeaderboard = false)}>
+		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden shadow-[0_0_150px_rgba(0,0,0,1)] flex flex-col">
+			<div class="p-6 border-b-2 border-zinc-800 flex justify-between items-center flex-shrink-0">
+				<div>
+					<h2 class="text-xl font-black text-cyan-400 uppercase tracking-tighter">Strength of Schedule</h2>
+					<p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">Sorted by schedule difficulty (hardest first)</p>
+				</div>
+				<button on:click={() => showSosLeaderboard = false} class="w-10 h-10 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-xl transition text-zinc-400 hover:text-white"><span class="text-xl">✕</span></button>
+			</div>
+			<div class="overflow-y-auto flex-1 p-4">
+				<div class="space-y-1">
+					{#each sosList as [team, data], idx}
+						{@const isActive = team === overviewTeam}
+						<button
+							on:click={() => { overviewTeam = team; showSosLeaderboard = false; }}
+							class="w-full flex items-center gap-3 px-3 py-2 rounded-xl transition-all {isActive ? 'bg-cyan-500/10 border border-cyan-500/30' : 'hover:bg-zinc-800/50 border border-transparent'}">
+							<span class="text-[10px] font-black text-zinc-600 w-6 text-right">{idx + 1}</span>
+							<span class="text-sm font-black {isActive ? 'text-cyan-400' : 'text-white'} w-16">{team}</span>
+							<span class="text-[10px] font-bold text-zinc-500 flex-1 truncate">{teamDetailsMap.get(team)?.nickname || ''}</span>
+							<div class="text-right flex-shrink-0">
+								<span class="text-sm font-black {data.sosValue >= 0 ? 'text-red-400' : 'text-green-400'}">{data.sosValue >= 0 ? '+' : ''}{data.sosValue.toFixed(1)}</span>
+								<div class="flex gap-3 text-[8px] text-zinc-600 font-bold">
+									<span>Opp: {data.avgOppEpa.toFixed(0)}</span>
+									<span>Ptr: {data.avgPartnerEpa.toFixed(0)}</span>
+								</div>
+							</div>
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	</div>
