@@ -65,6 +65,7 @@
 	let simRedTeams = ['', '', ''];
 	let simBlueTeams = ['', '', ''];
 	let overviewTeam = '1757';
+	let overviewDataView = false;
 	let quickLinksOpen = false;
 	let isFullscreen = false;
 	let matchOverrides = new Map();
@@ -170,7 +171,7 @@
 		})
 		: allianceSimulation;
 
-	$: bracketSimulation = ((overrides) => {
+	$: bracketSimulation = ((overrides, _playoffs) => {
 		if (effectiveAlliances.length < 8) return null;
 
 		const getAllianceEPA = (alliance) => {
@@ -180,14 +181,16 @@
 		};
 
 		// Map set_number to playoff match for actual results lookup
+		// Only map semifinal matches (comp_level 'sf') by set_number
+		// Grand finals (comp_level 'f') are mapped separately to M14/M15
 		const playoffResultMap = new Map();
 		playoffSchedule.forEach(m => {
-			playoffResultMap.set(m.set_number, m);
-		});
-		// Grand finals: comp_level 'f' maps to M14
-		playoffSchedule.forEach(m => {
-			if (m.comp_level === 'f' && m.set_number === 1 && m.match_number === 1) {
-				playoffResultMap.set(14, m);
+			if (m.comp_level === 'f') {
+				// Grand finals match 1 → M14, match 2 → M15 (tiebreaker)
+				if (m.match_number === 1) playoffResultMap.set(14, m);
+				if (m.match_number === 2) playoffResultMap.set(15, m);
+			} else {
+				playoffResultMap.set(m.set_number, m);
 			}
 		});
 
@@ -301,7 +304,7 @@
 			tiebreaker: m15,
 			alliances: effectiveAlliances
 		};
-	})(playoffOverrides);
+	})(playoffOverrides, playoffSchedule);
 
 	function getWinProb(scoreDiff) {
 		const score_sd = yearStats?.score_sd || 20;
@@ -1221,21 +1224,90 @@
 			};
 		});
 
-	$: overviewTeamSchedule = overviewTeam ? schedule
-		.filter(m => teamIsInMatch(overviewTeam, m))
-		.map((m, idx, arr) => {
-			const isRed = m.alliances.red.team_keys.includes(`frc${overviewTeam}`);
-			const alliance = isRed ? 'red' : 'blue';
-			const nextMatch = arr[idx + 1];
-			let swapNeeded = false;
-			if (nextMatch) {
-				const nextIsRed = nextMatch.alliances.red.team_keys.includes(`frc${overviewTeam}`);
-				const nextAlliance = nextIsRed ? 'red' : 'blue';
-				swapNeeded = alliance !== nextAlliance;
-			}
-			const result = getMatchResult(m.match_number);
-			return { ...m, alliance, swapNeeded, isPlayed: !!result };
-		}) : [];
+	$: overviewTeamSchedule = (() => {
+		const enrichMatch = (m, team) => {
+			if (!m.alliances) return { ...m, alliance: null, swapNeeded: false, isPlayed: false, isPlayoff: false };
+			const isRed = team ? m.alliances.red.team_keys.includes(`frc${team}`) : false;
+			const alliance = team ? (isRed ? 'red' : 'blue') : null;
+			const redScore = m.alliances?.red?.score ?? -1;
+			const blueScore = m.alliances?.blue?.score ?? -1;
+			const isPlayed = redScore >= 0 && blueScore >= 0 && (redScore > 0 || blueScore > 0);
+			return { ...m, alliance, swapNeeded: false, isPlayed, isPlayoff: m.comp_level !== 'qm' };
+		};
+
+		if (!overviewTeam) {
+			const quals = schedule.map(m => enrichMatch(m, null));
+			return quals;
+		}
+
+		const teamQuals = schedule
+			.filter(m => teamIsInMatch(overviewTeam, m))
+			.map((m, idx, arr) => {
+				const isRed = m.alliances.red.team_keys.includes(`frc${overviewTeam}`);
+				const alliance = isRed ? 'red' : 'blue';
+				const nextMatch = arr[idx + 1];
+				let swapNeeded = false;
+				if (nextMatch) {
+					const nextIsRed = nextMatch.alliances.red.team_keys.includes(`frc${overviewTeam}`);
+					const nextAlliance = nextIsRed ? 'red' : 'blue';
+					swapNeeded = alliance !== nextAlliance;
+				}
+				const result = getMatchResult(m.match_number);
+				return { ...m, alliance, swapNeeded, isPlayed: !!result, isPlayoff: false };
+			});
+
+		// Add playoff matches if team is on an alliance
+		const playoffMatches = [];
+		const allianceIdx = getTeamPlayoffAllianceIndex(overviewTeam);
+		if (allianceIdx >= 0 && bracketSimulation) {
+			const teamAlliance = effectiveAlliances[allianceIdx];
+			const allianceNum = allianceIdx + 1;
+
+			// Check if an alliance object matches the team's alliance by index
+			const isTeamAlliance = (a) => {
+				if (!a) return false;
+				if (a === teamAlliance) return true;
+				// Fallback: compare by captain in case object identity differs
+				return a.captain === teamAlliance.captain;
+			};
+
+			bracketSimulation.matches.forEach(bm => {
+				if (!bm.a1 || !bm.a2) return;
+				const isA1 = isTeamAlliance(bm.a1);
+				const isA2 = isTeamAlliance(bm.a2);
+				if (!isA1 && !isA2) return;
+
+				const a1Teams = [bm.a1.captain, ...(bm.a1.picks || [])].map(t => `frc${t}`);
+				const a2Teams = [bm.a2.captain, ...(bm.a2.picks || [])].map(t => `frc${t}`);
+
+				// Look up TBA match for time data
+				const bmNum = parseInt(bm.label.replace('M', ''));
+				const tbaMatch = bmNum >= 14
+					? playoffSchedule.find(pm => pm.comp_level === 'f' && pm.match_number === (bmNum - 13))
+					: playoffSchedule.find(pm => pm.comp_level !== 'f' && pm.set_number === bmNum);
+
+				playoffMatches.push({
+					match_number: bm.label,
+					comp_level: 'sf',
+					alliances: {
+						red: { team_keys: a1Teams, score: bm.played ? (bm.redScore ?? null) : null },
+						blue: { team_keys: a2Teams, score: bm.played ? (bm.blueScore ?? null) : null }
+					},
+					alliance: isA1 ? 'red' : 'blue',
+					swapNeeded: false,
+					isPlayed: bm.played,
+					isPlayoff: true,
+					bracketMatch: bm,
+					playoffLabel: bm.label,
+					time: tbaMatch?.time,
+					predicted_time: tbaMatch?.predicted_time,
+					actual_time: tbaMatch?.actual_time
+				});
+			});
+		}
+
+		return [...teamQuals, ...playoffMatches];
+	})();
 
 	$: sortedLeaderboard = [...teamMetrics].sort((a, b) => {
 		let valA, valB;
@@ -1688,6 +1760,88 @@
 
 	function clearPlayoffOverrides() {
 		playoffOverrides = new Map();
+	}
+
+	function formatMatchTime(unixSeconds) {
+		if (!unixSeconds) return null;
+		const d = new Date(unixSeconds * 1000);
+		const day = d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+		const time = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+		return `${day} ${time}`;
+	}
+
+	function getOverviewMatchPrediction(match) {
+		const redTeams = (match.alliances?.red?.team_keys || []).map(k => k.replace('frc', ''));
+		const blueTeams = (match.alliances?.blue?.team_keys || []).map(k => k.replace('frc', ''));
+		const redEpa = redTeams.reduce((s, t) => s + (teamStatsMap.get(t)?.epa || 0), 0);
+		const blueEpa = blueTeams.reduce((s, t) => s + (teamStatsMap.get(t)?.epa || 0), 0);
+		const winProb = getWinProb(redEpa - blueEpa);
+
+		const redScore = match.alliances?.red?.score ?? -1;
+		const blueScore = match.alliances?.blue?.score ?? -1;
+		const played = redScore >= 0 && blueScore >= 0 && (redScore > 0 || blueScore > 0);
+		const winner = played ? (redScore > blueScore ? 'red' : blueScore > redScore ? 'blue' : 'tie') : null;
+
+		function allianceRp(teams) {
+			let rp1Sum = 0, rp2Sum = 0, rp3Sum = 0;
+			const details = { rp1: [], rp2: [], rp3: [] };
+			teams.forEach(t => {
+				const stats = teamStatsMap.get(t);
+				const v1 = stats?.rp1 || 0, v2 = stats?.rp2 || 0, v3 = stats?.rp3 || 0;
+				rp1Sum += v1; rp2Sum += v2; rp3Sum += v3;
+				details.rp1.push({ team: t, value: v1 });
+				details.rp2.push({ team: t, value: v2 });
+				details.rp3.push({ team: t, value: v3 });
+			});
+			const rpSt = (sum) => sum > 1.0 ? 'lit' : sum > 0.8 ? 'contention' : 'muted';
+			const rpLbl = (sum) => sum > 1.0 ? 'Likely (>1.0)' : sum > 0.8 ? 'Possible (>0.8)' : 'Unlikely (\u22640.8)';
+			return {
+				rp1: rpSt(rp1Sum), rp2: rpSt(rp2Sum), rp3: rpSt(rp3Sum),
+				reasons: {
+					rp1: { teams: details.rp1, sum: rp1Sum, label: rpLbl(rp1Sum) },
+					rp2: { teams: details.rp2, sum: rp2Sum, label: rpLbl(rp2Sum) },
+					rp3: { teams: details.rp3, sum: rp3Sum, label: rpLbl(rp3Sum) },
+				}
+			};
+		}
+
+		const rpRed = allianceRp(redTeams);
+		const rpBlue = allianceRp(blueTeams);
+
+		if (played) {
+			rpRed.win = winner === 'red' ? 'lit' : 'muted';
+			rpRed.reasons.win = { winProb: winner === 'red' ? 1 : 0, label: winner === 'red' ? 'Won' : 'Lost' };
+			rpBlue.win = winner === 'blue' ? 'lit' : 'muted';
+			rpBlue.reasons.win = { winProb: winner === 'blue' ? 1 : 0, label: winner === 'blue' ? 'Won' : 'Lost' };
+		} else {
+			const winSt = (prob) => prob > 0.625 ? 'lit' : prob < 0.375 ? 'muted' : 'contention';
+			const winLbl = (prob) => prob > 0.625 ? 'Likely (>62.5%)' : prob < 0.375 ? 'Unlikely (<37.5%)' : 'Toss-up';
+			rpRed.win = winSt(winProb);
+			rpRed.reasons.win = { winProb, label: winLbl(winProb) };
+			rpBlue.win = winSt(1 - winProb);
+			rpBlue.reasons.win = { winProb: 1 - winProb, label: winLbl(1 - winProb) };
+		}
+
+		return { winProb, redEpa, blueEpa, played, winner, redScore, blueScore, rpRed, rpBlue };
+	}
+
+	function getTeamWarnings(teamNum) {
+		const issues = getMatchesWithIssues(teamNum);
+		const cardMatches = scoutingData.filter(r => getVal(r, 'Team #') === teamNum && getVal(r, 'card') && getVal(r, 'card') !== 'No Card' && getVal(r, 'card') !== 'N/A' && getVal(r, 'card') !== '');
+		const hasYellow = cardMatches.some(r => getVal(r, 'card') === 'Yellow');
+		const hasRed = cardMatches.some(r => getVal(r, 'card') === 'Red');
+		const cardCount = cardMatches.length;
+		const diedCount = issues.filter(i => i.hasDied).length;
+		const mechCount = issues.filter(i => i.hasMechanical).length;
+		const tippedCount = issues.filter(i => i.hasTipped).length;
+		return { cardCount, diedCount, mechCount, tippedCount, hasYellow, hasRed };
+	}
+
+	function getTeamPlayoffAllianceIndex(teamNum) {
+		if (!effectiveAlliances || effectiveAlliances.length === 0) return -1;
+		return effectiveAlliances.findIndex(a =>
+			a.captain === teamNum || (a.picks && a.picks.includes(teamNum)) || (a.allPicks && a.allPicks.includes(teamNum))
+		);
 	}
 
 	function enterDebugMode(mode) {
@@ -3352,22 +3506,94 @@
 					<div class="w-full md:w-80 flex-shrink-0">
 						<div class="bg-zinc-900/40 border-2 border-purple-500/20 rounded-3xl p-6 backdrop-blur-xl shadow-2xl sticky top-4">
 							<h3 class="text-xl font-black text-purple-400 uppercase italic tracking-tighter mb-4">Team Focus</h3>
-							<div class="relative mb-6">
-								<input 
-									type="text" 
-									bind:value={overviewTeam} 
-									placeholder="Enter Team #..." 
+							<div class="relative mb-4">
+								<input
+									type="text"
+									bind:value={overviewTeam}
+									placeholder="Enter Team # or leave blank for all..."
 									class="w-full bg-black/40 border-2 border-zinc-800 rounded-xl p-4 font-black text-white focus:border-purple-500 outline-none transition uppercase"
 								/>
 							</div>
-							
+
+							<!-- Data View Toggle -->
+							<div class="flex rounded-xl overflow-hidden border-2 border-zinc-800 mb-4">
+								<button on:click={() => overviewDataView = false} class="flex-1 py-2 text-[9px] font-black uppercase tracking-widest transition {!overviewDataView ? 'bg-purple-600 text-white' : 'bg-black/40 text-zinc-500 hover:text-white'}">Schedule</button>
+								<button on:click={() => overviewDataView = true} class="flex-1 py-2 text-[9px] font-black uppercase tracking-widest transition {overviewDataView ? 'bg-purple-600 text-white' : 'bg-black/40 text-zinc-500 hover:text-white'}">Data View</button>
+							</div>
+
 							{#if overviewTeam}
 								{@const details = teamDetailsMap.get(overviewTeam)}
+								{@const stats = teamStatsMap.get(overviewTeam)}
+								{@const opr = eventOprs?.[`frc${overviewTeam}`] || 0}
 								<div class="space-y-4">
 									<div class="p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl">
 										<p class="text-3xl font-black text-white">{overviewTeam}</p>
 										<p class="text-xs font-black text-zinc-500 uppercase tracking-widest truncate">{details?.nickname || 'Unknown Team'}</p>
 									</div>
+
+									{#if overviewDataView && stats}
+										{@const eventRank = eventRankings.find(r => r.team_key === `frc${overviewTeam}`)?.rank}
+										<!-- Team Performance Stats -->
+										<div class="space-y-2">
+											<div class="grid grid-cols-2 gap-2">
+												<div class="p-3 bg-blue-500/5 border border-blue-500/20 rounded-xl">
+													<p class="text-[8px] font-black text-blue-400 uppercase tracking-widest">EPA</p>
+													<p class="text-xl font-black text-white">{stats.epa.toFixed(1)}</p>
+												</div>
+												<div class="p-3 bg-green-500/5 border border-green-500/20 rounded-xl">
+													<p class="text-[8px] font-black text-green-400 uppercase tracking-widest">OPR</p>
+													<p class="text-xl font-black text-white">{opr.toFixed(1)}</p>
+												</div>
+											</div>
+											{#each [overviewTeamSchedule.filter(m2 => m2.isPlayed)] as wl}
+												{@const wins = wl.filter(m2 => {
+													const rs = m2.alliances?.red?.score ?? 0;
+													const bs = m2.alliances?.blue?.score ?? 0;
+													return (m2.alliance === 'red' && rs > bs) || (m2.alliance === 'blue' && bs > rs);
+												}).length}
+												<div class="grid grid-cols-2 gap-2">
+													<div class="p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+														<p class="text-[8px] font-black text-orange-400 uppercase tracking-widest">Event Rank</p>
+														<p class="text-xl font-black text-white">{eventRank ? `#${eventRank}` : '—'}</p>
+													</div>
+													<div class="p-3 bg-purple-500/5 border border-purple-500/20 rounded-xl">
+														<p class="text-[8px] font-black text-purple-400 uppercase tracking-widest">Record</p>
+														<p class="text-xl font-black text-white">{wins}-{wl.length - wins}</p>
+													</div>
+												</div>
+											{/each}
+											<div class="p-3 bg-zinc-800/50 border border-zinc-700 rounded-xl">
+												<p class="text-[8px] font-black text-zinc-400 uppercase tracking-widest mb-2">RP Rates</p>
+												<div class="grid grid-cols-3 gap-2 text-center">
+													<div>
+														<p class="text-xs font-black text-white">{(stats.rp1 || 0).toFixed(2)}</p>
+														<p class="text-[7px] text-zinc-500 font-bold">RP1</p>
+													</div>
+													<div>
+														<p class="text-xs font-black text-white">{(stats.rp2 || 0).toFixed(2)}</p>
+														<p class="text-[7px] text-zinc-500 font-bold">RP2</p>
+													</div>
+													<div>
+														<p class="text-xs font-black text-white">{(stats.rp3 || 0).toFixed(2)}</p>
+														<p class="text-[7px] text-zinc-500 font-bold">RP3</p>
+													</div>
+												</div>
+											</div>
+											{#each [getTeamWarnings(overviewTeam)] as teamWarn}
+												{#if teamWarn.cardCount > 0 || teamWarn.diedCount > 0 || teamWarn.mechCount > 0 || teamWarn.tippedCount > 0}
+													<div class="p-3 bg-red-500/5 border border-red-500/20 rounded-xl">
+														<p class="text-[8px] font-black text-red-400 uppercase tracking-widest mb-1">Issues</p>
+														<div class="space-y-0.5 text-[10px] text-red-300">
+															{#if teamWarn.cardCount > 0}<p>{teamWarn.hasRed ? 'Red' : 'Yellow'} carded ({teamWarn.cardCount}x)</p>{/if}
+															{#if teamWarn.diedCount > 0}<p>Died in {teamWarn.diedCount} match{teamWarn.diedCount > 1 ? 'es' : ''}</p>{/if}
+															{#if teamWarn.mechCount > 0}<p>Mech issue in {teamWarn.mechCount} match{teamWarn.mechCount > 1 ? 'es' : ''}</p>{/if}
+															{#if teamWarn.tippedCount > 0}<p>Tipped in {teamWarn.tippedCount} match{teamWarn.tippedCount > 1 ? 'es' : ''}</p>{/if}
+														</div>
+													</div>
+												{/if}
+											{/each}
+										</div>
+									{/if}
 								</div>
 							{/if}
 						</div>
@@ -3375,66 +3601,85 @@
 
 					<!-- Schedule & Status -->
 					<div class="flex-1">
-						{#if !overviewTeam}
+						{#if overviewTeamSchedule.length === 0}
 							<div class="h-64 flex flex-col items-center justify-center bg-zinc-900/20 rounded-[2.5rem] border-2 border-zinc-800 border-dashed">
-								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">Select a team to view schedule</p>
-							</div>
-						{:else if overviewTeamSchedule.length === 0}
-							<div class="h-64 flex flex-col items-center justify-center bg-zinc-900/20 rounded-[2.5rem] border-2 border-zinc-800 border-dashed">
-								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">No matches found for Team {overviewTeam}</p>
+								<p class="text-zinc-600 font-black uppercase tracking-[0.2em]">{overviewTeam ? `No matches found for Team ${overviewTeam}` : 'No schedule data available'}</p>
 							</div>
 						{:else}
+							{#if !overviewTeam}
+								<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Full Event Schedule ({overviewTeamSchedule.length} matches)</p>
+							{/if}
 							<div class="grid grid-cols-1 gap-4">
 								{#each overviewTeamSchedule as m}
-									<div 
-										on:click={() => selectedMatchPopup = m}
-										role="button"
-										tabindex="0"
-										on:keydown={(e) => e.key === 'Enter' && (selectedMatchPopup = m)}
-										class="group bg-zinc-900/40 border-2 {m.alliance === 'red' ? 'border-red-500/20 hover:border-red-500/40' : 'border-blue-500/20 hover:border-blue-500/40'} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden cursor-pointer">
+									{@const pred = overviewDataView ? getOverviewMatchPrediction(m) : null}
+									{@const allianceBorder = m.alliance === 'red' ? 'border-red-500/20 hover:border-red-500/40' : m.alliance === 'blue' ? 'border-blue-500/20 hover:border-blue-500/40' : 'border-zinc-700 hover:border-zinc-600'}
+									<div
+										class="group bg-zinc-900/40 border-2 {allianceBorder} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden">
 
-										<div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
-											<div class="flex items-center gap-6">
-												<div class="w-20 h-20 rounded-2xl flex flex-col items-center justify-center {m.alliance === 'red' ? 'bg-red-500/10 border-2 border-red-500/20' : 'bg-blue-500/10 border-2 border-blue-500/20'}">
-													<p class="text-[10px] font-black {m.alliance === 'red' ? 'text-red-500' : 'text-blue-500'} uppercase">Match</p>
-													<p class="text-3xl font-black text-white">{m.match_number}</p>
+										<div class="flex flex-col md:flex-row justify-between items-start gap-6 relative z-10">
+											<div class="flex items-start gap-6 flex-1">
+												<div class="w-20 h-20 rounded-2xl flex flex-col items-center justify-center flex-shrink-0 {m.alliance === 'red' ? 'bg-red-500/10 border-2 border-red-500/20' : m.alliance === 'blue' ? 'bg-blue-500/10 border-2 border-blue-500/20' : 'bg-zinc-800 border-2 border-zinc-700'}">
+													<p class="text-[10px] font-black {m.alliance === 'red' ? 'text-red-500' : m.alliance === 'blue' ? 'text-blue-500' : 'text-zinc-400'} uppercase">{m.isPlayoff ? m.playoffLabel || m.match_number : 'Match'}</p>
+													<p class="text-3xl font-black text-white">{m.isPlayoff ? '' : m.match_number}</p>
 												</div>
-												<div>
+												<div class="flex-1">
 													<div class="flex items-center gap-3 mb-3">
+														{#if m.isPlayoff}
+															<span class="text-[10px] font-black text-orange-400 uppercase tracking-widest">Playoff</span>
+														{/if}
 														{#if m.isPlayed}
 															<span class="text-[10px] font-black text-green-500 uppercase tracking-widest flex items-center gap-1">
 																<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" /></svg>
 																Played
 															</span>
+															{#if pred}
+																<span class="text-[10px] font-black text-zinc-400">{pred.redScore} - {pred.blueScore}</span>
+															{/if}
 														{:else}
 															<span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Upcoming</span>
+															{#if pred}
+																<span class="text-[10px] font-bold {pred.winProb > 0.5 ? 'text-red-400' : 'text-blue-400'}">{(Math.max(pred.winProb, 1 - pred.winProb) * 100).toFixed(0)}% {pred.winProb > 0.5 ? 'Red' : 'Blue'}</span>
+															{/if}
 														{/if}
 													</div>
-													
+
+													{#if m.time || m.predicted_time}
+														<div class="flex items-center gap-3 mb-3 text-[10px] text-zinc-500">
+															{#if m.time}
+																<span class="flex items-center gap-1">
+																	<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+																	<span class="font-bold">Scheduled:</span> {formatMatchTime(m.time)}
+																</span>
+															{/if}
+															{#if m.predicted_time && m.predicted_time !== m.time}
+																<span class="flex items-center gap-1 {m.predicted_time > m.time ? 'text-yellow-500/70' : 'text-zinc-500'}">
+																	<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+																	<span class="font-bold">Predicted:</span> {formatMatchTime(m.predicted_time)}
+																</span>
+															{/if}
+														</div>
+													{/if}
 													<div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-														<!-- Playing With -->
 														<div>
-															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Red Alliance</p>
+															<p class="text-[8px] font-black text-red-500/60 uppercase tracking-widest mb-1.5">Red Alliance {pred ? `(${pred.redEpa.toFixed(0)} EPA)` : ''}</p>
 															<div class="grid grid-cols-3 gap-2">
-																{#each m.alliances['red'].team_keys as key}
+																{#each (m.alliances?.red?.team_keys || []) as key}
 																	{@const tNum = key.replace('frc', '')}
-																	<button 
-																		on:click|stopPropagation={() => handleRowClick({ 'Team #': tNum })}
+																	<button
+																		on:click|stopPropagation={() => { overviewTeam = tNum; }}
 																		class="px-3 py-1.5 rounded-lg text-sm font-black {tNum === overviewTeam ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border-white/5'} border transition-all text-center whitespace-nowrap">
 																		{tNum}
 																	</button>
 																{/each}
 															</div>
 														</div>
-														
-														<!-- Playing Against -->
 														<div>
-															<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-1.5">Blue Alliance</p>
+															<p class="text-[8px] font-black text-blue-500/60 uppercase tracking-widest mb-1.5">Blue Alliance {pred ? `(${pred.blueEpa.toFixed(0)} EPA)` : ''}</p>
 															<div class="grid grid-cols-3 gap-2">
-																{#each m.alliances['blue'].team_keys as key}
+																{#each (m.alliances?.blue?.team_keys || []) as key}
 																	{@const tNum = key.replace('frc', '')}
-																	<button 
-																		on:click|stopPropagation={() => handleRowClick({ 'Team #': tNumOpp })}
+																	<button
+																		on:click|stopPropagation={() => { overviewTeam = tNum; }}
 																		class="px-3 py-1.5 rounded-lg text-sm font-black {tNum === overviewTeam ? 'bg-purple-600 text-white border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'bg-black/40 text-zinc-300 hover:bg-zinc-800 hover:text-white border-white/5'} border transition-all text-center whitespace-nowrap">
 																		{tNum}
 																	</button>
@@ -3442,24 +3687,83 @@
 															</div>
 														</div>
 													</div>
+
+													<!-- Data View: RP Cards & Warnings -->
+													{#if overviewDataView && pred && m.alliances}
+														<div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+															<div>
+																<p class="text-[7px] font-black text-red-500/50 uppercase tracking-widest mb-1">Red RP Projection</p>
+																<RPCards alliance="red" predictions={pred.rpRed} />
+															</div>
+															<div>
+																<p class="text-[7px] font-black text-blue-500/50 uppercase tracking-widest mb-1">Blue RP Projection</p>
+																<RPCards alliance="blue" predictions={pred.rpBlue} />
+															</div>
+														</div>
+
+														<!-- Win Probability Bar -->
+														{#if !pred.played}
+															<div class="mt-2 mb-1">
+																<div class="flex h-2 rounded-full overflow-hidden">
+																	<div class="bg-red-500 transition-all" style="width: {pred.winProb * 100}%"></div>
+																	<div class="bg-blue-500 transition-all" style="width: {(1 - pred.winProb) * 100}%"></div>
+																</div>
+															</div>
+														{/if}
+
+														<!-- Alliance Partner Warnings -->
+														{#if overviewTeam}
+															{@const allianceKeys = m.alliance === 'red' ? (m.alliances.red?.team_keys || []) : (m.alliances.blue?.team_keys || [])}
+															{@const partnerWarnings = allianceKeys.map(k => ({ team: k.replace('frc', ''), warnings: getTeamWarnings(k.replace('frc', '')) })).filter(pw => pw.team !== overviewTeam && (pw.warnings.cardCount > 0 || pw.warnings.diedCount > 0 || pw.warnings.mechCount > 0 || pw.warnings.tippedCount > 0))}
+															{#if partnerWarnings.length > 0}
+																<div class="mt-3 space-y-1.5">
+																	{#each partnerWarnings as pw}
+																		<div class="flex items-start gap-2 text-[10px] bg-yellow-500/5 border border-yellow-500/20 rounded-lg px-3 py-2">
+																			<span class="text-yellow-400 flex-shrink-0">⚠</span>
+																			<div class="text-yellow-300/90">
+																				{#if pw.warnings.cardCount > 0}
+																					<p><span class="font-black">Team {pw.team}</span> has been {pw.warnings.hasRed ? 'red' : 'yellow'} carded during quals</p>
+																				{/if}
+																				{#if pw.warnings.diedCount > 0}
+																					<p><span class="font-black">Team {pw.team}</span> has died in {pw.warnings.diedCount} previous match{pw.warnings.diedCount > 1 ? 'es' : ''}</p>
+																				{/if}
+																				{#if pw.warnings.mechCount > 0}
+																					<p><span class="font-black">Team {pw.team}</span> has broken down in {pw.warnings.mechCount} previous match{pw.warnings.mechCount > 1 ? 'es' : ''}</p>
+																				{/if}
+																				{#if pw.warnings.tippedCount > 0}
+																					<p><span class="font-black">Team {pw.team}</span> has tipped in {pw.warnings.tippedCount} previous match{pw.warnings.tippedCount > 1 ? 'es' : ''}</p>
+																				{/if}
+																			</div>
+																		</div>
+																	{/each}
+																</div>
+															{/if}
+														{/if}
+													{/if}
 												</div>
 											</div>
 
-											<div class="flex flex-col items-end gap-3">
-												{#if m.swapNeeded}
-													<div class="flex items-center gap-2 text-orange-400">
-														<svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
-														<span class="text-xs font-black uppercase tracking-widest">Bumper Swap After Match</span>
-													</div>
+											<div class="flex flex-col items-end gap-3 flex-shrink-0">
+												{#if !m.isPlayoff}
+													<button
+														on:click|stopPropagation={() => loadMatchIntoSimulator(m)}
+														class="bg-zinc-800 hover:bg-purple-600 text-white text-[10px] font-black px-6 py-3 rounded-xl transition-all uppercase tracking-[0.2em] shadow-lg active:scale-95 border border-zinc-700">
+														Simulate
+													</button>
 												{/if}
-												<button 
-													on:click|stopPropagation={() => loadMatchIntoSimulator(m)}
-													class="bg-zinc-800 hover:bg-purple-600 text-white text-[10px] font-black px-6 py-3 rounded-xl transition-all uppercase tracking-[0.2em] shadow-lg active:scale-95 border border-zinc-700">
-													Load Into Simulator
-												</button>
 											</div>
 										</div>
 									</div>
+									{#if m.swapNeeded}
+										<div class="flex items-center justify-center gap-3 py-2">
+											<div class="flex-1 border-t border-dashed border-orange-500/30"></div>
+											<div class="flex items-center gap-2 text-orange-400 bg-orange-500/5 border border-orange-500/20 rounded-full px-4 py-1.5">
+												<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+												<span class="text-[10px] font-black uppercase tracking-widest">Bumper Swap</span>
+											</div>
+											<div class="flex-1 border-t border-dashed border-orange-500/30"></div>
+										</div>
+									{/if}
 								{/each}
 							</div>
 						{/if}
