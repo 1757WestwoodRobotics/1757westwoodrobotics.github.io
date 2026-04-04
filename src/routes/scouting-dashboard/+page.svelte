@@ -81,6 +81,13 @@
 	let now = Date.now();
 	let countdownInterval = null;
 	let showBreakWindowsModal = false;
+	let compareMode = false;
+	let compareTeamA = '1757';
+	let compareTeamB = '';
+	let compareFilter = 'all';
+	let showCompareBreaksModal = false;
+	let compareTeamASuggestions = false;
+	let compareTeamBSuggestions = false;
 
 	const posMap = {
 		'OT': 'Outpost Trench',
@@ -1325,17 +1332,17 @@
 			};
 		});
 
-	$: overviewTeamSchedule = (() => {
-		const enrichMatch = (m, team) => {
-			if (!m.alliances) return { ...m, alliance: null, swapNeeded: false, isPlayed: false, isPlayoff: false };
-			const isRed = team ? m.alliances.red.team_keys.includes(`frc${team}`) : false;
-			const alliance = team ? (isRed ? 'red' : 'blue') : null;
-			const redScore = m.alliances?.red?.score ?? -1;
-			const blueScore = m.alliances?.blue?.score ?? -1;
-			const isPlayed = redScore >= 0 && blueScore >= 0 && (redScore > 0 || blueScore > 0);
-			return { ...m, alliance, swapNeeded: false, isPlayed, isPlayoff: m.comp_level !== 'qm' };
-		};
+	function enrichMatch(m, team) {
+		if (!m.alliances) return { ...m, alliance: null, swapNeeded: false, isPlayed: false, isPlayoff: false };
+		const isRed = team ? m.alliances.red.team_keys.includes(`frc${team}`) : false;
+		const alliance = team ? (isRed ? 'red' : 'blue') : null;
+		const redScore = m.alliances?.red?.score ?? -1;
+		const blueScore = m.alliances?.blue?.score ?? -1;
+		const isPlayed = redScore >= 0 && blueScore >= 0 && (redScore > 0 || blueScore > 0);
+		return { ...m, alliance, swapNeeded: false, isPlayed, isPlayoff: m.comp_level !== 'qm' };
+	}
 
+	$: overviewTeamSchedule = (() => {
 		if (!overviewTeam) {
 			const quals = schedule.map(m => enrichMatch(m, null));
 			return quals;
@@ -1463,6 +1470,127 @@
 		}
 		return windows;
 	})();
+
+	// === Schedule Compare Reactive Derivations ===
+
+	$: compareTeamASchedule = (() => {
+		if (!compareTeamA) return [];
+		return schedule.filter(m => teamIsInMatch(compareTeamA, m))
+			.map((m, idx, arr) => {
+				const enriched = enrichMatch(m, compareTeamA);
+				const next = arr[idx + 1];
+				let swapNeeded = false;
+				if (next) {
+					const nextEnriched = enrichMatch(next, compareTeamA);
+					swapNeeded = enriched.alliance !== nextEnriched.alliance;
+				}
+				return { ...enriched, swapNeeded, isPlayed: !!getMatchResult(m.match_number) };
+			});
+	})();
+
+	$: compareTeamBSchedule = (() => {
+		if (!compareTeamB) return [];
+		return schedule.filter(m => teamIsInMatch(compareTeamB, m))
+			.map((m, idx, arr) => {
+				const enriched = enrichMatch(m, compareTeamB);
+				const next = arr[idx + 1];
+				let swapNeeded = false;
+				if (next) {
+					const nextEnriched = enrichMatch(next, compareTeamB);
+					swapNeeded = enriched.alliance !== nextEnriched.alliance;
+				}
+				return { ...enriched, swapNeeded, isPlayed: !!getMatchResult(m.match_number) };
+			});
+	})();
+
+	$: compareTimeline = (() => {
+		if (!compareTeamA || !compareTeamB) return [];
+		const aSet = new Set(compareTeamASchedule.map(m => m.match_number));
+		const bSet = new Set(compareTeamBSchedule.map(m => m.match_number));
+		const allNums = new Set([...aSet, ...bSet]);
+		const timeline = [];
+		for (const num of allNums) {
+			const match = schedule.find(m => m.match_number === num);
+			if (!match) continue;
+			const aIn = aSet.has(num), bIn = bSet.has(num);
+			let relationship = 'none';
+			if (aIn && bIn) {
+				const aRed = match.alliances.red.team_keys.includes(`frc${compareTeamA}`);
+				const bRed = match.alliances.red.team_keys.includes(`frc${compareTeamB}`);
+				relationship = (aRed === bRed) ? 'together' : 'against';
+			} else if (aIn) {
+				relationship = 'teamA_only';
+			} else {
+				relationship = 'teamB_only';
+			}
+			timeline.push({
+				match,
+				matchNumber: num,
+				relationship,
+				teamA: aIn ? enrichMatch(match, compareTeamA) : null,
+				teamB: bIn ? enrichMatch(match, compareTeamB) : null,
+				isPlayed: enrichMatch(match, null).isPlayed,
+				time: match.predicted_time || match.time || 0
+			});
+		}
+		return timeline.sort((a, b) => a.matchNumber - b.matchNumber);
+	})();
+
+	$: compareSummary = (() => ({
+		together: compareTimeline.filter(e => e.relationship === 'together').length,
+		against: compareTimeline.filter(e => e.relationship === 'against').length,
+		aOnly: compareTimeline.filter(e => e.relationship === 'teamA_only').length,
+		bOnly: compareTimeline.filter(e => e.relationship === 'teamB_only').length
+	}))();
+
+	$: compareSharedBreaks = (() => {
+		if (!compareTeamA || !compareTeamB || !compareTimeline.length) return [];
+		// Build a set of match numbers each team plays (unplayed only)
+		const aUnplayedNums = new Set(compareTeamASchedule.filter(m => !m.isPlayed).map(m => m.match_number));
+		const bUnplayedNums = new Set(compareTeamBSchedule.filter(m => !m.isPlayed).map(m => m.match_number));
+		// Get all unplayed matches from the timeline, sorted by time
+		const allUpcoming = compareTimeline.filter(e => !e.isPlayed && e.time).sort((a, b) => a.time - b.time);
+		const windows = [];
+		for (let i = 0; i < allUpcoming.length - 1; i++) {
+			const curr = allUpcoming[i];
+			const next = allUpcoming[i + 1];
+			if (!curr.time || !next.time) continue;
+			// Check if either team has a match in the gap
+			const matchesInGap = allUpcoming.filter(e => e.time > curr.time && e.time < next.time);
+			if (matchesInGap.length > 0) continue;
+			// Both teams are idle in this window
+			const minutes = Math.round((next.time - curr.time) / 60);
+			if (minutes > 0) {
+				windows.push({
+					fromLabel: `Q${curr.matchNumber}`,
+					toLabel: `Q${next.matchNumber}`,
+					fromTime: curr.time,
+					toTime: next.time,
+					minutes,
+					fromRelationship: curr.relationship,
+					toRelationship: next.relationship
+				});
+			}
+		}
+		return windows;
+	})();
+
+	$: compareFilteredTimeline = compareFilter === 'all' ? compareTimeline
+		: compareTimeline.filter(e => {
+			if (compareFilter === 'together') return e.relationship === 'together';
+			if (compareFilter === 'against') return e.relationship === 'against';
+			if (compareFilter === 'teamA') return e.relationship !== 'teamB_only';
+			if (compareFilter === 'teamB') return e.relationship !== 'teamA_only';
+			return true;
+		});
+
+	$: compareTeamASuggestList = compareTeamA.length > 0
+		? allTeamsList.filter(t => t.includes(compareTeamA) || (teamDetailsMap.get(t)?.nickname || '').toLowerCase().includes(compareTeamA.toLowerCase())).slice(0, 5)
+		: [];
+
+	$: compareTeamBSuggestList = compareTeamB.length > 0
+		? allTeamsList.filter(t => t.includes(compareTeamB) || (teamDetailsMap.get(t)?.nickname || '').toLowerCase().includes(compareTeamB.toLowerCase())).slice(0, 5)
+		: [];
 
 	$: sortedLeaderboard = [...teamMetrics].sort((a, b) => {
 		let valA, valB;
@@ -2946,19 +3074,20 @@
 			
 			<!-- Mode Buttons Row -->
 			<div class="flex flex-wrap gap-2">
-				<button on:click={() => { pitMode = !pitMode; if(pitMode) { simulatorMode = false; selectionMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {pitMode ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+				<button on:click={() => { pitMode = !pitMode; if(pitMode) { simulatorMode = false; selectionMode = false; defenseMode = false; compareMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {pitMode ? 'bg-zinc-100 border-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
 					<span class="hidden sm:inline">No Statistics</span>
 					<span class="sm:hidden">Pit</span>
 				</button>
-				<button on:click={() => { simulatorMode = !simulatorMode; if(simulatorMode) { selectionMode = false; pitMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {simulatorMode ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Simulator</button>
-				<button on:click={() => { selectionMode = !selectionMode; if(selectionMode) { simulatorMode = false; pitMode = false; defenseMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {selectionMode ? 'bg-orange-600 border-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+				<button on:click={() => { simulatorMode = !simulatorMode; if(simulatorMode) { selectionMode = false; pitMode = false; defenseMode = false; compareMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {simulatorMode ? 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Simulator</button>
+				<button on:click={() => { selectionMode = !selectionMode; if(selectionMode) { simulatorMode = false; pitMode = false; defenseMode = false; compareMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {selectionMode ? 'bg-orange-600 border-orange-500 text-white shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
 					<span class="hidden sm:inline">Selection Mode</span>
 					<span class="sm:hidden">Selection</span>
 				</button>
-				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; overviewMode = false; scoutLeadMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
-				<button on:click={() => { overviewMode = !overviewMode; if(overviewMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; scoutLeadMode = false; if(!overviewTeam && searchTerm) overviewTeam = searchTerm; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {overviewMode ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Overview</button>
-				<button on:click={() => { scoutLeadMode = !scoutLeadMode; if(scoutLeadMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; overviewMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {scoutLeadMode ? 'bg-yellow-600 border-yellow-500 text-white shadow-[0_0_20px_rgba(234,179,8,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Scout Lead</button>
-				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; overviewMode = false; scoutLeadMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode && !overviewMode && !scoutLeadMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
+				<button on:click={() => { defenseMode = !defenseMode; if(defenseMode) { simulatorMode = false; pitMode = false; selectionMode = false; overviewMode = false; scoutLeadMode = false; compareMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {defenseMode ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(239,68,68,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Defense</button>
+				<button on:click={() => { overviewMode = !overviewMode; if(overviewMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; scoutLeadMode = false; compareMode = false; if(!overviewTeam && searchTerm) overviewTeam = searchTerm; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {overviewMode ? 'bg-purple-600 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Overview</button>
+				<button on:click={() => { scoutLeadMode = !scoutLeadMode; if(scoutLeadMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; overviewMode = false; compareMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {scoutLeadMode ? 'bg-yellow-600 border-yellow-500 text-white shadow-[0_0_20px_rgba(234,179,8,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Scout Lead</button>
+				<button on:click={() => { compareMode = !compareMode; if(compareMode) { simulatorMode = false; pitMode = false; selectionMode = false; defenseMode = false; overviewMode = false; scoutLeadMode = false; } }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {compareMode ? 'bg-teal-600 border-teal-500 text-white shadow-[0_0_20px_rgba(20,184,166,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">Compare</button>
+				<button on:click={() => { pitMode = false; simulatorMode = false; selectionMode = false; defenseMode = false; overviewMode = false; scoutLeadMode = false; compareMode = false; }} class="px-3 sm:px-4 py-1.5 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-widest transition border-2 whitespace-nowrap {!pitMode && !simulatorMode && !selectionMode && !defenseMode && !overviewMode && !scoutLeadMode && !compareMode ? 'bg-green-600 border-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)]' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:text-white'}">
 					<span class="hidden sm:inline">All Data</span>
 					<span class="sm:hidden">All</span>
 				</button>
@@ -4417,6 +4546,293 @@
 					</div>
 				</div>
 			</div>
+		{:else if compareMode}
+			<div class="animate-in fade-in slide-in-from-top-4 mb-12">
+				<div class="flex flex-col lg:flex-row gap-8">
+					<!-- LEFT SIDEBAR: Team Inputs + Summary -->
+					<div class="w-full lg:w-80 flex-shrink-0">
+						<div class="bg-zinc-900/40 border-2 border-teal-500/20 rounded-3xl p-6 backdrop-blur-xl shadow-2xl sticky top-4 space-y-5">
+							<h2 class="text-xs font-black text-teal-400 uppercase tracking-[0.3em]">Schedule Compare</h2>
+
+							<!-- Team A Input -->
+							<div class="relative">
+								<label class="text-[8px] font-black text-teal-400 uppercase tracking-widest mb-1 block">Team A</label>
+								<input type="text" bind:value={compareTeamA}
+									on:focus={() => compareTeamASuggestions = true}
+									on:blur={() => setTimeout(() => compareTeamASuggestions = false, 200)}
+									placeholder="Team # or Name..."
+									class="w-full bg-black/40 border-2 border-teal-500/30 rounded-xl p-3 font-black text-white focus:border-teal-500 outline-none transition text-sm" />
+								{#if compareTeamASuggestions && compareTeamASuggestList.length > 0 && compareTeamA}
+									<div class="absolute top-full left-0 right-0 mt-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-[100] overflow-hidden">
+										{#each compareTeamASuggestList as t}
+											<button on:mousedown|preventDefault={() => { compareTeamA = t; compareTeamASuggestions = false; }}
+												class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-800 transition flex items-center gap-2">
+												<span class="font-black text-teal-400">{t}</span>
+												<span class="text-[10px] text-zinc-500 truncate">{teamDetailsMap.get(t)?.nickname || ''}</span>
+											</button>
+										{/each}
+									</div>
+								{/if}
+								{#if compareTeamA && teamDetailsMap.get(compareTeamA)}
+									<p class="text-[10px] text-zinc-500 mt-1 font-bold truncate">{teamDetailsMap.get(compareTeamA)?.nickname || ''}</p>
+								{/if}
+							</div>
+
+							<!-- Team B Input -->
+							<div class="relative">
+								<label class="text-[8px] font-black text-amber-400 uppercase tracking-widest mb-1 block">Team B</label>
+								<input type="text" bind:value={compareTeamB}
+									on:focus={() => compareTeamBSuggestions = true}
+									on:blur={() => setTimeout(() => compareTeamBSuggestions = false, 200)}
+									placeholder="Team # or Name..."
+									class="w-full bg-black/40 border-2 border-amber-500/30 rounded-xl p-3 font-black text-white focus:border-amber-500 outline-none transition text-sm" />
+								{#if compareTeamBSuggestions && compareTeamBSuggestList.length > 0 && compareTeamB}
+									<div class="absolute top-full left-0 right-0 mt-1 bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl z-[100] overflow-hidden">
+										{#each compareTeamBSuggestList as t}
+											<button on:mousedown|preventDefault={() => { compareTeamB = t; compareTeamBSuggestions = false; }}
+												class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-800 transition flex items-center gap-2">
+												<span class="font-black text-amber-400">{t}</span>
+												<span class="text-[10px] text-zinc-500 truncate">{teamDetailsMap.get(t)?.nickname || ''}</span>
+											</button>
+										{/each}
+									</div>
+								{/if}
+								{#if compareTeamB && teamDetailsMap.get(compareTeamB)}
+									<p class="text-[10px] text-zinc-500 mt-1 font-bold truncate">{teamDetailsMap.get(compareTeamB)?.nickname || ''}</p>
+								{/if}
+							</div>
+
+							<!-- Warning: same team -->
+							{#if compareTeamA && compareTeamB && compareTeamA === compareTeamB}
+								<div class="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-[10px] font-bold text-red-400 text-center">
+									Same team entered in both fields
+								</div>
+							{/if}
+
+							<!-- Summary Stats -->
+							{#if compareTeamA && compareTeamB && compareTeamA !== compareTeamB && compareTimeline.length > 0}
+								<div class="grid grid-cols-2 gap-2">
+									<div class="bg-green-500/10 border border-green-500/20 rounded-xl p-3 text-center">
+										<p class="text-[8px] font-black text-green-400 uppercase tracking-widest">Together</p>
+										<p class="text-2xl font-black text-white">{compareSummary.together}</p>
+									</div>
+									<div class="bg-red-500/10 border border-red-500/20 rounded-xl p-3 text-center">
+										<p class="text-[8px] font-black text-red-400 uppercase tracking-widest">Against</p>
+										<p class="text-2xl font-black text-white">{compareSummary.against}</p>
+									</div>
+									<div class="bg-teal-500/10 border border-teal-500/20 rounded-xl p-3 text-center">
+										<p class="text-[8px] font-black text-teal-400 uppercase tracking-widest">{compareTeamA} Only</p>
+										<p class="text-2xl font-black text-white">{compareSummary.aOnly}</p>
+									</div>
+									<div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center">
+										<p class="text-[8px] font-black text-amber-400 uppercase tracking-widest">{compareTeamB} Only</p>
+										<p class="text-2xl font-black text-white">{compareSummary.bOnly}</p>
+									</div>
+								</div>
+
+								<!-- Shared Breaks Button -->
+								<button on:click={() => showCompareBreaksModal = true}
+									class="w-full bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 text-center hover:border-orange-500/40 transition group">
+									<p class="text-[8px] font-black text-orange-400 uppercase tracking-widest">Shared Breaks</p>
+									<p class="text-lg font-black text-white">{compareSharedBreaks.length} windows</p>
+									<p class="text-[8px] text-orange-400/50 font-bold mt-1 uppercase tracking-widest group-hover:text-orange-400/80 transition-colors">View all &rarr;</p>
+								</button>
+							{/if}
+
+							<!-- Filter Toggles -->
+							{#if compareTimeline.length > 0}
+								<div>
+									<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-2">Filter</p>
+									<div class="flex flex-wrap gap-1.5">
+										{#each [
+											{ key: 'all', label: 'All', color: 'zinc' },
+											{ key: 'together', label: 'Allies', color: 'green' },
+											{ key: 'against', label: 'Opponents', color: 'red' },
+											{ key: 'teamA', label: compareTeamA || 'A', color: 'teal' },
+											{ key: 'teamB', label: compareTeamB || 'B', color: 'amber' }
+										] as f}
+											<button on:click={() => compareFilter = f.key}
+												class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider transition border
+												{compareFilter === f.key
+													? f.color === 'green' ? 'bg-green-500/20 border-green-500/40 text-green-400'
+														: f.color === 'red' ? 'bg-red-500/20 border-red-500/40 text-red-400'
+														: f.color === 'teal' ? 'bg-teal-500/20 border-teal-500/40 text-teal-400'
+														: f.color === 'amber' ? 'bg-amber-500/20 border-amber-500/40 text-amber-400'
+														: 'bg-zinc-700/40 border-zinc-600 text-white'
+													: 'border-zinc-800 text-zinc-600 hover:text-zinc-400'}">
+												{f.label}
+											</button>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- RIGHT: Chronological Timeline -->
+					<div class="flex-1">
+						{#if !compareTeamA || !compareTeamB}
+							<div class="text-center py-20 text-zinc-600">
+								<p class="text-6xl mb-4">&#x1f50d;</p>
+								<p class="text-sm font-black uppercase tracking-widest">Enter two team numbers to compare schedules</p>
+							</div>
+						{:else if compareTeamA === compareTeamB}
+							<div class="text-center py-20 text-zinc-600">
+								<p class="text-6xl mb-4">&#x26a0;</p>
+								<p class="text-sm font-black uppercase tracking-widest">Enter two different team numbers</p>
+							</div>
+						{:else if compareFilteredTimeline.length === 0}
+							<div class="text-center py-20 text-zinc-600">
+								<p class="text-6xl mb-4">&#x1f4cb;</p>
+								<p class="text-sm font-black uppercase tracking-widest">No matches found</p>
+								<p class="text-[10px] text-zinc-700 mt-2">Check that both team numbers are at this event</p>
+							</div>
+						{:else}
+							<div class="grid grid-cols-1 gap-4">
+								{#each compareFilteredTimeline as entry, idx}
+									{@const relationColor = entry.relationship === 'together' ? 'green' : entry.relationship === 'against' ? 'red' : entry.relationship === 'teamA_only' ? 'teal' : 'amber'}
+									{@const borderClass = entry.relationship === 'together' ? 'border-green-500/20 hover:border-green-500/40' : entry.relationship === 'against' ? 'border-red-500/20 hover:border-red-500/40' : entry.relationship === 'teamA_only' ? 'border-teal-500/20 hover:border-teal-500/40' : 'border-amber-500/20 hover:border-amber-500/40'}
+									<div class="group bg-zinc-900/40 border-2 {borderClass} rounded-[2rem] p-6 backdrop-blur-xl shadow-xl transition-all relative overflow-hidden">
+										<!-- Relationship Badge + Match Header -->
+										<div class="flex items-center gap-4 mb-4">
+											<!-- Match Number Box -->
+											<div class="w-16 h-16 rounded-2xl flex flex-col items-center justify-center flex-shrink-0
+												{entry.relationship === 'together' ? 'bg-green-500/10 border-2 border-green-500/20' : entry.relationship === 'against' ? 'bg-red-500/10 border-2 border-red-500/20' : 'bg-zinc-800 border-2 border-zinc-700'}">
+												<p class="text-[9px] font-black text-zinc-400 uppercase">Match</p>
+												<p class="text-2xl font-black text-white">{entry.matchNumber}</p>
+											</div>
+
+											<!-- Relationship Badge -->
+											<div class="flex flex-col gap-1">
+												{#if entry.relationship === 'together'}
+													<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/30 text-[9px] font-black text-green-400 uppercase tracking-widest">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+														Allies
+													</span>
+													<span class="text-[9px] font-bold {entry.teamA?.alliance === 'red' ? 'text-red-400' : 'text-blue-400'} uppercase">
+														Both on {entry.teamA?.alliance} Alliance
+													</span>
+												{:else if entry.relationship === 'against'}
+													<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-[9px] font-black text-red-400 uppercase tracking-widest">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+														Opponents
+													</span>
+													<span class="text-[9px] font-bold text-zinc-500">
+														<span class="text-teal-400">{compareTeamA}</span> on {entry.teamA?.alliance} &#x2022;
+														<span class="text-amber-400">{compareTeamB}</span> on {entry.teamB?.alliance}
+													</span>
+												{:else if entry.relationship === 'teamA_only'}
+													<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-[9px] font-black text-teal-400 uppercase tracking-widest">
+														{compareTeamA} Only
+													</span>
+													<span class="text-[9px] font-bold {entry.teamA?.alliance === 'red' ? 'text-red-400' : 'text-blue-400'} uppercase">
+														{entry.teamA?.alliance} Alliance
+													</span>
+												{:else}
+													<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-[9px] font-black text-amber-400 uppercase tracking-widest">
+														{compareTeamB} Only
+													</span>
+													<span class="text-[9px] font-bold {entry.teamB?.alliance === 'red' ? 'text-red-400' : 'text-blue-400'} uppercase">
+														{entry.teamB?.alliance} Alliance
+													</span>
+												{/if}
+											</div>
+
+											<!-- Status -->
+											<div class="ml-auto text-right">
+												{#if entry.isPlayed}
+													<span class="text-[9px] font-black text-green-500 uppercase tracking-widest">Played</span>
+													{#if entry.match.alliances}
+														<p class="text-[10px] font-bold text-zinc-400">
+															{entry.match.alliances.red.score} - {entry.match.alliances.blue.score}
+														</p>
+													{/if}
+												{:else}
+													<span class="text-[9px] font-black text-zinc-500 uppercase tracking-widest">Upcoming</span>
+												{/if}
+											</div>
+										</div>
+
+										<!-- Match Times -->
+										{#if entry.match.time || entry.match.predicted_time}
+											<div class="flex items-center gap-3 mb-3 text-[10px] text-zinc-500">
+												{#if entry.match.time}
+													<span class="flex items-center gap-1">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+														<span class="font-bold">Sched:</span> {formatMatchTime(entry.match.time)}
+													</span>
+												{/if}
+												{#if entry.match.predicted_time && entry.match.predicted_time !== entry.match.time}
+													<span class="flex items-center gap-1 {entry.match.predicted_time > entry.match.time ? 'text-yellow-500/70' : 'text-zinc-500'}">
+														<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+														<span class="font-bold">Pred:</span> {formatMatchTime(entry.match.predicted_time)}
+													</span>
+												{/if}
+											</div>
+										{/if}
+
+										<!-- Alliance Rosters -->
+										<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+											<!-- Red Alliance -->
+											<div>
+												<p class="text-[8px] font-black text-red-500/60 uppercase tracking-widest mb-1.5">Red Alliance</p>
+												<div class="grid grid-cols-3 gap-2">
+													{#each (entry.match.alliances?.red?.team_keys || []) as key}
+														{@const tNum = key.replace('frc', '')}
+														{@const isTeamA = tNum === compareTeamA}
+														{@const isTeamB = tNum === compareTeamB}
+														<button on:click|stopPropagation={() => {
+															if (!isTeamA && !isTeamB) { compareTeamB = tNum; }
+														}} class="text-xs font-black py-1.5 px-2 rounded-lg transition text-center
+															{isTeamA ? 'bg-teal-500/20 border-2 border-teal-500/60 text-teal-300 ring-2 ring-teal-500/30' : isTeamB ? 'bg-amber-500/20 border-2 border-amber-500/60 text-amber-300 ring-2 ring-amber-500/30' : 'bg-red-500/10 border border-red-500/20 text-red-300 hover:bg-red-500/20'}">
+															{tNum}
+														</button>
+													{/each}
+												</div>
+											</div>
+											<!-- Blue Alliance -->
+											<div>
+												<p class="text-[8px] font-black text-blue-500/60 uppercase tracking-widest mb-1.5">Blue Alliance</p>
+												<div class="grid grid-cols-3 gap-2">
+													{#each (entry.match.alliances?.blue?.team_keys || []) as key}
+														{@const tNum = key.replace('frc', '')}
+														{@const isTeamA = tNum === compareTeamA}
+														{@const isTeamB = tNum === compareTeamB}
+														<button on:click|stopPropagation={() => {
+															if (!isTeamA && !isTeamB) { compareTeamB = tNum; }
+														}} class="text-xs font-black py-1.5 px-2 rounded-lg transition text-center
+															{isTeamA ? 'bg-teal-500/20 border-2 border-teal-500/60 text-teal-300 ring-2 ring-teal-500/30' : isTeamB ? 'bg-amber-500/20 border-2 border-amber-500/60 text-amber-300 ring-2 ring-amber-500/30' : 'bg-blue-500/10 border border-blue-500/20 text-blue-300 hover:bg-blue-500/20'}">
+															{tNum}
+														</button>
+													{/each}
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- Break Interstitial between cards -->
+									{#if idx < compareFilteredTimeline.length - 1}
+										{@const nextEntry = compareFilteredTimeline[idx + 1]}
+										{@const gapTime = entry.time && nextEntry.time ? Math.round((nextEntry.time - entry.time) / 60) : null}
+										{@const bothIdle = entry.time && nextEntry.time && !compareTimeline.some(e => e.time > entry.time && e.time < nextEntry.time)}
+										{#if gapTime && bothIdle && gapTime > 5}
+											<div class="flex items-center justify-center gap-3 py-1">
+												<div class="flex-1 border-t border-dashed {gapTime >= 30 ? 'border-green-500/30' : gapTime >= 15 ? 'border-yellow-500/30' : 'border-red-500/30'}"></div>
+												<div class="flex items-center gap-2 {gapTime >= 30 ? 'text-green-400 bg-green-500/5 border-green-500/20' : gapTime >= 15 ? 'text-yellow-400 bg-yellow-500/5 border-yellow-500/20' : 'text-red-400 bg-red-500/5 border-red-500/20'} border rounded-full px-4 py-1.5">
+													<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+													<span class="text-[10px] font-black uppercase tracking-widest">Shared Break &bull; {gapTime} min</span>
+												</div>
+												<div class="flex-1 border-t border-dashed {gapTime >= 30 ? 'border-green-500/30' : gapTime >= 15 ? 'border-yellow-500/30' : 'border-red-500/30'}"></div>
+											</div>
+										{/if}
+									{/if}
+								{/each}
+							</div>
+						{/if}
+					</div>
+				</div>
+			</div>
+
 		{:else}
 			<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 				<div class="bg-zinc-900/50 p-3 md:p-6 rounded-2xl md:rounded-3xl border border-zinc-800 shadow-xl"><p class="text-[8px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-1">Scouted Entries</p><p class="text-2xl md:text-4xl font-black text-white">{scoutingData.length}</p></div>
@@ -5489,6 +5905,61 @@
 					{/each}
 					{#if allBreakWindows.length === 0}
 						<p class="text-center text-zinc-500 py-8 italic">No break data available</p>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Compare Shared Breaks Modal -->
+{#if showCompareBreaksModal}
+	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<div class="fixed inset-0 z-[125] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
+		role="dialog"
+		aria-modal="true"
+		on:click|self={() => showCompareBreaksModal = false}
+		on:keydown={(e) => e.key === 'Escape' && (showCompareBreaksModal = false)}
+		tabindex="-1">
+		<div class="bg-[#0a0a0a] border-2 border-zinc-800 rounded-[2rem] w-full max-w-lg max-h-[80vh] overflow-hidden shadow-[0_0_150px_rgba(0,0,0,1)] flex flex-col">
+			<div class="p-6 border-b-2 border-zinc-800 flex justify-between items-center flex-shrink-0">
+				<div>
+					<h2 class="text-xl font-black text-teal-400 uppercase tracking-tighter">Shared Break Windows</h2>
+					<p class="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1">
+						Breaks where both <span class="text-teal-400">{compareTeamA}</span> and <span class="text-amber-400">{compareTeamB}</span> are idle
+					</p>
+				</div>
+				<button on:click={() => showCompareBreaksModal = false}
+					class="w-10 h-10 flex items-center justify-center bg-zinc-900 hover:bg-red-600 rounded-xl transition text-zinc-400 hover:text-white">
+					<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+					</svg>
+				</button>
+			</div>
+			<div class="overflow-y-auto flex-1 p-4">
+				<div class="space-y-2">
+					{#each compareSharedBreaks as bw, idx}
+						{@const isNext = idx === 0}
+						<div class="flex items-center justify-between px-4 py-3 rounded-xl {isNext ? 'bg-teal-500/10 border border-teal-500/20' : 'bg-zinc-900/50 border border-zinc-800'}">
+							<div class="flex items-center gap-3">
+								<span class="text-sm font-black text-white">{bw.fromLabel}</span>
+								<svg class="w-4 h-4 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+								</svg>
+								<span class="text-sm font-black text-white">{bw.toLabel}</span>
+							</div>
+							<div class="flex items-center gap-2">
+								<span class="text-lg font-black {bw.minutes >= 30 ? 'text-green-400' : bw.minutes >= 15 ? 'text-yellow-400' : 'text-red-400'}">
+									{bw.minutes} min
+								</span>
+								{#if isNext}
+									<span class="text-[8px] font-black text-teal-400 uppercase tracking-widest">Next</span>
+								{/if}
+							</div>
+						</div>
+					{/each}
+					{#if compareSharedBreaks.length === 0}
+						<p class="text-center text-zinc-500 py-8 italic">No shared break windows found</p>
 					{/if}
 				</div>
 			</div>
