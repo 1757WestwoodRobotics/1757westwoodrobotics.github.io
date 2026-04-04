@@ -89,6 +89,47 @@
 	let compareTeamASuggestions = false;
 	let compareTeamBSuggestions = false;
 
+	// Nexus Integration
+	let nexusEventData = null;
+	let nexusPits = {};
+	let nexusInspection = {};
+	let nexusRefreshInterval = null;
+
+	async function fetchNexusStaticData() {
+		const apiKey = import.meta.env.VITE_NEXUS_API_KEY;
+		if (!apiKey) return;
+		try {
+			const headers = { 'Nexus-Api-Key': apiKey };
+			const [pitsRes, inspectionRes] = await Promise.all([
+				fetch(`https://frc.nexus/api/v1/event/${EVENT_KEY}/pits`, { headers }),
+				fetch(`https://frc.nexus/api/v1/event/${EVENT_KEY}/inspection`, { headers })
+			]);
+
+			if (pitsRes.ok) nexusPits = await pitsRes.json();
+			if (inspectionRes.ok) nexusInspection = await inspectionRes.json();
+		} catch (e) {
+			console.error('Error fetching Nexus static data:', e);
+		}
+	}
+
+	async function fetchNexusEventData() {
+		const apiKey = import.meta.env.VITE_NEXUS_API_KEY;
+		if (!apiKey) return;
+		try {
+			const headers = { 'Nexus-Api-Key': apiKey };
+			const res = await fetch(`https://frc.nexus/api/v1/event/${EVENT_KEY}`, { headers });
+			if (res.ok) nexusEventData = await res.json();
+		} catch (e) {
+			console.error('Error fetching Nexus event data:', e);
+		}
+	}
+
+	function getNexusMatch(m) {
+		if (!nexusEventData?.matches) return null;
+		const targetLabel = m.isPlayoff ? (m.playoffLabel || m.match_number) : `Qualification ${m.match_number}`;
+		return nexusEventData.matches.find(nm => nm.label === targetLabel || nm.label.includes(targetLabel));
+	}
+
 	const posMap = {
 		'OT': 'Outpost Trench',
 		'OBFT': 'Outpost Bump Favoring Trench',
@@ -1191,6 +1232,9 @@
 		}, 3000);
 
 		countdownInterval = setInterval(() => { now = Date.now(); }, 1000);
+		fetchNexusStaticData();
+		fetchNexusEventData();
+		nexusRefreshInterval = setInterval(fetchNexusEventData, 30000);
 
 		const handleFullscreenChange = () => {
 			isFullscreen = !!document.fullscreenElement;
@@ -1260,13 +1304,13 @@
 					currentStep = '';
 					console.log('All tasks complete, loading:', loading);
 				});
-				return () => { clearInterval(messageInterval); clearInterval(countdownInterval); };
+				return () => { clearInterval(messageInterval); clearInterval(countdownInterval); clearInterval(nexusRefreshInterval); };
 			}
 		}
 		console.log('No cache or cache expired, fetching fresh data');
 		fetchData();
 
-		return () => { clearInterval(messageInterval); clearInterval(countdownInterval); };
+		return () => { clearInterval(messageInterval); clearInterval(countdownInterval); clearInterval(nexusRefreshInterval); };
 	});
 
 	function handleSort(key) {
@@ -4200,6 +4244,23 @@
 									<div class="p-4 bg-purple-500/5 border border-purple-500/20 rounded-2xl">
 										<p class="text-3xl font-black text-white">{overviewTeam}</p>
 										<p class="text-xs font-black text-zinc-500 uppercase tracking-widest truncate">{details?.nickname || 'Unknown Team'}</p>
+
+										{#if nexusPits[overviewTeam] || nexusInspection[overviewTeam]}
+											<div class="mt-4 pt-4 border-t border-purple-500/20 flex gap-4">
+												{#if nexusPits[overviewTeam]}
+													<div>
+														<p class="text-[8px] font-black text-purple-400 uppercase tracking-widest">Pit</p>
+														<p class="text-sm font-black text-white">{nexusPits[overviewTeam]}</p>
+													</div>
+												{/if}
+												{#if nexusInspection[overviewTeam]}
+													<div>
+														<p class="text-[8px] font-black text-purple-400 uppercase tracking-widest">Inspection</p>
+														<p class="text-sm font-black {nexusInspection[overviewTeam]?.status === 'inspected' ? 'text-green-400' : 'text-yellow-400'} uppercase">{nexusInspection[overviewTeam]?.status}</p>
+													</div>
+												{/if}
+											</div>
+										{/if}
 									</div>
 
 									{#if overviewDataView && stats}
@@ -4301,6 +4362,11 @@
 												{/if}
 											{/each}
 										</div>
+										<div class="mt-4 pt-4 border-t border-purple-500/10">
+											<p class="text-[7px] text-zinc-600 uppercase font-bold tracking-widest text-center">
+												Timing & Pits via <a href="https://frc.nexus" target="_blank" class="text-purple-500/50 hover:text-purple-500">frc.nexus</a>
+											</p>
+										</div>
 									{/if}
 								</div>
 							{/if}
@@ -4328,6 +4394,12 @@
 										<p class="text-[10px] font-bold {nextMatch.alliance === 'red' ? 'text-red-400' : 'text-blue-400'} mt-1 uppercase">
 											{nextMatch.alliance === 'red' ? 'Red' : 'Blue'} Alliance
 										</p>
+										{#if nexusEventData?.nowQueuing}
+											<div class="mt-2 pt-2 border-t border-purple-500/10">
+												<p class="text-[8px] font-black text-zinc-500 uppercase tracking-widest mb-0.5">Currently Queuing</p>
+												<p class="text-[10px] font-black text-purple-400 uppercase">{nexusEventData.nowQueuing}</p>
+											</div>
+										{/if}
 									</div>
 
 									<!-- Alliance Partners -->
@@ -4350,16 +4422,26 @@
 									<div class="bg-zinc-900/60 border-2 border-green-500/20 rounded-2xl p-4 backdrop-blur-xl">
 										<p class="text-[8px] font-black text-green-400 uppercase tracking-widest mb-1">Time Until Match</p>
 										{#if nextMatchTime}
+											{@const nexusMatch = getNexusMatch(nextMatch)}
+											{@const displayTime = (nexusMatch?.times?.estimatedOnFieldTime) ? nexusMatch.times.estimatedOnFieldTime / 1000 : nextMatchTime}
 											<p class="text-2xl font-black text-white tabular-nums">
-												{formatCountdown(nextMatchTime, now)}
+												{formatCountdown(displayTime, now)}
 											</p>
 											<div class="text-[9px] text-zinc-500 mt-1 space-y-0.5">
+												{#if nexusMatch?.status}
+													<p class="text-green-400/80 font-black uppercase tracking-tighter mb-1">Status: {nexusMatch.status}</p>
+												{/if}
 												{#if nextMatch.time}
 													<p><span class="font-bold">Sched:</span> {formatMatchTime(nextMatch.time)}</p>
 												{/if}
 												{#if nextMatch.predicted_time && nextMatch.predicted_time !== nextMatch.time}
 													<p class="{nextMatch.predicted_time > nextMatch.time ? 'text-yellow-500/70' : ''}">
 														<span class="font-bold">Pred:</span> {formatMatchTime(nextMatch.predicted_time)}
+													</p>
+												{/if}
+												{#if nexusMatch?.times?.estimatedOnFieldTime}
+													<p class="text-purple-400/80">
+														<span class="font-bold">Nexus:</span> {formatMatchTime(nexusMatch.times.estimatedOnFieldTime / 1000)}
 													</p>
 												{/if}
 											</div>
@@ -4415,6 +4497,13 @@
 															<span class="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Upcoming</span>
 															{#if pred}
 																<span class="text-[10px] font-bold {pred.winProb > 0.5 ? 'text-red-400' : 'text-blue-400'}">{(Math.max(pred.winProb, 1 - pred.winProb) * 100).toFixed(0)}% {pred.winProb > 0.5 ? 'Red' : 'Blue'}</span>
+															{/if}
+															{@const nexusMatch = getNexusMatch(m)}
+															{#if nexusMatch?.status}
+																<span class="text-[10px] font-black text-purple-400 uppercase tracking-widest flex items-center gap-1">
+																	<svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>
+																	{nexusMatch.status}
+																</span>
 															{/if}
 														{/if}
 													</div>
