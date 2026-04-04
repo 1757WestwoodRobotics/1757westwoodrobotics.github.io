@@ -12,9 +12,26 @@
 	export let getVal;
 	export let allTeamsList = [];
 	export let readOnly = false;
+	export let teamMediaMap = new Map();
+	export let teamImageIndices = new Map();
+	export let onImageCycle = () => {};
 
 	$: summary = getTeamSummary(team);
 	$: colors = teamColorsMap?.get(team) || { primary: alliance === 'red' ? '#ef4444' : '#3b82f6', secondary: alliance === 'red' ? '#991b1b' : '#1e3a8a' };
+
+	$: images = (() => {
+		if (!team) return [];
+		const pitImg = summary?.pit ? getDriveDirectLink(getVal(summary.pit, 'Bot pic')) : null;
+		const tbaImages = teamMediaMap?.get(team) || [];
+		const imgs = [];
+		if (pitImg) imgs.push(pitImg);
+		tbaImages.forEach(img => {
+			if (img !== pitImg) imgs.push(img);
+		});
+		return imgs;
+	})();
+	$: currentIdx = teamImageIndices?.get(team) || 0;
+	$: currentImg = images[currentIdx];
 
 	const borderColor = alliance === 'red' ? 'border-red-500/30' : 'border-blue-500/30';
 	const hoverBorder = alliance === 'red' ? 'hover:border-red-500' : 'hover:border-blue-500';
@@ -78,14 +95,22 @@
 				</div>
 			</div>
 			<!-- Bot Picture -->
-			{#if summary.pit && getDriveDirectLink(getVal(summary.pit, 'Bot pic'))}
+			{#if currentImg}
 				<div
-					class="w-20 h-20 md:w-24 md:h-24 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-[var(--team-primary)] transition-all flex-shrink-0"
+					class="w-20 h-20 md:w-24 md:h-24 rounded-lg md:rounded-xl overflow-hidden border-2 border-white/10 shadow-lg bg-black/40 cursor-zoom-in hover:border-[var(--team-primary)] transition-all flex-shrink-0 relative group/img"
 					role="button"
 					tabindex="0"
-					on:click|stopPropagation={() => onImageClick(getDriveDirectLink(getVal(summary.pit, 'Bot pic')))}
-					on:keydown={(e) => e.key === 'Enter' && onImageClick(getDriveDirectLink(getVal(summary.pit, 'Bot pic')))}>
-					<img src={getDriveDirectLink(getVal(summary.pit, 'Bot pic'))} alt="Bot" class="w-full h-full object-contain" />
+					on:click|stopPropagation={() => onImageClick(currentImg)}
+					on:keydown={(e) => e.key === 'Enter' && onImageClick(currentImg)}>
+					<img src={currentImg} alt="Bot" class="w-full h-full object-contain" />
+					
+					{#if images.length > 1}
+						<button 
+							class="absolute bottom-1 right-1 bg-black/80 text-white text-[7px] font-black px-1.5 py-0.5 rounded-full border border-white/10 opacity-0 group-hover/img:opacity-100 transition-opacity z-20"
+							on:click|stopPropagation={() => onImageCycle(team)}>
+							{currentIdx + 1}/{images.length} ↻
+						</button>
+					{/if}
 				</div>
 			{/if}
 		</div>

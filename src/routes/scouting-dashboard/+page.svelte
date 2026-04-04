@@ -38,6 +38,7 @@
 		teamStats: false,
 		teamColors: false,
 		teamDetails: false,
+		teamMedia: false,
 		rankings: false,
 		yearStats: false
 	};
@@ -49,6 +50,8 @@
 	let teamStatsMap = new Map(); 
 	let teamColorsMap = new Map();
 	let teamDetailsMap = new Map();
+	let teamMediaMap = new Map();
+	let teamImageIndices = new Map();
 	let matchResultsMap = new Map();
 	let eventRankings = [];
 	let eventOprs = {}; 
@@ -714,6 +717,11 @@
 			await fetchAllTeamDetails();
 			loadingSteps.teamDetails = false;
 
+			currentStep = 'teamMedia';
+			loadingSteps.teamMedia = true;
+			await fetchAllTeamMedia();
+			loadingSteps.teamMedia = false;
+
 			currentStep = 'yearStats';
 			loadingSteps.yearStats = true;
 			await fetchYearStats();
@@ -737,6 +745,7 @@
 				stats: Array.from(teamStatsMap.entries()),
 				colors: Array.from(teamColorsMap.entries()),
 				details: Array.from(teamDetailsMap.entries()),
+				media: Array.from(teamMediaMap.entries()),
 				yearStats: yearStats,
 				timestamp: Date.now()
 			}));
@@ -1027,10 +1036,76 @@
 		}
 	}
 
+	async function fetchAllTeamMedia(teamsToFetchOverride = null) {
+		const uniqueTeams = (teamsToFetchOverride || allTeamsList).filter(t => !teamMediaMap.has(t));
+		
+		if (uniqueTeams.length === 0) return;
+
+		try {
+			// Fetch team media concurrently
+			const promises = uniqueTeams.map(teamNum => 
+				fetch(`https://www.thebluealliance.com/api/v3/team/frc${teamNum}/media/${CURRENT_YEAR}`, {
+					headers: { 'X-TBA-Auth-Key': TBA_KEY }
+				}).then(res => res.ok ? res.json().then(data => ({ teamNum, data })) : { teamNum, data: [] })
+				.catch(e => {
+					console.error(`Error fetching TBA media for ${teamNum}:`, e);
+					return { teamNum, data: [] };
+				})
+			);
+
+			const results = await Promise.all(promises);
+			let updated = false;
+			results.forEach(({ teamNum, data }) => {
+				const images = (data && Array.isArray(data)) ? data
+					.filter(m => ['imgur', 'cdphotothread', 'image'].includes(m.type))
+					.map(m => {
+						if (m.direct_url) return m.direct_url;
+						if (m.type === 'imgur') return `https://i.imgur.com/${m.foreign_key}.png`;
+						if (m.type === 'cdphotothread' && m.details?.image_partial) {
+							return `https://www.chiefdelphi.com/media/img/${m.details.image_partial}`;
+						}
+						return null;
+					})
+					.filter(Boolean) : [];
+				teamMediaMap.set(teamNum, images);
+				updated = true;
+			});
+
+			if (updated) {
+				teamMediaMap = teamMediaMap;
+				saveCache();
+			}
+		} catch (e) {
+			console.error('Error fetching team media:', e);
+		}
+	}
+
+	function getTeamImages(teamNum) {
+		const pit = pitData.find(p => getVal(p, 'Team number') === teamNum);
+		const pitImg = pit ? getDriveDirectLink(getVal(pit, 'Bot pic')) : null;
+		const tbaImages = teamMediaMap.get(teamNum) || [];
+		
+		const images = [];
+		if (pitImg) images.push(pitImg);
+		tbaImages.forEach(img => {
+			if (img !== pitImg) images.push(img);
+		});
+		return images;
+	}
+
+	function cycleTeamImage(teamNum) {
+		const images = getTeamImages(teamNum);
+		if (images.length <= 1) return;
+		const current = teamImageIndices.get(teamNum) || 0;
+		teamImageIndices.set(teamNum, (current + 1) % images.length);
+		teamImageIndices = teamImageIndices;
+	}
+
 	async function fetchSelectedTeamDetails(teamNumber) {
 		statsLoading = true;
 		teamStats = null;
 		fetchTeamColors(teamNumber); // Async fetch in background
+		fetchAllTeamMedia([teamNumber]); // Async fetch in background
 		
 		try {
 			let tbaData = teamDetailsMap.get(teamNumber);
@@ -1112,7 +1187,7 @@
 		const cached = localStorage.getItem('scouting_cache');
 		if (cached) {
 			const parsed = JSON.parse(cached);
-			const { data, pit, teams, rankings, stats, colors, details, yearStats: cachedYearStats, timestamp } = parsed;
+			const { data, pit, teams, rankings, stats, colors, details, media, yearStats: cachedYearStats, timestamp } = parsed;
 			console.log('Cache found, age:', Date.now() - timestamp);
 			if (Date.now() - timestamp < 3600000) {
 				console.log('Cache is fresh, loading from cache');
@@ -1123,6 +1198,7 @@
 				if (stats) teamStatsMap = new Map(stats);
 				if (colors) teamColorsMap = new Map(colors);
 				if (details) teamDetailsMap = new Map(details);
+				if (media) teamMediaMap = new Map(media);
 				if (cachedYearStats) yearStats = cachedYearStats;
 				
 				// Still show loading while fetching fresh data
@@ -1151,6 +1227,16 @@
 					return fetchAllTeamStats();
 				}).then(() => {
 					loadingSteps.teamStats = false;
+					currentStep = 'teamDetails';
+					loadingSteps.teamDetails = true;
+					return fetchAllTeamDetails();
+				}).then(() => {
+					loadingSteps.teamDetails = false;
+					currentStep = 'teamMedia';
+					loadingSteps.teamMedia = true;
+					return fetchAllTeamMedia();
+				}).then(() => {
+					loadingSteps.teamMedia = false;
 					currentStep = 'yearStats';
 					loadingSteps.yearStats = true;
 					return fetchYearStats();
@@ -2760,6 +2846,22 @@
 						<p class="text-xs text-zinc-400">{teamDetailsMap.size} profiles indexed</p>
 					</div>
 				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamMedia || !teamMediaMap.size ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.teamMedia}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if teamMediaMap.size}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Team Media (TBA)</p>
+						<p class="text-xs text-zinc-400">{teamMediaMap.size} galleries indexed</p>
+					</div>
+				</div>
 			</div>
 
 			<!-- Loading Message -->
@@ -2918,6 +3020,9 @@
 					{#each allTeamsList.filter(tNum => !searchTerm || tNum.includes(searchTerm)) as teamNum}
 						{@const pit = pitData.find(p => getVal(p, 'Team number') === teamNum)}
 						{@const colors = teamColorsMap.get(teamNum) || { primary: '#3b82f6', secondary: '#1e40af' }}
+						{@const images = getTeamImages(teamNum)}
+						{@const currentIdx = teamImageIndices.get(teamNum) || 0}
+						{@const currentImg = images[currentIdx]}
 						<div class="bg-zinc-900/40 border-2 border-zinc-800 rounded-xl md:rounded-[2.5rem] p-3 md:p-6 hover:border-zinc-700 transition-all group cursor-pointer overflow-hidden relative shadow-2xl" 
 							style="--team-primary: {colors.primary}; --team-secondary: {colors.secondary}"
 							role="button"
@@ -2941,14 +3046,23 @@
 								{/if}
 							</div>
 
-							{#if pit && getDriveDirectLink(getVal(pit, 'Bot pic'))}
+							{#if currentImg}
 								<div class="w-full h-48 rounded-3xl overflow-hidden mb-6 bg-black/40 border border-white/5 relative group-hover:scale-[1.02] transition-transform duration-500 cursor-zoom-in"
 									role="button"
 									tabindex="0"
-									on:click|stopPropagation={() => openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}
-									on:keydown={(e) => e.key === 'Enter' && openImageViewer(getDriveDirectLink(getVal(pit, 'Bot pic')))}>
-									<img src={getDriveDirectLink(getVal(pit, 'Bot pic'))} alt="Robot" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
+									on:click|stopPropagation={() => openImageViewer(currentImg)}
+									on:keydown={(e) => e.key === 'Enter' && openImageViewer(currentImg)}>
+									<img src={currentImg} alt="Robot" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
 									<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+									
+									{#if images.length > 1}
+										<button 
+											class="absolute bottom-3 right-3 bg-black/60 text-white text-[10px] font-black px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10 hover:bg-white/20 transition-colors z-20"
+											on:click|stopPropagation={() => cycleTeamImage(teamNum)}>
+											IMAGE {currentIdx + 1}/{images.length} ↻
+										</button>
+									{/if}
+
 									<div class="absolute top-3 right-3 bg-black/60 text-white text-xs font-black px-3 py-1 rounded-full backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
 										🔍 Click to zoom
 									</div>
@@ -3075,6 +3189,9 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
+								{teamMediaMap}
+								{teamImageIndices}
+								onImageCycle={cycleTeamImage}
 								onTeamInput={(idx, val) => { simRedTeams[idx] = val; simRedTeams = [...simRedTeams]; fetchTeamColors(val); }}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
@@ -3108,6 +3225,9 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
+								{teamMediaMap}
+								{teamImageIndices}
+								onImageCycle={cycleTeamImage}
 								onTeamInput={(idx, val) => { simBlueTeams[idx] = val; simBlueTeams = [...simBlueTeams]; fetchTeamColors(val); }}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
@@ -5145,6 +5265,9 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
+								{teamMediaMap}
+								{teamImageIndices}
+								onImageCycle={cycleTeamImage}
 								onTeamInput={() => {}}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
@@ -5179,6 +5302,9 @@
 								{getTeamSummary}
 								{teamColorsMap}
 								{teamDetailsMap}
+								{teamMediaMap}
+								{teamImageIndices}
+								onImageCycle={cycleTeamImage}
 								onTeamInput={() => {}}
 								onTeamClick={(t) => handleRowClick({ 'Team #': t })}
 								onImageClick={(url) => openImageViewer(url)}
@@ -5381,7 +5507,6 @@
 
 		<!-- Image Container -->
 		<div class="w-full h-full flex items-center justify-center p-8 overflow-hidden"
-			on:click|stopPropagation
 			on:wheel={handleViewerWheel}
 			on:mousedown={handleViewerMouseDown}
 			on:mousemove={handleViewerMouseMove}
@@ -5392,6 +5517,7 @@
 			on:touchend={handleViewerTouchEnd}
 			style="cursor: {viewerScale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'}">
 			<img 
+				on:click|stopPropagation
 				src={viewerImageSrc} 
 				alt="Robot fullscreen view"
 				class="max-w-full max-h-full object-contain select-none transition-transform duration-100"
