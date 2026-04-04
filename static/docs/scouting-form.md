@@ -89,13 +89,6 @@ Same hold-to-time pattern with teleop-specific actions:
 | NEUTRAL ZONE | `tele_neutral` | Robot is in the neutral zone |
 | OPPONENT ZONE | `tele_opponent` | Robot is in the opponent zone |
 
-### Teleop Counters (Tap to Increment)
-
-| Button | Code | What to Track |
-|--------|------|---------------|
-| Fuel Scored | `tele_fuel` | Each fuel piece scored (tap once per piece) |
-| Fuel Fed | `tele_fed` | Each fuel piece fed to partner |
-
 ### Teleop Checkboxes
 
 - **Alliance won auto?** — Check if your alliance won the autonomous period
