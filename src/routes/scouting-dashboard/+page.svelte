@@ -2880,8 +2880,6 @@
 	<meta name="description" content="Scouting view for 1757 - REBUILT 2026" />
 </svelte:head>
 
-<Navbar />
-
 <!-- Loading Overlay -->
 {#if loading}
 	<div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
@@ -4384,7 +4382,7 @@
 								<p class="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-3">Full Event Schedule ({overviewTeamSchedule.length} matches)</p>
 							{/if}
 							{#if overviewTeam && nextMatch}
-								<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3 mb-6">
+								<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3 mb-8 sticky top-4 z-30 bg-[#0a0a0c]/80 backdrop-blur-md p-3 -m-3 rounded-[2rem] border border-white/5 shadow-2xl">
 									<!-- Next Match -->
 									<div class="bg-zinc-900/60 border-2 border-purple-500/20 rounded-2xl p-4 backdrop-blur-xl">
 										<p class="text-[8px] font-black text-purple-400 uppercase tracking-widest mb-1">Next Match</p>
@@ -4419,31 +4417,35 @@
 									</div>
 
 									<!-- Time Until Next Match -->
-									<div class="bg-zinc-900/60 border-2 border-green-500/20 rounded-2xl p-4 backdrop-blur-xl">
+									<div class="bg-zinc-900/60 border-2 border-green-500/20 rounded-2xl p-4 backdrop-blur-xl xl:col-span-2">
 										<p class="text-[8px] font-black text-green-400 uppercase tracking-widest mb-1">Time Until Match</p>
 										{#if nextMatchTime}
 											{@const nexusMatch = getNexusMatch(nextMatch)}
 											{@const displayTime = (nexusMatch?.times?.estimatedOnFieldTime) ? nexusMatch.times.estimatedOnFieldTime / 1000 : nextMatchTime}
-											<p class="text-2xl font-black text-white tabular-nums">
-												{formatCountdown(displayTime, now)}
-											</p>
-											<div class="text-[9px] text-zinc-500 mt-1 space-y-0.5">
-												{#if nexusMatch?.status}
-													<p class="text-green-400/80 font-black uppercase tracking-tighter mb-1">Status: {nexusMatch.status}</p>
-												{/if}
-												{#if nextMatch.time}
-													<p><span class="font-bold">Sched:</span> {formatMatchTime(nextMatch.time)}</p>
-												{/if}
-												{#if nextMatch.predicted_time && nextMatch.predicted_time !== nextMatch.time}
-													<p class="{nextMatch.predicted_time > nextMatch.time ? 'text-yellow-500/70' : ''}">
-														<span class="font-bold">Pred:</span> {formatMatchTime(nextMatch.predicted_time)}
+											<div class="flex items-center justify-between gap-6">
+												<div class="flex-1">
+													<p class="text-4xl font-black text-white tabular-nums leading-none">
+														{formatCountdown(displayTime, now)}
 													</p>
-												{/if}
-												{#if nexusMatch?.times?.estimatedOnFieldTime}
-													<p class="text-purple-400/80">
-														<span class="font-bold">Nexus:</span> {formatMatchTime(nexusMatch.times.estimatedOnFieldTime / 1000)}
-													</p>
-												{/if}
+													{#if nexusMatch?.status}
+														<p class="text-green-400 font-black uppercase tracking-tighter text-[10px] mt-2">Status: {nexusMatch.status}</p>
+													{/if}
+												</div>
+												<div class="text-xs text-zinc-500 space-y-1.5 text-right border-l border-zinc-800 pl-6 flex-shrink-0">
+													{#if nextMatch.time}
+														<p><span class="font-black text-zinc-400 uppercase tracking-tighter mr-1">Sched:</span> {formatMatchTime(nextMatch.time)}</p>
+													{/if}
+													{#if nextMatch.predicted_time && nextMatch.predicted_time !== nextMatch.time}
+														<p class="{nextMatch.predicted_time > nextMatch.time ? 'text-yellow-500/70' : ''}">
+															<span class="font-black text-zinc-400 uppercase tracking-tighter mr-1">Pred:</span> {formatMatchTime(nextMatch.predicted_time)}
+														</p>
+													{/if}
+													{#if nexusMatch?.times?.estimatedOnFieldTime}
+														<p class="text-purple-400/80">
+															<span class="font-black uppercase tracking-tighter mr-1">Nexus:</span> {formatMatchTime(nexusMatch.times.estimatedOnFieldTime / 1000)}
+														</p>
+													{/if}
+												</div>
 											</div>
 										{:else}
 											<p class="text-sm text-zinc-500 italic">No time data</p>
