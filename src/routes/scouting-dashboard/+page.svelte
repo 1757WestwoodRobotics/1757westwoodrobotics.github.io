@@ -663,7 +663,7 @@
 				if (resPit.ok) {
 					const textPit = await resPit.text();
 					const rawPit = parseCSV(textPit, 1);
-					pitData = rawPit
+					const processedPit = rawPit
 						.map(row => {
 							const teamNum = getVal(row, 'Team number');
 							if (teamNum && teamNum !== 'N/A') {
@@ -676,6 +676,13 @@
 							const teamNum = getVal(row, 'Team number');
 							return teamNum && teamNum !== 'N/A';
 						});
+					
+					// Ensure only the latest information is kept for each team (assuming chronological order in CSV)
+					const latestPitMap = new Map();
+					processedPit.forEach(row => {
+						latestPitMap.set(getVal(row, 'Team number'), row);
+					});
+					pitData = Array.from(latestPitMap.values());
 				}
 				loadingSteps.pitData = false;
 			}
