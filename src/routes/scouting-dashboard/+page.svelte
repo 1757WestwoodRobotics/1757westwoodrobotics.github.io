@@ -2712,7 +2712,7 @@
 
 <!-- Loading Overlay -->
 {#if loading}
-	<div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/95 backdrop-blur-lg animate-in fade-in duration-300">
+	<div class="fixed inset-0 z-[150] flex items-center justify-center bg-black/60 backdrop-blur-xl animate-in fade-in duration-300">
 		<div class="flex flex-col items-center gap-6 max-w-md px-6">
 			<!-- Logo/Icon -->
 			<div class="flex flex-col items-center gap-4">
@@ -2805,6 +2805,22 @@
 					</div>
 				</div>
 
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.rankings || !eventRankings.length ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.rankings}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if eventRankings.length}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Event Rankings (TBA)</p>
+						<p class="text-xs text-zinc-400">{eventRankings.length} teams ranked</p>
+					</div>
+				</div>
+
 				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.teamStats || !teamStatsMap.size ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
 					<div class="flex-shrink-0">
 						{#if loadingSteps.teamStats}
@@ -2867,6 +2883,22 @@
 					<div class="flex-1 min-w-0">
 						<p class="text-sm font-black text-white uppercase tracking-widest">Team Media (TBA)</p>
 						<p class="text-xs text-zinc-400">{teamMediaMap.size} galleries indexed</p>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-3 p-3 rounded-lg {loadingSteps.yearStats || !yearStats ? 'bg-blue-600/20 border-2 border-blue-500/50' : 'bg-zinc-900/40 border border-zinc-800'}">
+					<div class="flex-shrink-0">
+						{#if loadingSteps.yearStats}
+							<div class="w-5 h-5 border-2 border-transparent border-t-blue-500 border-r-blue-500 rounded-full animate-spin"></div>
+						{:else if yearStats}
+							<svg class="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+						{:else}
+							<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+						{/if}
+					</div>
+					<div class="flex-1 min-w-0">
+						<p class="text-sm font-black text-white uppercase tracking-widest">Year Stats (Statbotics)</p>
+						<p class="text-xs text-zinc-400">{yearStats ? '2026 Season Data Loaded' : 'Awaiting Statbotics...'}</p>
 					</div>
 				</div>
 			</div>
@@ -4815,7 +4847,7 @@
 {#if showSosLeaderboard}
 	{@const sosMap = computeEventSOS()}
 	{@const sosList = [...sosMap.entries()].sort((a, b) => b[1].sosValue - a[1].sosValue)}
-	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200"
+	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
 		role="dialog"
 		aria-modal="true"
 		on:click|self={() => showSosLeaderboard = false}
@@ -4856,7 +4888,7 @@
 <!-- Match Scouting Data Popup -->
 {#if selectedMatchPopup}
 	{@const matchData = getMatchScoutingData(selectedMatchPopup.match_number)}
-	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200" 
+	<div class="fixed inset-0 z-[120] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200" 
 		role="dialog"
 		aria-modal="true"
 		on:click|self={() => selectedMatchPopup = null}
@@ -5165,7 +5197,7 @@
 <!-- Match Simulator Modal -->
 {#if matchSimModal}
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-[130] bg-black/90 backdrop-blur-2xl flex items-start justify-center overflow-y-auto p-4 md:p-8"
+	<div class="fixed inset-0 z-[130] bg-black/60 backdrop-blur-xl flex items-start justify-center overflow-y-auto p-4 md:p-8"
 		on:click|self={closeMatchSimModal}
 		on:keydown={(e) => { if (e.key === 'Escape') closeMatchSimModal(); }}
 		tabindex="-1">
@@ -5412,7 +5444,7 @@
 <!-- Break Windows Modal -->
 {#if showBreakWindowsModal}
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
-	<div class="fixed inset-0 z-[125] flex items-center justify-center p-2 md:p-4 bg-black/95 backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-200"
+	<div class="fixed inset-0 z-[125] flex items-center justify-center p-2 md:p-4 bg-black/60 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-200"
 		role="dialog"
 		aria-modal="true"
 		on:click|self={() => showBreakWindowsModal = false}
@@ -5466,7 +5498,7 @@
 
 <!-- Image Viewer Modal -->
 {#if viewerImageSrc}
-	<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/98 backdrop-blur-lg animate-in fade-in duration-200"
+	<div class="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-xl animate-in fade-in duration-200"
 		role="dialog"
 		aria-modal="true"
 		aria-label="Image viewer"
