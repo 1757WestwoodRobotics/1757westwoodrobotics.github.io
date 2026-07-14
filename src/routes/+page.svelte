@@ -292,6 +292,9 @@
 					<a class="w-24" href="https://chasecorp.com/?srsltid=AfmBOorDPcwtwKZ6bX4MZ7KIE7BjTeKqg5HijOm-n5i3TUlUU4nfhjVb" target="_blank">
 						<img src="/img/sponsors/chasecorp.webp" />
 					</a>
+					<a class="w-24" href="https://www.printmaster.com" target="_blank">
+						<img src="/img/sponsors/PrintMaster.png" />
+					</a>
 				</div>
 			</div>
 		</div>
