@@ -160,6 +160,10 @@
 		<div class="bg-slate-800 rounded-xl drop-shadow-md mt-9">
 			<svelte:component this={Carousel} bind:this={carousel} autoplay>
 				<div>
+					<img src="/img/robots/2026rebuilt.png" alt="Rebuilt"/>
+					<h1>2026 Rebuilt - "Orion"</h1>
+				</div>
+				<div>
 					<img src="/img/robots/2025reefscape.png" alt="Reefscape"/>
 					<h1>2025 Reefscape - "PERSEUS"</h1>
 				</div>
@@ -253,17 +257,17 @@
 			<div class="p-8 bg-stone-400 rounded-xl drop-shadow-md m-2">
 				<p class="mb-4"><b>Silver Tier</b></p>
 				<div class="flex justify-around items-center flex-wrap gap-2">
-					<a class="w-32" href="https://www.medtronic.com/us-en/index.html" target="_blank">
-						<img src="/img/sponsors/medtronic.png" />
-					</a>
 					<a class="w-32" href="https://www.te.com/en/home.html" target="_blank">
 						<img src="/img/sponsors/te connectivity.svg" />
 					</a>
 					<a class="w-32" href="https://www.globalp.com/" target="_blank">
 						<img src="/img/sponsors/global partners.webp" />
 					</a>
-					<a class="w-32" href="http://actfastenersinc.com/" target="_blank">
-						<img src="/img/sponsors/actfasteners.png" />
+					<a class="w-32" href="https://www.mathworks.com" target="_blank">
+						<img src="/img/sponsors/mathworks.webp" />
+					</a>
+					<a class="w-32" href="https://www.group1auto.com" target="_blank">
+						<img src="/img/sponsors/group1auto.webp" />
 					</a>
 				</div>
 			</div>
@@ -273,17 +277,8 @@
 					<a class="w-24" href="https://www.needhambank.com/" target="_blank">
 						<img src="/img/sponsors/needhambank.svg" />
 					</a>
-					<a class="w-24" href="https://www.se.com/us/en/" target="_blank">
-						<img src="/img/sponsors/schneiderelectric.png" />
-					</a>
-					<a class="w-24" href="https://www.fabworks.com/" target="_blank">
-						<img src="/img/sponsors/fabworks.svg" />
-					</a>
 					<a class="w-24" href="https://www.dedhamsavings.com/" target="_blank">
 						<img src="/img/sponsors/dedhamsavings.svg" />
-					</a>
-					<a class="w-24" href="https://printmasteronline.com/" target="_blank">
-						<img src="/img/sponsors/PrintMaster.png" />
 					</a>
 					<a class="w-24" href="https://www.poiriersales.com/" target="_blank">
 						<img src="/img/sponsors/poirier.png" />
@@ -294,7 +289,9 @@
 					<a class="w-24" href="https://polymaker.com/" target="_blank">
 						<img src="/img/sponsors/polymaker.webp" />
 					</a>
-					<h3 class="w-24">Peng Family</h3>
+					<a class="w-24" href="https://chasecorp.com/?srsltid=AfmBOorDPcwtwKZ6bX4MZ7KIE7BjTeKqg5HijOm-n5i3TUlUU4nfhjVb" target="_blank">
+						<img src="/img/sponsors/chasecorp.webp" />
+					</a>
 				</div>
 			</div>
 		</div>

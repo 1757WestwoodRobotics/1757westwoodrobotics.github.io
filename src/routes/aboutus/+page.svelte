@@ -111,14 +111,14 @@
 					class="rounded-full aspect-square ring-4 w-32 mb-5 rotate-6 ring-green-800"
 				/>
 				<b>Luke Szigety</b>
-				Technical Lead
+				Co-Vice Captain
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img 
-					src="/img/team/isabel.webp" 
+					src="" 
 					class="rounded-full aspect-square ring-4 w-32 mb-5 -rotate-1 ring-purple-800" />
-				<b>Isabel Wu</b>
-				Business Lead
+				<b>Carson Koukkos</b>
+				Co-Vice Captain
 			</div>
 		</div>
 		<br />
@@ -150,6 +150,14 @@
 				<b>Dwight Meglan</b>
 				Mentor
 			</div>
+			<div class="flex justify-center align-center items-center flex-col">
+				<img
+					src="/img/team/luke_m.webp"
+					class="rounded-full aspect-square ring-4 w-32 ring-yellow-600 mb-5"
+				/>
+				<b>Luke Maxwell</b>
+				Technical Mentor
+			</div>
 		</div>
 		<br />
 		<h3 class="text-xl">Other Leadership</h3>
@@ -158,43 +166,27 @@
 		>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/constantina.webp"
-					class="rounded-full aspect-square ring-4 w-32 ring-fuchsia-800 mb-5 -rotate-2"
-				/>
-				<b>Constantina Flevarakis</b>
-				Design Lead
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
 					src="/img/team/hamsini.webp"
 					class="rounded-full aspect-square ring-4 w-32 -rotate-12 ring-yellow-800 mb-5"
 				/>
 				<b>Hamsini Siddi</b>
-				Outreach Co-Lead
+				Outreach Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/duanmu.webp"
-					class="rounded-full aspect-square ring-4 w-32 ring-green-800 mb-5"
-				/>
-				<b>Duanmu Jiang</b>
-				Outreach Co-Lead
-			</div>
-			<div class="flex justify-center align-center items-center flex-col">
-				<img
-					src="/img/team/henry.webp"
+					src="/img/team/isabel.webp"
 					class="rounded-full aspect-square ring-4 w-32 ring-cyan-800 mb-7"
 				/>
-				<b>Henry Marsland</b>
-				Open Alliance Co-Lead
+				<b>Isabel Wu</b>
+				Finance Lead
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src="/img/team/yuhan.webp"
+					src=""
 					class="rounded-full aspect-square ring-4 w-32 rotate-3 ring-pink-800 mb-7"
 				/>
-				<b>Yuhan Chen</b>
-				Open Alliance Co-Lead
+				<b>Aarthi Movva</b>
+				Media Lead
 			</div>
 		</div>
 	</span>

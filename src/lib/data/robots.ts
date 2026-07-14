@@ -85,7 +85,8 @@ export const robots: Robot[] = [
 			]
 		},
 		competitionResults: [
-			{ event: 'URI District Event', qualRecord: '6-8-0', rank: 'Ranked 29th' }
+			{ event: 'URI District Event', qualRecord: '6-6-0', rank: 'Ranked 19th' },
+			{ event: 'WPI District Event', qualRecord: '3-9-0', rank: 'Ranked 29th' }
 		],
 		galleryImages: []
 	},

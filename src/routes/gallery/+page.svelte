@@ -12,6 +12,27 @@
 	});
 
 	let urls = {
+		'2026': [
+			'/img/gallery/2026/URIpits1.webp',
+			'/img/gallery/2026/URIcalibration.webp',
+			'/img/gallery/2026/URIpits2.webp',
+			'/img/gallery/2026/URIcompqueue.webp',
+			'/img/gallery/2026/URIpits3.webp',
+			'/img/gallery/2026/URIcomp1.webp',
+			'/img/gallery/2026/URIcomp2.webp',
+			'/img/gallery/2026/URIcomp3.webp',
+			'/img/gallery/2026/URIcomp4.webp',
+			'/img/gallery/2026/WPIcomp1.webp',
+			'/img/gallery/2026/WPIcomp2.webp',
+			'/img/gallery/2026/WPIcomp3.webp',
+			'/img/gallery/2026/WPIcomp4.webp',
+			'/img/gallery/2026/WPIauto.webp',
+			'/img/gallery/2026/WPIaction.webp',
+			'/img/gallery/2026/Nefirst2.webp',
+			'/img/gallery/2026/Nefirst3.webp',
+			'/img/gallery/2026/Openhouse.webp',
+			'/img/gallery/2026/Openhouse2.webp'
+		],
 		'2025': [
 			'/img/gallery/2025/NERD picture.webp',
 			'/img/gallery/2025/Nerdscoring.webp',
@@ -376,6 +397,25 @@
 
 <div class="w-full min-h-screen bg-slate-900 text-white">
 	<br />
+	<h3 class="w-full text-center text-5xl">2026: Rebuilt</h3>
+	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
+		<svelte:component
+			this={Carousel}
+			bind:this={carousel}
+			autoplay
+			pauseOnFocus
+			autoplayProgressVisible
+			let:loaded
+		>
+			{#each urls['2026'] as url, imageIndex}
+				<div class="mx-auto my-4 w-full h-full flex items-center justify-center align-center">
+					{#if loaded.includes(imageIndex)}
+						<img src={url} class="max-h-[70vh]" />
+					{/if}
+				</div>
+			{/each}
+		</svelte:component>
+	</div>
 	<h3 class="w-full text-center text-5xl">2025: Reefscape</h3>
 	<div class="rounded-xl p-4 drop-shadow-sm bg-slate-800 m-4">
 		<svelte:component
