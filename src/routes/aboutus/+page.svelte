@@ -115,7 +115,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img 
-					src="" 
+					src="/img/team/carson.webp" 
 					class="rounded-full aspect-square ring-4 w-32 mb-5 -rotate-1 ring-purple-800" />
 				<b>Carson Koukkos</b>
 				Co-Vice Captain
@@ -182,7 +182,7 @@
 			</div>
 			<div class="flex justify-center align-center items-center flex-col">
 				<img
-					src=""
+					src="/img/team/aarthi.webp"
 					class="rounded-full aspect-square ring-4 w-32 rotate-3 ring-pink-800 mb-7"
 				/>
 				<b>Aarthi Movva</b>
